@@ -1,6 +1,15 @@
 {
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/proyecto-pes/browser"
+      }
+    }
+  ],
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/" }
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }
