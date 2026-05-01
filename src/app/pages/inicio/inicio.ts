@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AfterViewInit, Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
 import { DialogModule } from 'primeng/dialog';
 import { GalleriaModule } from 'primeng/galleria';
-import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-inicio',
@@ -14,7 +14,9 @@ import { ApiService } from '../../services/api.service';
   styleUrl: './inicio.css',
 })
 export class Inicio implements OnInit, AfterViewInit, OnDestroy {
-  mostrarPostulaciones = true;
+  @HostBinding('class.dark') temaOscuro = false;
+
+  mostrarPostulaciones = false;
   mostrarImagenPopup = false;
   mostrarDetalleNoticia = false;
   noticiaSeleccionada: Noticia | null = null;
@@ -29,6 +31,10 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
     imagenDestacada: '',
     imagenesCarrusel: [] as string[],
     imagenesGaleria: [] as GaleriaImg[],
+    mostrarPopup: true,
+    imagenPopup: '',
+    tituloPopup: '',
+    cuerpoPopup: '',
   };
 
   get imgDestacada(): string {
@@ -63,10 +69,13 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
   partidos: Partido[] = [];
 
   profesores: any[] = [];
-  constructor(private router: Router, private apiService: ApiService) {}
+
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.apiService.getConfig().subscribe({
+    this.temaOscuro = localStorage.getItem('inicio-tema') === 'oscuro';
+
+    this.http.get<any>('http://localhost:3000/config').subscribe({
       next: (config) => {
         if (config.tituloHeader) this.siteConfig.tituloHeader = config.tituloHeader;
         if (config.tituloBienvenida) this.siteConfig.tituloBienvenida = config.tituloBienvenida;
@@ -77,25 +86,30 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
           this.siteConfig.imagenesCarrusel = config.imagenesCarrusel;
         if (Array.isArray(config.imagenesGaleria) && config.imagenesGaleria.length > 0)
           this.siteConfig.imagenesGaleria = config.imagenesGaleria;
+        this.siteConfig.mostrarPopup = config.mostrarPopup ?? true;
+        if (config.imagenPopup) this.siteConfig.imagenPopup = config.imagenPopup;
+        if (config.tituloPopup) this.siteConfig.tituloPopup = config.tituloPopup;
+        if (config.cuerpoPopup) this.siteConfig.cuerpoPopup = config.cuerpoPopup;
+        if (this.siteConfig.mostrarPopup) this.mostrarPostulaciones = true;
       },
       error: () => {},
     });
 
-    this.apiService.getNoticias().subscribe({
+    this.http.get<Noticia[]>('http://localhost:3000/noticias').subscribe({
       next: (data) => {
         if (data && data.length > 0) this.noticias = data;
       },
       error: () => {},
     });
 
-    this.apiService.getPartidos().subscribe({
+    this.http.get<Partido[]>('http://localhost:3000/partidos').subscribe({
       next: (data) => {
         if (data && data.length > 0) this.partidos = data;
       },
       error: () => {},
     });
 
-    this.apiService.getPlanteles().subscribe({
+    this.http.get<any[]>('http://localhost:3000/planteles').subscribe({
       next: (data) => {
         if (data && data.length > 0) this.profesores = data;
       },
@@ -104,10 +118,6 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    if (typeof IntersectionObserver === 'undefined') {
-      return;
-    }
-
     const sectionIds = ['noticias', 'partidos', 'galerias', 'planteles'];
 
     this.observer = new IntersectionObserver(
@@ -130,6 +140,11 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.observer?.disconnect();
+  }
+
+  toggleTema(): void {
+    this.temaOscuro = !this.temaOscuro;
+    localStorage.setItem('inicio-tema', this.temaOscuro ? 'oscuro' : 'claro');
   }
 
   scrollTo(section: string): void {

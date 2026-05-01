@@ -2,6 +2,9 @@
 <header class="page-header">
   <h1>{{ siteConfig.tituloHeader }}</h1>
   <nav class="header-nav">
+    <button type="button" class="theme-toggle" (click)="toggleTema()" [title]="temaOscuro ? 'Modo claro' : 'Modo oscuro'">
+      <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
     <button pButton type="button" label="Postular" icon="pi pi-user-plus" size="small" (click)="navegarFormulario()"></button>
     <button pButton type="button" label="Subir Voucher" icon="pi pi-receipt" size="small" severity="secondary" (click)="navegarRegistro()"></button>
     <button pButton type="button" label="Iniciar Sesión" icon="pi pi-sign-in" size="small" severity="secondary" (click)="navegarLogin()"></button>
@@ -203,15 +206,15 @@
 
 <!-- ========= FLOATING BUTTON ========= -->
 <button
-  *ngIf="!mostrarPostulaciones"
+  *ngIf="siteConfig.mostrarPopup && !mostrarPostulaciones"
   type="button"
   class="floating-popup-button"
   (click)="abrirPopup()"
-  aria-label="Abrir postulaciones">
-  P
+  aria-label="Abrir aviso">
+  <i class="pi pi-megaphone"></i>
 </button>
 
-<!-- ========= DIALOG: POSTULACIONES ========= -->
+<!-- ========= DIALOG: POPUP AVISO ========= -->
 <p-dialog
   [(visible)]="mostrarPostulaciones"
   [modal]="true"
@@ -219,11 +222,11 @@
   [draggable]="false"
   [resizable]="false"
   styleClass="postulaciones-dialog"
-  header="Postulaciones aqui"
+  [header]="siteConfig.tituloPopup || 'Aviso'"
   (onHide)="cerrarPopup()">
   <div class="postulaciones-dialog-content">
-    <h1>Inscríbete en el club y comienza tu proceso de postulación.</h1>
-    <img src="media/1449849007-sub.jpg" alt="Imagen de inscripción del club" />
+    <img *ngIf="siteConfig.imagenPopup" [src]="siteConfig.imagenPopup" alt="Imagen del aviso" />
+    <p *ngIf="siteConfig.cuerpoPopup" style="white-space:pre-line; margin:0.75rem 0;">{{ siteConfig.cuerpoPopup }}</p>
     <button pButton type="button" label="Quiero postular" class="dialog-action" (click)="navegarFormulario()"></button>
   </div>
 </p-dialog>

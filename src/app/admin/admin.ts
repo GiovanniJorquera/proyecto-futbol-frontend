@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, NgIf, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -8,6 +9,8 @@ import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { TextareaModule } from 'primeng/textarea';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -16,12 +19,11 @@ import { catchError, of, timeout } from 'rxjs';
 import { EstadoPago, Pago } from '../models/pago';
 import { PagosService } from '../services/pagos.service';
 import { AuthService } from '../services/auth.service';
-import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ConfirmDialogModule, ToastModule],
+  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ToggleButtonModule, TextareaModule, ConfirmDialogModule, ToastModule],
   providers: [ConfirmationService, MessageService],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
@@ -100,17 +102,11 @@ export class AdminComponent implements OnInit {
 
   /* ── PAGOS ────────────────────────────────────── */
   pagosPendientes: Pago[] = [];
-  // (cargarPartidos and partido CRUD methods are after PAGOS section)
+  pagosAprobados: Pago[] = [];
   pagoSeleccionado: Pago | null = null;
   modalVoucherVisible = false;
   cargandoPagos = false;
-  usandoEjemplos = false;
-
-  private readonly pagosEjemplo: Pago[] = [
-    { id: 'pago-ejemplo-1', apoderado: 'Camila Rojas', alumno: 'Nicolás Rojas (12.345.678-9)', sede: 'Sede 1', monto: 25000, fecha: '2026-04-18', voucherBase64: '/media/comprobantetransbankboleta.webp', estado: 'pendiente' },
-    { id: 'pago-ejemplo-2', apoderado: 'Francisco Díaz', alumno: 'Tomás Díaz (13.456.789-0)', sede: 'Sede 2', monto: 30000, fecha: '2026-04-20', voucherBase64: '/media/comprobantetransbankboleta.webp', estado: 'pendiente' },
-    { id: 'pago-ejemplo-3', apoderado: 'Andrea Muñoz', alumno: 'Martina Muñoz (14.567.890-1)', sede: 'Sede 1', monto: 28000, fecha: '2026-04-22', voucherBase64: '/media/comprobantetransbankboleta.webp', estado: 'pendiente' },
-  ];
+  cargandoAprobados = false;
 
   /* ── PARTIDOS ─────────────────────────────────── */
   partidos: any[] = [];
@@ -131,6 +127,10 @@ export class AdminComponent implements OnInit {
     imagenDestacada: '',
     imagenesCarrusel: [] as string[],
     imagenesGaleria: [] as { url: string; descripcion: string }[],
+    mostrarPopup: true,
+    imagenPopup: '',
+    tituloPopup: '',
+    cuerpoPopup: '',
   };
   guardandoConfig = false;
   noticiasAdmin: any[] = [];
@@ -144,7 +144,7 @@ export class AdminComponent implements OnInit {
   ];
 
   constructor(
-    private apiService: ApiService,
+    private http: HttpClient,
     private router: Router,
     private pagosService: PagosService,
     private authService: AuthService,
@@ -159,8 +159,13 @@ export class AdminComponent implements OnInit {
     this.cargarDivisiones();
     this.cargarPartidos();
     this.cargarPendientes();
+    this.cargarAprobados();
     this.cargarConfig();
     this.cargarNoticiasAdmin();
+  }
+
+  private authHeaders() {
+    return { headers: new HttpHeaders({ Authorization: `Bearer ${this.authService.getToken()}` }) };
   }
 
   private toast(severity: 'success' | 'error' | 'warn' | 'info', summary: string, detail: string) {
@@ -174,7 +179,7 @@ export class AdminComponent implements OnInit {
   /* ── SOLICITUDES ──────────────────────────────── */
   cargarSolicitudes() {
     this.cargando = true;
-    this.apiService.getInscripciones().subscribe({
+    this.http.get<any[]>('http://localhost:3000/inscripciones', this.authHeaders()).subscribe({
       next: (data) => { this.solicitudes = data; this.cargando = false; },
       error: () => { this.toast('error', 'Error', 'No se pudieron cargar las solicitudes.'); this.cargando = false; }
     });
@@ -182,7 +187,7 @@ export class AdminComponent implements OnInit {
 
   aprobar(id: string) {
     this.confirmar('¿Estás seguro de <strong>aprobar</strong> a este jugador?', 'Aprobar inscripción', 'pi pi-check-circle', 'Sí, aprobar', 'p-button-success', () => {
-      this.apiService.aprobarInscripcion(id).subscribe({
+      this.http.put(`http://localhost:3000/aprobar/${id}`, {}, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Aprobado', 'El jugador fue aprobado.'); this.modalSolicitudVisible = false; this.cargarSolicitudes(); },
         error: () => this.toast('error', 'Error', 'No se pudo aprobar al jugador.')
       });
@@ -191,7 +196,7 @@ export class AdminComponent implements OnInit {
 
   rechazar(id: string) {
     this.confirmar('¿Estás seguro de <strong>rechazar</strong> a este jugador?', 'Rechazar inscripción', 'pi pi-exclamation-triangle', 'Sí, rechazar', 'p-button-danger', () => {
-      this.apiService.rechazarInscripcion(id).subscribe({
+      this.http.put(`http://localhost:3000/rechazar/${id}`, {}, this.authHeaders()).subscribe({
         next: () => { this.toast('warn', 'Rechazado', 'El jugador fue rechazado.'); this.modalSolicitudVisible = false; this.cargarSolicitudes(); },
         error: () => this.toast('error', 'Error', 'No se pudo rechazar al jugador.')
       });
@@ -202,7 +207,7 @@ export class AdminComponent implements OnInit {
 
   /* ── ESTUDIANTES ──────────────────────────────── */
   cargarEstudiantes() {
-    this.apiService.getEstudiantes().subscribe({
+    this.http.get<any[]>('http://localhost:3000/estudiantes', this.authHeaders()).subscribe({
       next: (data) => this.estudiantes = data,
       error: () => {}
     });
@@ -219,8 +224,8 @@ export class AdminComponent implements OnInit {
   guardarEstudiante() {
     if (!this.estudianteForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
     const req = this.estudianteEditando
-      ? this.apiService.saveEstudiante(this.estudianteForm, this.estudianteEditando._id)
-      : this.apiService.saveEstudiante(this.estudianteForm);
+      ? this.http.put(`http://localhost:3000/estudiantes/${this.estudianteEditando._id}`, this.estudianteForm, this.authHeaders())
+      : this.http.post('http://localhost:3000/estudiantes', this.estudianteForm, this.authHeaders());
     req.subscribe({
       next: () => { this.modalEstudianteVisible = false; this.toast('success', 'Guardado', `Estudiante ${this.estudianteEditando ? 'actualizado' : 'agregado'}.`); this.cargarEstudiantes(); },
       error: () => this.toast('error', 'Error', 'No se pudo guardar el estudiante.')
@@ -229,7 +234,7 @@ export class AdminComponent implements OnInit {
 
   eliminarEstudiante(id: string) {
     this.confirmar('¿Eliminar este estudiante?', 'Eliminar estudiante', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.apiService.deleteEstudiante(id).subscribe({
+      this.http.delete(`http://localhost:3000/estudiantes/${id}`, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Eliminado', 'Estudiante eliminado.'); this.cargarEstudiantes(); },
         error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
       });
@@ -238,7 +243,7 @@ export class AdminComponent implements OnInit {
 
   /* ── PROFESORES ───────────────────────────────── */
   cargarProfesores() {
-    this.apiService.getProfesores().subscribe({
+    this.http.get<any[]>('http://localhost:3000/profesores', this.authHeaders()).subscribe({
       next: (data) => this.profesores = data,
       error: () => {}
     });
@@ -256,8 +261,8 @@ export class AdminComponent implements OnInit {
     if (!this.profesorForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
     const data = { ...this.profesorForm, divisiones: this.profesorForm.divisionesTexto.split(',').map(d => d.trim()).filter(Boolean) };
     const req = this.profesorEditando
-      ? this.apiService.saveProfesor(data, this.profesorEditando._id)
-      : this.apiService.saveProfesor(data);
+      ? this.http.put(`http://localhost:3000/profesores/${this.profesorEditando._id}`, data, this.authHeaders())
+      : this.http.post('http://localhost:3000/profesores', data, this.authHeaders());
     req.subscribe({
       next: () => { this.modalProfesorVisible = false; this.toast('success', 'Guardado', `Profesor ${this.profesorEditando ? 'actualizado' : 'agregado'}.`); this.cargarProfesores(); },
       error: () => this.toast('error', 'Error', 'No se pudo guardar el profesor.')
@@ -266,7 +271,7 @@ export class AdminComponent implements OnInit {
 
   eliminarProfesor(id: string) {
     this.confirmar('¿Eliminar este profesor?', 'Eliminar profesor', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.apiService.deleteProfesor(id).subscribe({
+      this.http.delete(`http://localhost:3000/profesores/${id}`, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Eliminado', 'Profesor eliminado.'); this.cargarProfesores(); },
         error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
       });
@@ -275,7 +280,7 @@ export class AdminComponent implements OnInit {
 
   /* ── DIVISIONES ───────────────────────────────── */
   cargarDivisiones() {
-    this.apiService.getDivisiones().subscribe({
+    this.http.get<any[]>('http://localhost:3000/divisiones', this.authHeaders()).subscribe({
       next: (data) => this.divisiones = data,
       error: () => {}
     });
@@ -292,8 +297,8 @@ export class AdminComponent implements OnInit {
   guardarDivision() {
     if (!this.divisionForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
     const req = this.divisionEditando
-      ? this.apiService.saveDivision(this.divisionForm, this.divisionEditando._id)
-      : this.apiService.saveDivision(this.divisionForm);
+      ? this.http.put(`http://localhost:3000/divisiones/${this.divisionEditando._id}`, this.divisionForm, this.authHeaders())
+      : this.http.post('http://localhost:3000/divisiones', this.divisionForm, this.authHeaders());
     req.subscribe({
       next: () => { this.modalDivisionVisible = false; this.toast('success', 'Guardado', `División ${this.divisionEditando ? 'actualizada' : 'agregada'}.`); this.cargarDivisiones(); },
       error: () => this.toast('error', 'Error', 'No se pudo guardar la división.')
@@ -302,7 +307,7 @@ export class AdminComponent implements OnInit {
 
   eliminarDivision(id: string) {
     this.confirmar('¿Eliminar esta división?', 'Eliminar división', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.apiService.deleteDivision(id).subscribe({
+      this.http.delete(`http://localhost:3000/divisiones/${id}`, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Eliminada', 'División eliminada.'); this.cargarDivisiones(); },
         error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
       });
@@ -311,7 +316,7 @@ export class AdminComponent implements OnInit {
 
   /* ── PARTIDOS ─────────────────────────────────── */
   cargarPartidos() {
-    this.apiService.getPartidos().subscribe({
+    this.http.get<any[]>('http://localhost:3000/partidos').subscribe({
       next: (data) => this.partidos = data,
       error: () => {}
     });
@@ -328,8 +333,8 @@ export class AdminComponent implements OnInit {
   guardarPartido() {
     if (!this.partidoForm.visitante.trim()) { this.toast('warn', 'Campo requerido', 'El equipo visitante es obligatorio.'); return; }
     const req = this.partidoEditando
-      ? this.apiService.savePartido(this.partidoForm, this.partidoEditando._id)
-      : this.apiService.savePartido(this.partidoForm);
+      ? this.http.put(`http://localhost:3000/partidos/${this.partidoEditando._id}`, this.partidoForm, this.authHeaders())
+      : this.http.post('http://localhost:3000/partidos', this.partidoForm, this.authHeaders());
     req.subscribe({
       next: () => { this.modalPartidoVisible = false; this.toast('success', 'Guardado', `Partido ${this.partidoEditando ? 'actualizado' : 'agregado'}.`); this.cargarPartidos(); },
       error: () => this.toast('error', 'Error', 'No se pudo guardar el partido.')
@@ -338,7 +343,7 @@ export class AdminComponent implements OnInit {
 
   eliminarPartido(id: string) {
     this.confirmar('¿Eliminar este partido?', 'Eliminar partido', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.apiService.deletePartido(id).subscribe({
+      this.http.delete(`http://localhost:3000/partidos/${id}`, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Eliminado', 'Partido eliminado.'); this.cargarPartidos(); },
         error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
       });
@@ -346,13 +351,52 @@ export class AdminComponent implements OnInit {
   }
 
   /* ── PAGOS ────────────────────────────────────── */
+  cargarAprobados(): void {
+    this.cargandoAprobados = true;
+    this.pagosService.getPagosAprobados().pipe(
+      timeout(5000),
+      catchError(() => {
+        this.toast('warn', 'Atención', 'No se pudo cargar los pagos aprobados.');
+        return of([] as Pago[]);
+      })
+    ).subscribe((pagos) => {
+      this.pagosAprobados = pagos;
+      this.cargandoAprobados = false;
+    });
+  }
+
+  rechazarPagoAprobado(pago: Pago): void {
+    this.confirmar(
+      `¿Confirmas <strong>rechazar</strong> el pago de ${pago.alumno}? Esta acción lo moverá a rechazados.`,
+      'Rechazar pago aprobado',
+      'pi pi-exclamation-triangle',
+      'Sí, rechazar',
+      'p-button-danger',
+      () => {
+        this.pagosService.updateEstadoPago(pago.id, 'rechazado').subscribe({
+          next: () => {
+            this.pagosAprobados = this.pagosAprobados.filter(p => p.id !== pago.id);
+            if (this.pagoSeleccionado?.id === pago.id) { this.modalVoucherVisible = false; this.pagoSeleccionado = null; }
+            this.toast('warn', 'Pago rechazado', `El pago de ${pago.alumno} fue movido a rechazados.`);
+            this.cargarPendientes();
+          },
+          error: () => this.toast('error', 'Error', 'No se pudo actualizar el estado del pago.')
+        });
+      }
+    );
+  }
+
   cargarPendientes(): void {
-    this.pagosPendientes = [...this.pagosEjemplo];
-    this.usandoEjemplos = true;
-    this.cargandoPagos = false;
-    this.pagosService.getPagosPendientes().pipe(timeout(3000), catchError(() => of([] as Pago[]))).subscribe((pagos) => {
-      const filtrados = pagos.filter(p => p.estado === 'pendiente');
-      if (filtrados.length > 0) { this.pagosPendientes = filtrados; this.usandoEjemplos = false; }
+    this.cargandoPagos = true;
+    this.pagosService.getPagosPendientes().pipe(
+      timeout(5000),
+      catchError(() => {
+        this.toast('warn', 'Atención', 'No se pudo conectar al servidor de pagos.');
+        return of([] as Pago[]);
+      })
+    ).subscribe((pagos) => {
+      this.pagosPendientes = pagos;
+      this.cargandoPagos = false;
     });
   }
 
@@ -361,7 +405,7 @@ export class AdminComponent implements OnInit {
       this.pagoSeleccionado = pago;
       this.modalVoucherVisible = true;
     } else {
-      this.apiService.getPago(pago.id).subscribe({
+      this.http.get<any>(`http://localhost:3000/pagos/${pago.id}`, this.authHeaders()).subscribe({
         next: (full) => { this.pagoSeleccionado = { ...pago, voucherBase64: full.voucherBase64 }; this.modalVoucherVisible = true; },
         error: () => this.toast('error', 'Error', 'No se pudo cargar el voucher.')
       });
@@ -382,6 +426,7 @@ export class AdminComponent implements OnInit {
             this.pagosPendientes = this.pagosPendientes.filter(i => i.id !== pago.id);
             if (this.pagoSeleccionado?.id === pago.id) { this.modalVoucherVisible = false; this.pagoSeleccionado = null; }
             this.toast('success', aprobando ? 'Pago aprobado' : 'Pago rechazado', `El pago de ${pago.alumno} fue procesado.`);
+            if (aprobando) this.cargarAprobados();
           },
           error: () => this.toast('error', 'Error', 'No se pudo actualizar el pago.')
         });
@@ -391,7 +436,7 @@ export class AdminComponent implements OnInit {
 
   /* ── CONFIG / NOTICIAS ────────────────────────── */
   cargarConfig(): void {
-    this.apiService.getConfig().subscribe({
+    this.http.get<any>('http://localhost:3000/config').subscribe({
       next: (c) => {
         this.siteConfig.tituloHeader = c.tituloHeader || 'Escuela de Futbol - Inicio';
         this.siteConfig.tituloBienvenida = c.tituloBienvenida || '¡Bienvenidos Crack!';
@@ -399,6 +444,10 @@ export class AdminComponent implements OnInit {
         this.siteConfig.imagenDestacada = c.imagenDestacada || '';
         this.siteConfig.imagenesCarrusel = c.imagenesCarrusel || [];
         this.siteConfig.imagenesGaleria = c.imagenesGaleria || [];
+        this.siteConfig.mostrarPopup = c.mostrarPopup !== undefined ? c.mostrarPopup : true;
+        this.siteConfig.imagenPopup = c.imagenPopup || '';
+        this.siteConfig.tituloPopup = c.tituloPopup || '';
+        this.siteConfig.cuerpoPopup = c.cuerpoPopup || '';
       },
       error: () => {},
     });
@@ -427,7 +476,7 @@ export class AdminComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const b64 = await this.comprimirImagen(file, 1600, 0.80);
+    const b64 = await this.comprimirImagen(file, 1200, 0.72);
     this.siteConfig.imagenesCarrusel = [...this.siteConfig.imagenesCarrusel, b64];
     input.value = '';
   }
@@ -440,13 +489,22 @@ export class AdminComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const b64 = await this.comprimirImagen(file, 1400, 0.78);
+    const b64 = await this.comprimirImagen(file, 1000, 0.70);
     this.siteConfig.imagenesGaleria = [...this.siteConfig.imagenesGaleria, { url: b64, descripcion: '' }];
     input.value = '';
   }
 
   eliminarImagenGaleria(i: number) {
     this.siteConfig.imagenesGaleria = this.siteConfig.imagenesGaleria.filter((_, idx) => idx !== i);
+  }
+
+  async seleccionarImagenPopup(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const b64 = await this.comprimirImagen(file, 1000, 0.75);
+    this.siteConfig.imagenPopup = b64;
+    input.value = '';
   }
 
   seleccionarImagenDestacada(event: Event): void {
@@ -463,23 +521,62 @@ export class AdminComponent implements OnInit {
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-        this.siteConfig.imagenDestacada = canvas.toDataURL('image/jpeg', 0.82);
+        this.siteConfig.imagenDestacada = canvas.toDataURL('image/jpeg', 0.75);
       };
       img.src = e.target?.result as string;
     };
     reader.readAsDataURL(file);
   }
 
-  guardarConfig(): void {
+  private putConfig(payload: object): void {
     this.guardandoConfig = true;
-    this.apiService.updateConfig(this.siteConfig).subscribe({
-      next: () => { this.guardandoConfig = false; this.toast('success', 'Guardado', 'Configuración actualizada.'); },
-      error: () => { this.guardandoConfig = false; this.toast('error', 'Error', 'No se pudo guardar la configuración.'); },
+    this.http.put<any>('http://localhost:3000/config', payload, this.authHeaders()).subscribe({
+      next: (res) => {
+        this.guardandoConfig = false;
+        if (res && res.imagenesCarrusel) this.siteConfig.imagenesCarrusel = res.imagenesCarrusel;
+        if (res && res.imagenesGaleria)  this.siteConfig.imagenesGaleria  = res.imagenesGaleria;
+        this.toast('success', 'Guardado', 'Configuración actualizada.');
+      },
+      error: (err) => {
+        this.guardandoConfig = false;
+        const detalle = err?.error?.detalle || err?.message || '';
+        this.toast('error', 'Error al guardar', detalle || 'No se pudo guardar la configuración.');
+      },
     });
   }
 
+  guardarTextos(): void {
+    this.putConfig({
+      tituloHeader:        this.siteConfig.tituloHeader,
+      tituloBienvenida:    this.siteConfig.tituloBienvenida,
+      subtituloBienvenida: this.siteConfig.subtituloBienvenida,
+      imagenDestacada:     this.siteConfig.imagenDestacada,
+    });
+  }
+
+  guardarCarrusel(): void {
+    this.putConfig({ imagenesCarrusel: this.siteConfig.imagenesCarrusel });
+  }
+
+  guardarGaleria(): void {
+    this.putConfig({ imagenesGaleria: this.siteConfig.imagenesGaleria });
+  }
+
+  guardarPopup(): void {
+    this.putConfig({
+      mostrarPopup: this.siteConfig.mostrarPopup,
+      imagenPopup:  this.siteConfig.imagenPopup,
+      tituloPopup:  this.siteConfig.tituloPopup,
+      cuerpoPopup:  this.siteConfig.cuerpoPopup,
+    });
+  }
+
+  guardarConfig(): void {
+    this.putConfig(this.siteConfig);
+  }
+
   cargarNoticiasAdmin(): void {
-    this.apiService.getNoticias().subscribe({ next: (d) => this.noticiasAdmin = d, error: () => {} });
+    this.http.get<any[]>('http://localhost:3000/noticias').subscribe({ next: (d) => this.noticiasAdmin = d, error: () => {} });
   }
 
   abrirModalNoticia(n?: any): void {
@@ -493,8 +590,8 @@ export class AdminComponent implements OnInit {
   guardarNoticia(): void {
     if (!this.noticiaForm.titulo) { this.toast('warn', 'Campo requerido', 'El título es obligatorio.'); return; }
     const req = this.noticiaEditando
-      ? this.apiService.saveNoticia(this.noticiaForm, this.noticiaEditando._id)
-      : this.apiService.saveNoticia(this.noticiaForm);
+      ? this.http.put(`http://localhost:3000/noticias/${this.noticiaEditando._id}`, this.noticiaForm, this.authHeaders())
+      : this.http.post('http://localhost:3000/noticias', this.noticiaForm, this.authHeaders());
     req.subscribe({
       next: () => { this.modalNoticiaVisible = false; this.toast('success', 'Guardado', `Noticia ${this.noticiaEditando ? 'actualizada' : 'creada'}.`); this.cargarNoticiasAdmin(); },
       error: () => this.toast('error', 'Error', 'No se pudo guardar la noticia.'),
@@ -503,7 +600,7 @@ export class AdminComponent implements OnInit {
 
   eliminarNoticia(id: string): void {
     this.confirmar('¿Eliminar esta noticia? Esta acción no se puede deshacer.', 'Eliminar noticia', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.apiService.deleteNoticia(id).subscribe({
+      this.http.delete(`http://localhost:3000/noticias/${id}`, this.authHeaders()).subscribe({
         next: () => { this.toast('success', 'Eliminada', 'Noticia eliminada.'); this.cargarNoticiasAdmin(); },
         error: () => this.toast('error', 'Error', 'No se pudo eliminar la noticia.'),
       });

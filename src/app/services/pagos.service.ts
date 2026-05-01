@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { EstadoPago, Pago } from '../models/pago';
 import { AuthService } from './auth.service';
-import { environment } from '../../environments/environment';
 
 export interface CrearPagoDto {
   apoderado: string;
@@ -43,7 +42,7 @@ function fromMongoPago(pago: PagoMongoResponse): Pago {
   providedIn: 'root',
 })
 export class PagosService {
-  private readonly apiUrl = `${environment.apiUrl}/pagos`;
+  private readonly apiUrl = 'http://localhost:3000/pagos';
   private readonly authService = inject(AuthService);
 
   constructor(private readonly http: HttpClient) {}
@@ -63,6 +62,12 @@ export class PagosService {
 
   getPagosPendientes(): Observable<Pago[]> {
     return this.http.get<PagoMongoResponse[]>(`${this.apiUrl}?estado=pendiente`, this.authHeaders()).pipe(
+      map((pagos) => pagos.map(fromMongoPago))
+    );
+  }
+
+  getPagosAprobados(): Observable<Pago[]> {
+    return this.http.get<PagoMongoResponse[]>(`${this.apiUrl}?estado=aprobado`, this.authHeaders()).pipe(
       map((pagos) => pagos.map(fromMongoPago))
     );
   }

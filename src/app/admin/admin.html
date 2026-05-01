@@ -44,7 +44,13 @@
       class="tab-btn"
       [class.active]="activeTab === 'pagos'"
       (click)="setActiveTab('pagos')">
-      Validación de Pagos
+      Pagos Pendientes
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'pagos-aprobados'"
+      (click)="setActiveTab('pagos-aprobados')">
+      Pagos Aprobados
     </button>
     <button
       class="tab-btn"
@@ -377,10 +383,6 @@
         <h3>Validación de Pagos</h3>
       </div>
       <p style="color:rgba(233,247,234,0.55); font-size:0.88rem; margin-top:0;">Solo se muestran pagos pendientes.</p>
-      <p class="example-banner" *ngIf="usandoEjemplos">
-        Mostrando pagos de ejemplo porque el backend no devolvió registros pendientes.
-      </p>
-
       <p *ngIf="cargandoPagos">Cargando pagos...</p>
 
       <p-card *ngFor="let pago of pagosPendientes" class="pago-item">
@@ -407,6 +409,85 @@
       <p *ngIf="!cargandoPagos && pagosPendientes.length === 0">
         No hay pagos pendientes para revisar.
       </p>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO PAGOS APROBADOS -->
+  <div *ngIf="activeTab === 'pagos-aprobados'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Pagos Aprobados</h3>
+        <p-button label="Recargar" icon="pi pi-refresh" severity="secondary" size="small"
+          [loading]="cargandoAprobados" (onClick)="cargarAprobados()">
+        </p-button>
+      </div>
+      <p style="color:rgba(233,247,234,0.55); font-size:0.88rem; margin-top:0;">
+        Pagos ya validados. Puedes rechazarlos si cometiste un error.
+      </p>
+
+      <p *ngIf="cargandoAprobados">Cargando pagos aprobados...</p>
+
+      <p-table
+        *ngIf="!cargandoAprobados"
+        [value]="pagosAprobados"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        sortField="fecha"
+        [sortOrder]="-1">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="alumno">Alumno <p-sortIcon field="alumno"/></th>
+            <th>Apoderado</th>
+            <th>Sede</th>
+            <th pSortableColumn="monto">Monto <p-sortIcon field="monto"/></th>
+            <th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha"/></th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-pago>
+          <tr>
+            <td>{{ pago.alumno }}</td>
+            <td>{{ pago.apoderado }}</td>
+            <td>{{ pago.sede }}</td>
+            <td>{{ pago.monto | currency:'CLP':'symbol':'1.0-0' }}</td>
+            <td>{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <p-tag value="Aprobado" severity="success"></p-tag>
+            </td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button
+                  icon="pi pi-receipt"
+                  size="small"
+                  severity="secondary"
+                  pTooltip="Ver voucher"
+                  (onClick)="verVoucher(pago)">
+                </p-button>
+                <p-button
+                  icon="pi pi-times"
+                  size="small"
+                  severity="danger"
+                  pTooltip="Rechazar (deshacer aprobación)"
+                  (onClick)="rechazarPagoAprobado(pago)">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" style="text-align:center; padding:2rem;">
+              No hay pagos aprobados todavía.
+            </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
     </p-card>
   </div>
 
@@ -465,7 +546,7 @@
             label="Guardar Cambios"
             icon="pi pi-save"
             [loading]="guardandoConfig"
-            (onClick)="guardarConfig()">
+            (onClick)="guardarTextos()">
           </p-button>
         </div>
       </div>
@@ -498,6 +579,9 @@
           </span>
         </div>
       </div>
+      <div style="margin-top:1.25rem; display:flex; justify-content:flex-end;">
+        <p-button label="Guardar carrusel" icon="pi pi-save" [loading]="guardandoConfig" (onClick)="guardarCarrusel()"></p-button>
+      </div>
     </p-card>
 
     <!-- Galería de imágenes -->
@@ -527,6 +611,9 @@
               style="width:100%; font-size:0.78rem;" />
           </div>
         </div>
+      </div>
+      <div style="margin-top:1.25rem; display:flex; justify-content:flex-end;">
+        <p-button label="Guardar galería" icon="pi pi-save" [loading]="guardandoConfig" (onClick)="guardarGaleria()"></p-button>
       </div>
     </p-card>
 
@@ -564,6 +651,56 @@
         </ng-template>
       </p-table>
     </p-card>
+
+    <!-- Gestión de Popup -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Popup de Aviso</h3>
+        <p-togglebutton
+          [(ngModel)]="siteConfig.mostrarPopup"
+          onLabel="Popup activo"
+          offLabel="Popup desactivado"
+          onIcon="pi pi-eye"
+          offIcon="pi pi-eye-slash">
+        </p-togglebutton>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:1.25rem; margin-top:1rem;">
+
+        <!-- Imagen popup -->
+        <div>
+          <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Imagen del popup</label>
+          <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+            <p-button label="Seleccionar imagen" icon="pi pi-image" severity="secondary" (onClick)="inputImagenPopup.click()"></p-button>
+            <input #inputImagenPopup type="file" accept="image/*" style="display:none" (change)="seleccionarImagenPopup($event)" />
+            <span *ngIf="!siteConfig.imagenPopup" style="opacity:0.5; font-size:0.85rem;">Sin imagen seleccionada</span>
+          </div>
+          <div *ngIf="siteConfig.imagenPopup" style="margin-top:0.75rem;">
+            <img [src]="siteConfig.imagenPopup" alt="Preview popup" style="max-width:280px; max-height:180px; border-radius:8px; object-fit:cover; border:1px solid rgba(57,211,83,0.25);" />
+            <div style="margin-top:0.5rem;">
+              <p-button label="Quitar imagen" icon="pi pi-times" severity="danger" size="small" (onClick)="siteConfig.imagenPopup = ''"></p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Título popup -->
+        <div>
+          <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Título del popup</label>
+          <input pInputText [(ngModel)]="siteConfig.tituloPopup" placeholder="Ej: ¡Inscripciones abiertas!" style="width:100%;" />
+        </div>
+
+        <!-- Cuerpo popup -->
+        <div>
+          <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Texto del popup</label>
+          <textarea pTextarea [(ngModel)]="siteConfig.cuerpoPopup" rows="4" placeholder="Escribe el mensaje del popup aquí..." style="width:100%; resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end;">
+          <p-button label="Guardar popup" icon="pi pi-save" [loading]="guardandoConfig" (onClick)="guardarPopup()"></p-button>
+        </div>
+      </div>
+    </p-card>
+
   </div>
 
 </div>
@@ -755,7 +892,7 @@
       </div>
       <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
         <label style="font-weight:600;">Tipo</label>
-        <p-select [options]="tipoPartidoOpciones" [(ngModel)]="partidoForm.tipo" optionLabel="label" optionValue="value" style="width:100%;"></p-select>
+        <p-select [options]="tipoPartidoOpciones" [(ngModel)]="partidoForm.tipo" optionLabel="label" optionValue="value" appendTo="body" style="width:100%;"></p-select>
       </div>
     </div>
     <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
@@ -811,6 +948,7 @@
         optionLabel="label"
         optionValue="value"
         placeholder="Seleccionar categoría"
+        appendTo="body"
         style="width:100%;">
       </p-select>
     </div>
