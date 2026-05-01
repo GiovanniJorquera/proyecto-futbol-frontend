@@ -1,0 +1,125 @@
+/* fondo general */
+body {
+  margin: 0;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0b6623, #14532d);
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #0b6623, #39d353);
+  color: white;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.header p {
+  margin-top: 10px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* CONTENEDOR */
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* CARD */
+.card {
+  width: 900px;
+  padding: 30px;
+  margin-top: -50px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* TEXTO INFO */
+.info {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* SECCIONES */
+.seccion {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 25px;
+  background: #fafafa;
+}
+
+.seccion h3 {
+  margin: 0 0 15px 0;
+  color: #0b6623;
+  font-weight: 600;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* CAMPOS */
+.campo {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+/* INPUTS */
+input, p-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #8a1717;
+  transition: 0.2s;
+}
+
+/* FOCUS */
+input:focus {
+  outline: none;
+  border: 2px solid #39d353;
+}
+
+/* BOTÓN */
+.boton {
+  width: 100%;
+  margin-top: 30px;
+  background: linear-gradient(135deg, #0b6623, #39d353);
+  border: none;
+  height: 50px;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.boton:hover {
+  opacity: 0.9;
+}
+
+/* ERRORES */
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 3px;
+}
+/* borde rojo */
+.input-error {
+  border: 2px solid red !important;
+}

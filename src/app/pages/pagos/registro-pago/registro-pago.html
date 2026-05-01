@@ -1,0 +1,66 @@
+<header class="page-header">
+  <h1>Registro de Pago</h1>
+  <nav class="header-nav">
+    <button pButton type="button" label="Inicio" icon="pi pi-home" size="small" severity="secondary" (click)="volverInicio()"></button>
+    <button pButton type="button" label="Postular" icon="pi pi-user-plus" size="small" (click)="navegarFormulario()"></button>
+    <button pButton type="button" label="Iniciar Sesión" icon="pi pi-sign-in" size="small" severity="secondary" (click)="navegarLogin()"></button>
+  </nav>
+</header>
+
+<section class="registro-page">
+  <p-card header="Registro de pago" subheader="Vista apoderado">
+    <form [formGroup]="form" (ngSubmit)="guardarPago()" class="registro-form">
+      <div class="field">
+        <label for="nombreAlumno">Nombre del alumno</label>
+        <input id="nombreAlumno" pInputText type="text" formControlName="nombreAlumno" />
+        <small *ngIf="campoInvalido('nombreAlumno')">Ingresa el nombre del alumno.</small>
+      </div>
+
+      <div class="field">
+        <label for="rutAlumno">RUT alumno</label>
+        <input id="rutAlumno" pInputText type="text" formControlName="rutAlumno" />
+        <small *ngIf="campoInvalido('rutAlumno')">Ingresa el RUT del alumno.</small>
+      </div>
+
+      <div class="field">
+        <label for="montoPagado">Monto pagado</label>
+        <input id="montoPagado" pInputText type="number" formControlName="montoPagado" />
+        <small *ngIf="campoInvalido('montoPagado')">Ingresa un monto valido.</small>
+      </div>
+
+      <div class="field">
+        <label for="fecha">Fecha</label>
+        <input id="fecha" type="date" formControlName="fecha" />
+        <small *ngIf="campoInvalido('fecha')">Selecciona una fecha.</small>
+      </div>
+
+      <div class="field">
+        <label for="sede">Sede</label>
+        <p-select
+          inputId="sede"
+          [options]="sedes"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona sede"
+          formControlName="sede">
+        </p-select>
+        <small *ngIf="campoInvalido('sede')">Debes seleccionar una sede.</small>
+      </div>
+
+      <div class="field field-file">
+        <label for="voucher">Comprobante</label>
+        <input id="voucher" type="file" accept="image/*" (change)="onFileSelected($event)" />
+        <small *ngIf="campoInvalido('voucherBase64')">Debes subir un comprobante.</small>
+      </div>
+
+      <div class="preview" *ngIf="voucherPreview">
+        <img [src]="voucherPreview" alt="Vista previa del comprobante" />
+      </div>
+
+      <button pButton type="submit" label="Enviar pago" [disabled]="enviando"></button>
+
+      <p class="msg ok" *ngIf="tipoMensaje === 'ok'">{{ mensaje }}</p>
+      <p class="msg error" *ngIf="tipoMensaje === 'error'">{{ mensaje }}</p>
+    </form>
+  </p-card>
+</section>

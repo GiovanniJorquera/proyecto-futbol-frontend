@@ -1,0 +1,50 @@
+<section class="validacion-page">
+  <header class="head">
+    <h2>Validacion de pagos</h2>
+    <p>Solo se muestran pagos pendientes.</p>
+    <p class="example-banner" *ngIf="usandoEjemplos">
+      Mostrando pagos de ejemplo porque el backend no devolvio registros pendientes.
+    </p>
+  </header>
+
+  <p *ngIf="cargando" class="empty">Cargando pagos...</p>
+
+  <p-card *ngFor="let pago of pagosPendientes" class="pago-item">
+    <div class="item-main" (click)="verVoucher(pago)">
+      <h3>{{ pago.alumno }}</h3>
+      <p><strong>Apoderado:</strong> {{ pago.apoderado }}</p>
+      <p><strong>Sede:</strong> {{ pago.sede }}</p>
+      <p><strong>Monto:</strong> {{ pago.monto | currency:'CLP':'symbol':'1.0-0' }}</p>
+      <p><strong>Fecha:</strong> {{ pago.fecha | date:'dd/MM/yyyy' }}</p>
+      <p class="estado">Estado: {{ pago.estado }}</p>
+    </div>
+
+    <div class="actions">
+      <button pButton type="button" severity="success" label="Aprobar" (click)="cambiarEstado(pago, 'aprobado')"></button>
+      <button pButton type="button" severity="danger" label="Rechazar" (click)="cambiarEstado(pago, 'rechazado')"></button>
+    </div>
+
+    <div class="voucher-thumb">
+      <span>Voucher</span>
+      <img [src]="pago.voucherBase64" alt="Voucher del pago" />
+    </div>
+  </p-card>
+
+  <p *ngIf="!cargando && pagosPendientes.length === 0" class="empty">
+    No hay pagos pendientes para revisar.
+  </p>
+
+  <p-dialog
+    header="Voucher de pago"
+    [(visible)]="modalVoucherVisible"
+    [modal]="true"
+    [style]="{ width: 'min(95vw, 820px)' }"
+    [draggable]="false"
+    [resizable]="false">
+    <div class="voucher-modal" *ngIf="pagoSeleccionado">
+      <p><strong>Alumno:</strong> {{ pagoSeleccionado.alumno }}</p>
+      <p><strong>Sede:</strong> {{ pagoSeleccionado.sede }}</p>
+      <img [src]="pagoSeleccionado.voucherBase64" alt="Voucher de pago" />
+    </div>
+  </p-dialog>
+</section>

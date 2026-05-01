@@ -1,0 +1,429 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  color: #f4f7f3;
+}
+
+.admin-container {
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* ── HEADER ─────────────────────────────────────── */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 0.75rem 1.5rem;
+  background: rgba(6, 10, 6, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(42, 181, 76, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-header h1 {
+  margin: 0;
+  color: #39d353;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── TABS ───────────────────────────────────────── */
+.menu-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: rgba(6, 10, 6, 0.9);
+  border-bottom: 1px solid rgba(42, 181, 76, 0.14);
+  padding: 6px 16px;
+  position: sticky;
+  top: 52px;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.tab-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 0.45rem 1.1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgba(233, 247, 234, 0.48);
+  transition: all 0.16s;
+  letter-spacing: 0.03em;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+}
+
+.tab-btn:hover {
+  color: #39d353;
+  background: rgba(57, 211, 83, 0.08);
+  border-color: rgba(57, 211, 83, 0.15);
+}
+
+.tab-btn.active {
+  color: #39d353;
+  background: rgba(57, 211, 83, 0.14);
+  border-color: rgba(57, 211, 83, 0.32);
+}
+
+/* ── CONTENIDO DE TABS ──────────────────────────── */
+.tab-content {
+  padding: 1.5rem;
+  min-height: calc(100vh - 110px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── SECTION HEADER ─────────────────────────────── */
+.sec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.sec-header h3 {
+  margin: 0;
+  color: rgba(233, 247, 234, 0.88);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── CARDS ─────────────────────────────────────── */
+:host ::ng-deep .p-card,
+:host ::ng-deep .p-card.p-component {
+  background: rgba(12, 18, 12, 0.82) !important;
+  border: 1px solid rgba(57, 211, 83, 0.13) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.42) !important;
+  color: #f4f7f3 !important;
+}
+
+:host ::ng-deep .p-card .p-card-body,
+:host ::ng-deep .p-card .p-card-content {
+  background: transparent !important;
+  color: #f4f7f3 !important;
+}
+
+:host ::ng-deep .p-card .p-card-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(57, 211, 83, 0.1) !important;
+  color: #39d353 !important;
+}
+
+/* ── TABLE ─────────────────────────────────────── */
+:host ::ng-deep .p-datatable,
+:host ::ng-deep .p-datatable-table {
+  background: transparent !important;
+  color: #f4f7f3 !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th,
+:host ::ng-deep .p-datatable thead > tr > th {
+  background: rgba(35, 169, 72, 0.1) !important;
+  color: #39d353 !important;
+  border-color: rgba(57, 211, 83, 0.14) !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  padding: 0.85rem 1rem !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr,
+:host ::ng-deep .p-datatable tbody > tr {
+  background: rgba(12, 18, 12, 0.55) !important;
+  color: #e9f7ea !important;
+  border-bottom: 1px solid rgba(57, 211, 83, 0.07) !important;
+  transition: background 0.13s;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover,
+:host ::ng-deep .p-datatable tbody > tr:hover {
+  background: rgba(57, 211, 83, 0.07) !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td,
+:host ::ng-deep .p-datatable tbody > tr > td {
+  border-color: rgba(57, 211, 83, 0.07) !important;
+  padding: 0.75rem 1rem !important;
+  color: #e9f7ea !important;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-emptymessage td {
+  text-align: center !important;
+  padding: 2.5rem 1rem !important;
+  color: rgba(233, 247, 234, 0.38) !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .p-sortable-column-icon {
+  color: rgba(57, 211, 83, 0.55) !important;
+}
+
+/* ── PAGINATOR ─────────────────────────────────── */
+:host ::ng-deep .p-paginator {
+  background: rgba(8, 14, 8, 0.7) !important;
+  color: #e9f7ea !important;
+  border-top: 1px solid rgba(57, 211, 83, 0.1) !important;
+  border-radius: 0 0 16px 16px !important;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-element {
+  color: rgba(233, 247, 234, 0.65) !important;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-element:hover {
+  background: rgba(57, 211, 83, 0.1) !important;
+  color: #39d353 !important;
+}
+
+:host ::ng-deep .p-paginator .p-highlight {
+  background: rgba(57, 211, 83, 0.18) !important;
+  color: #39d353 !important;
+}
+
+/* ── SELECTS / DROPDOWNS ───────────────────────── */
+:host ::ng-deep .p-select,
+:host ::ng-deep .p-dropdown {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+}
+
+:host ::ng-deep .p-select .p-select-label,
+:host ::ng-deep .p-dropdown .p-dropdown-label,
+:host ::ng-deep .p-select .p-placeholder,
+:host ::ng-deep .p-dropdown .p-placeholder {
+  color: rgba(233, 247, 234, 0.7) !important;
+}
+
+:host ::ng-deep .p-select-panel,
+:host ::ng-deep .p-dropdown-panel {
+  background: #111a11 !important;
+  border: 1px solid rgba(57, 211, 83, 0.2) !important;
+}
+
+:host ::ng-deep .p-select-panel .p-select-option,
+:host ::ng-deep .p-dropdown-panel .p-dropdown-item {
+  color: #e9f7ea !important;
+}
+
+:host ::ng-deep .p-select-panel .p-select-option:hover,
+:host ::ng-deep .p-dropdown-panel .p-dropdown-item:hover {
+  background: rgba(57, 211, 83, 0.1) !important;
+}
+
+:host ::ng-deep .p-select-panel .p-highlight,
+:host ::ng-deep .p-dropdown-panel .p-highlight {
+  background: rgba(57, 211, 83, 0.18) !important;
+  color: #39d353 !important;
+}
+
+/* ── INPUTS ─────────────────────────────────────── */
+:host ::ng-deep .tab-content input[pInputText],
+:host ::ng-deep .tab-content input[type='text'],
+:host ::ng-deep .tab-content input[type='number'] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+}
+
+/* ── DIALOGS ───────────────────────────────────── */
+:host ::ng-deep .p-dialog {
+  border: 1px solid rgba(57, 211, 83, 0.18) !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65) !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: #0c140c !important;
+  color: #39d353 !important;
+  border-bottom: 1px solid rgba(57, 211, 83, 0.16) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  background: linear-gradient(180deg, #111a11, #0d130d) !important;
+  color: #f4f7f3 !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: #0c140c !important;
+  border-top: 1px solid rgba(57, 211, 83, 0.1) !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header-close {
+  color: #39d353 !important;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header-close:hover {
+  background: rgba(57, 211, 83, 0.12) !important;
+}
+
+:host ::ng-deep .p-dialog input,
+:host ::ng-deep .p-dialog input[pInputText],
+:host ::ng-deep .p-dialog textarea {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+  border-radius: 8px !important;
+}
+
+:host ::ng-deep .p-dialog input[type='date'] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+  color-scheme: dark;
+}
+
+:host ::ng-deep .p-dialog label {
+  color: rgba(233, 247, 234, 0.78) !important;
+}
+
+:host ::ng-deep .p-dialog textarea {
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f4f7f3 !important;
+}
+
+/* ── TAGS ───────────────────────────────────────── */
+:host ::ng-deep .p-tag {
+  font-weight: 700;
+  font-size: 0.77rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── ESTADOS ────────────────────────────────────── */
+.estado-pendiente { color: #ffb74d; font-weight: 700; }
+.estado-aprobado  { color: #39d353; font-weight: 700; }
+.estado-rechazado { color: #ef5350; font-weight: 700; }
+
+/* ── FILTER BAR ─────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  align-items: flex-end;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.filter-field.grow { flex: 1; min-width: 200px; }
+.filter-field.medium { min-width: 160px; }
+.filter-field.narrow { min-width: 90px; }
+
+.filter-field label {
+  font-size: 0.77rem;
+  font-weight: 700;
+  color: rgba(233, 247, 234, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.result-count {
+  font-size: 0.83rem;
+  color: rgba(233, 247, 234, 0.42);
+  margin-bottom: 0.5rem;
+}
+
+/* ── PAGOS ──────────────────────────────────────── */
+.pago-item { margin-bottom: 1rem; }
+
+.item-main { cursor: pointer; }
+
+.item-main h3 {
+  margin: 0 0 0.4rem;
+  color: #39d353;
+}
+
+.item-main p { color: rgba(233, 247, 234, 0.8); margin: 0.2rem 0; }
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.voucher-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  color: rgba(233, 247, 234, 0.55);
+  font-size: 0.84rem;
+}
+
+.voucher-thumb img {
+  max-width: 120px;
+  border-radius: 8px;
+  border: 1px solid rgba(57, 211, 83, 0.22);
+}
+
+.example-banner {
+  background: rgba(255, 193, 7, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.84rem;
+  color: #ffb74d;
+  margin-bottom: 1rem;
+}
+
+.estado { color: #ffb74d; font-weight: 600; }
+
+/* ── CONFIG INICIO ──────────────────────────────── */
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 640px;
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.config-field label {
+  font-weight: 600;
+  color: rgba(233, 247, 234, 0.78);
+  font-size: 0.9rem;
+}
+
+.config-field small { color: rgba(233, 247, 234, 0.4); font-size: 0.8rem; }
+
+.img-preview-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.img-status-label {
+  font-size: 0.82rem;
+  color: rgba(233, 247, 234, 0.55);
+  font-weight: 500;
+}

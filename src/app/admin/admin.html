@@ -1,0 +1,839 @@
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="admin-container">
+
+  <header class="admin-header">
+    <h1>Panel Administrador — Santiago Wanderers</h1>
+    <button pButton type="button" label="Inicio" icon="pi pi-home" size="small" severity="secondary" (click)="volverInicio()"></button>
+  </header>
+
+  <!-- MENÚ DE NAVEGACIÓN -->
+  <div class="menu-tabs">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'solicitudes'"
+      (click)="setActiveTab('solicitudes')">
+      Solicitudes
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'estudiantes'"
+      (click)="setActiveTab('estudiantes')">
+      Estudiantes
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'profesores'"
+      (click)="setActiveTab('profesores')">
+      Profesores
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'divisiones'"
+      (click)="setActiveTab('divisiones')">
+      Divisiones
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'partidos'"
+      (click)="setActiveTab('partidos')">
+      Partidos
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'pagos'"
+      (click)="setActiveTab('pagos')">
+      Validación de Pagos
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'inicio'"
+      (click)="setActiveTab('inicio')">
+      Editar Inicio
+    </button>
+  </div>
+
+  <!-- CONTENIDO DE SOLICITUDES -->
+  <div *ngIf="activeTab === 'solicitudes'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Solicitudes de Inscripción</h3>
+      </div>
+
+      <!-- BARRA DE FILTROS -->
+      <div class="filter-bar">
+
+        <div class="filter-field grow">
+          <label>Buscar</label>
+          <input
+            pInputText
+            [(ngModel)]="filtros.texto"
+            placeholder="Nombre, apellido, RUT, apoderado..."
+            style="width:100%;" />
+        </div>
+
+        <div class="filter-field medium">
+          <label>Estado</label>
+          <p-select
+            [options]="estadoOpciones"
+            [(ngModel)]="filtros.estado"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todos">
+          </p-select>
+        </div>
+
+        <div class="filter-field medium">
+          <label>Comuna</label>
+          <p-select
+            [options]="comunaOpciones"
+            [(ngModel)]="filtros.comuna"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todas">
+          </p-select>
+        </div>
+
+        <div class="filter-field narrow">
+          <label>Edad mín.</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="filtros.edadMin"
+            placeholder="8"
+            min="0" max="99"
+            style="width:100%;" />
+        </div>
+
+        <div class="filter-field narrow">
+          <label>Edad máx.</label>
+          <input
+            pInputText
+            type="number"
+            [(ngModel)]="filtros.edadMax"
+            placeholder="18"
+            min="0" max="99"
+            style="width:100%;" />
+        </div>
+
+        <p-button
+          label="Limpiar"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          (onClick)="limpiarFiltros()">
+        </p-button>
+
+      </div>
+
+      <p class="result-count">
+        Mostrando {{ solicitudesFiltradas.length }} de {{ solicitudes.length }} solicitudes
+      </p>
+
+      <p *ngIf="cargando">Cargando solicitudes...</p>
+
+      <p-table
+        *ngIf="!cargando"
+        [value]="solicitudesFiltradas"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        sortField="fechaRegistro"
+        [sortOrder]="-1">
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="pupilo.nombre">Alumno <p-sortIcon field="pupilo.nombre"/></th>
+            <th>RUT</th>
+            <th>Apoderado</th>
+            <th>Comuna</th>
+            <th pSortableColumn="fechaRegistro">Fecha <p-sortIcon field="fechaRegistro"/></th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-s>
+          <tr>
+            <td>{{ s.pupilo.nombre }} {{ s.pupilo.apellidoPaterno }} {{ s.pupilo.apellidoMaterno }}</td>
+            <td>{{ s.pupilo.rut }}</td>
+            <td>{{ s.apoderado.nombre }}</td>
+            <td>{{ s.pupilo.comuna?.name }}</td>
+            <td>{{ s.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <p-tag
+                [value]="s.estado || 'pendiente'"
+                [severity]="getEstadoSeverity(s.estado || 'pendiente')">
+              </p-tag>
+            </td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button
+                  icon="pi pi-eye"
+                  size="small"
+                  severity="secondary"
+                  (onClick)="verDetalle(s)"
+                  pTooltip="Ver detalle">
+                </p-button>
+                <p-button
+                  icon="pi pi-check"
+                  size="small"
+                  severity="success"
+                  (onClick)="aprobar(s._id)"
+                  pTooltip="Aprobar"
+                  [disabled]="s.estado === 'aprobado'">
+                </p-button>
+                <p-button
+                  icon="pi pi-times"
+                  size="small"
+                  severity="danger"
+                  (onClick)="rechazar(s._id)"
+                  pTooltip="Rechazar"
+                  [disabled]="s.estado === 'rechazado'">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">No hay solicitudes registradas.</td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO DE ESTUDIANTES -->
+  <div *ngIf="activeTab === 'estudiantes'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Lista de Estudiantes</h3>
+        <p-button label="Agregar Estudiante" icon="pi pi-user-plus" (onClick)="abrirModalEstudiante()"></p-button>
+      </div>
+      <p-table [value]="estudiantes" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>RUT</th>
+            <th>División</th>
+            <th>Teléfono</th>
+            <th>Fecha Ingreso</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-e>
+          <tr>
+            <td>{{ e.nombre }}</td>
+            <td>{{ e.rut }}</td>
+            <td>{{ e.division }}</td>
+            <td>{{ e.telefono }}</td>
+            <td>{{ e.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalEstudiante(e)" pTooltip="Editar"></p-button>
+                <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarEstudiante(e._id)" pTooltip="Eliminar"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="6" style="text-align:center; padding:2rem;">No hay estudiantes registrados. Agrega el primero.</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO DE PROFESORES -->
+  <div *ngIf="activeTab === 'profesores'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Lista de Profesores</h3>
+        <p-button label="Agregar Profesor" icon="pi pi-user-plus" (onClick)="abrirModalProfesor()"></p-button>
+      </div>
+      <p-table [value]="profesores" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>Especialidad</th>
+            <th>Experiencia</th>
+            <th>Divisiones</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-p>
+          <tr>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.especialidad }}</td>
+            <td>{{ p.experiencia }}</td>
+            <td>{{ (p.divisiones || []).join(', ') }}</td>
+            <td>{{ p.telefono }}</td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalProfesor(p)" pTooltip="Editar"></p-button>
+                <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarProfesor(p._id)" pTooltip="Eliminar"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="6" style="text-align:center; padding:2rem;">No hay profesores registrados. Agrega el primero.</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO DE DIVISIONES -->
+  <div *ngIf="activeTab === 'divisiones'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Divisiones del Club</h3>
+        <p-button label="Agregar División" icon="pi pi-plus" (onClick)="abrirModalDivision()"></p-button>
+      </div>
+      <p-table [value]="divisiones" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Profesor Principal</th>
+            <th>Estudiantes</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-division>
+          <tr>
+            <td>{{ division.nombre }}</td>
+            <td>{{ division.categoria }}</td>
+            <td>{{ division.profesorPrincipal }}</td>
+            <td>{{ division.estudiantes }}</td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalDivision(division)" pTooltip="Editar"></p-button>
+                <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarDivision(division._id)" pTooltip="Eliminar"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="5" style="text-align:center; padding:2rem;">No hay divisiones registradas. Agrega la primera.</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO DE PARTIDOS -->
+  <div *ngIf="activeTab === 'partidos'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Partidos</h3>
+        <p-button label="Agregar Partido" icon="pi pi-plus" (onClick)="abrirModalPartido()"></p-button>
+      </div>
+      <p-table [value]="partidos" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Local</th>
+            <th>Visitante</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Resultado</th>
+            <th>Sede</th>
+            <th>Tipo</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-p>
+          <tr>
+            <td>{{ p.local }}</td>
+            <td>{{ p.visitante }}</td>
+            <td>{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>{{ p.hora || '—' }}</td>
+            <td>{{ p.resultado || '—' }}</td>
+            <td>{{ p.sede || '—' }}</td>
+            <td>
+              <p-tag [value]="p.tipo === 'resultado' ? 'Resultado' : 'Próximo'" [severity]="p.tipo === 'resultado' ? 'success' : 'info'"></p-tag>
+            </td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalPartido(p)" pTooltip="Editar"></p-button>
+                <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarPartido(p._id)" pTooltip="Eliminar"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="8" style="text-align:center; padding:2rem;">No hay partidos registrados. Agrega el primero.</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO DE VALIDACIÓN DE PAGOS -->
+  <div *ngIf="activeTab === 'pagos'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3>Validación de Pagos</h3>
+      </div>
+      <p style="color:rgba(233,247,234,0.55); font-size:0.88rem; margin-top:0;">Solo se muestran pagos pendientes.</p>
+      <p class="example-banner" *ngIf="usandoEjemplos">
+        Mostrando pagos de ejemplo porque el backend no devolvió registros pendientes.
+      </p>
+
+      <p *ngIf="cargandoPagos">Cargando pagos...</p>
+
+      <p-card *ngFor="let pago of pagosPendientes" class="pago-item">
+        <div class="item-main" (click)="verVoucher(pago)">
+          <h3>{{ pago.alumno }}</h3>
+          <p><strong>Apoderado:</strong> {{ pago.apoderado }}</p>
+          <p><strong>Sede:</strong> {{ pago.sede }}</p>
+          <p><strong>Monto:</strong> {{ pago.monto | currency:'CLP':'symbol':'1.0-0' }}</p>
+          <p><strong>Fecha:</strong> {{ pago.fecha | date:'dd/MM/yyyy' }}</p>
+          <p class="estado">Estado: {{ pago.estado }}</p>
+        </div>
+
+        <div class="actions">
+          <button pButton type="button" severity="success" label="Aprobar" (click)="cambiarEstado(pago, 'aprobado')"></button>
+          <button pButton type="button" severity="danger" label="Rechazar" (click)="cambiarEstado(pago, 'rechazado')"></button>
+        </div>
+
+        <div class="voucher-thumb">
+          <span>Voucher</span>
+          <img [src]="pago.voucherBase64" alt="Voucher del pago" />
+        </div>
+      </p-card>
+
+      <p *ngIf="!cargandoPagos && pagosPendientes.length === 0">
+        No hay pagos pendientes para revisar.
+      </p>
+    </p-card>
+  </div>
+
+  <!-- CONTENIDO EDITAR INICIO -->
+  <div *ngIf="activeTab === 'inicio'" class="tab-content">
+
+    <!-- Configuración de textos -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Textos de la Página de Inicio</h3>
+      </div>
+
+      <div class="config-form">
+
+        <div class="config-field">
+          <label>Título del encabezado</label>
+          <input pInputText [(ngModel)]="siteConfig.tituloHeader" style="width:100%;" placeholder="Ej: Escuela de Futbol - Inicio" />
+        </div>
+
+        <div class="config-field">
+          <label>Título de bienvenida</label>
+          <input pInputText [(ngModel)]="siteConfig.tituloBienvenida" style="width:100%;" placeholder="Ej: ¡Bienvenidos Crack!" />
+        </div>
+
+        <div class="config-field">
+          <label>Subtítulo de bienvenida</label>
+          <input pInputText [(ngModel)]="siteConfig.subtituloBienvenida" style="width:100%;" placeholder="Ej: Revisa las últimas novedades de tu club." />
+        </div>
+
+        <div class="config-field">
+          <label>Imagen destacada (panel lateral)</label>
+          <div class="img-preview-row">
+            <img
+              *ngIf="siteConfig.imagenDestacada"
+              [src]="siteConfig.imagenDestacada"
+              alt="Vista previa"
+              style="height:120px; border-radius:10px; object-fit:cover; border:1px solid rgba(57,211,83,0.25);" />
+            <img
+              *ngIf="!siteConfig.imagenDestacada"
+              src="media/KevinVasquez.png"
+              alt="Imagen actual"
+              style="height:120px; border-radius:10px; object-fit:cover; border:1px solid rgba(57,211,83,0.15); opacity:0.55;" />
+            <div style="display:flex; flex-direction:column; gap:0.5rem; justify-content:center;">
+              <span class="img-status-label">
+                {{ siteConfig.imagenDestacada ? 'Imagen personalizada activa' : 'Usando imagen por defecto' }}
+              </span>
+              <input type="file" accept="image/*" (change)="seleccionarImagenDestacada($event)"
+                style="font-size:0.88rem; color:rgba(233,247,234,0.75);" />
+              <small class="config-field">Se comprimirá automáticamente al subir.</small>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p-button
+            label="Guardar Cambios"
+            icon="pi pi-save"
+            [loading]="guardandoConfig"
+            (onClick)="guardarConfig()">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Carrusel de imágenes -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Carrusel de Imágenes</h3>
+        <label style="cursor:pointer;">
+          <span pButton icon="pi pi-image" label="Agregar imagen" class="p-button p-button-sm"></span>
+          <input type="file" accept="image/*" (change)="agregarImagenCarrusel($event)" style="display:none;" />
+        </label>
+      </div>
+      <p style="color:rgba(233,247,234,0.5); font-size:0.85rem; margin:0 0 1rem;">
+        Las imágenes se comprimen automáticamente. Se mostrarán en la página de inicio como carrusel hero.
+      </p>
+      <div *ngIf="siteConfig.imagenesCarrusel.length === 0" style="color:rgba(233,247,234,0.35); font-style:italic;">
+        No hay imágenes en el carrusel. Agrega la primera.
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem;">
+        <div *ngFor="let img of siteConfig.imagenesCarrusel; let i = index" style="position:relative; border-radius:10px; overflow:hidden; border:1px solid rgba(57,211,83,0.2);">
+          <img [src]="img" alt="Imagen carrusel" style="width:100%; height:120px; object-fit:cover; display:block;" />
+          <button pButton type="button" icon="pi pi-trash" size="small" severity="danger"
+            style="position:absolute; top:0.4rem; right:0.4rem; opacity:0.9;"
+            (click)="eliminarImagenCarrusel(i)" pTooltip="Eliminar">
+          </button>
+          <span style="position:absolute; bottom:0.4rem; left:0.5rem; background:rgba(0,0,0,0.6); color:rgba(233,247,234,0.7); font-size:0.72rem; padding:0.15rem 0.4rem; border-radius:4px;">
+            {{ i + 1 }}
+          </span>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Galería de imágenes -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Galería</h3>
+        <label style="cursor:pointer;">
+          <span pButton icon="pi pi-images" label="Agregar imagen" class="p-button p-button-sm"></span>
+          <input type="file" accept="image/*" (change)="agregarImagenGaleria($event)" style="display:none;" />
+        </label>
+      </div>
+      <p style="color:rgba(233,247,234,0.5); font-size:0.85rem; margin:0 0 1rem;">
+        Imágenes visibles en la sección Galería de la página de inicio.
+      </p>
+      <div *ngIf="siteConfig.imagenesGaleria.length === 0" style="color:rgba(233,247,234,0.35); font-style:italic;">
+        No hay imágenes en la galería. Agrega la primera.
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem;">
+        <div *ngFor="let item of siteConfig.imagenesGaleria; let i = index" style="position:relative; border-radius:10px; overflow:hidden; border:1px solid rgba(57,211,83,0.2);">
+          <img [src]="item.url" [alt]="item.descripcion || 'Imagen galería'" style="width:100%; height:120px; object-fit:cover; display:block;" />
+          <button pButton type="button" icon="pi pi-trash" size="small" severity="danger"
+            style="position:absolute; top:0.4rem; right:0.4rem; opacity:0.9;"
+            (click)="eliminarImagenGaleria(i)" pTooltip="Eliminar">
+          </button>
+          <div style="padding:0.5rem; background:rgba(0,0,0,0.5);">
+            <input pInputText [(ngModel)]="item.descripcion" placeholder="Descripción (opcional)"
+              style="width:100%; font-size:0.78rem;" />
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Gestión de noticias -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Noticias</h3>
+        <p-button label="Agregar Noticia" icon="pi pi-plus" (onClick)="abrirModalNoticia()"></p-button>
+      </div>
+
+      <p-table [value]="noticiasAdmin" [paginator]="true" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-noticia>
+          <tr>
+            <td>{{ noticia.titulo }}</td>
+            <td>{{ noticia.categoria }}</td>
+            <td>{{ noticia.fecha | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div style="display:flex; gap:0.5rem;">
+                <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalNoticia(noticia)" pTooltip="Editar"></p-button>
+                <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarNoticia(noticia._id)" pTooltip="Eliminar"></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="4">No hay noticias registradas.</td></tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+</div>
+
+<!-- MODAL DETALLE SOLICITUD -->
+<p-dialog
+  header="Detalle de Solicitud"
+  [(visible)]="modalSolicitudVisible"
+  [modal]="true"
+  [style]="{ width: 'min(95vw, 640px)' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <div *ngIf="solicitudSeleccionada" style="display:flex; flex-direction:column; gap:1.5rem;">
+
+    <div>
+      <h4 style="margin-bottom:0.5rem;">Datos del Alumno</h4>
+      <p><strong>Nombre:</strong> {{ solicitudSeleccionada.pupilo.nombre }} {{ solicitudSeleccionada.pupilo.apellidoPaterno }} {{ solicitudSeleccionada.pupilo.apellidoMaterno }}</p>
+      <p><strong>RUT:</strong> {{ solicitudSeleccionada.pupilo.rut }}</p>
+      <p><strong>Fecha de Nacimiento:</strong> {{ solicitudSeleccionada.pupilo.fechaNacimiento | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Género:</strong> {{ solicitudSeleccionada.pupilo.genero?.name }}</p>
+      <p><strong>Dirección:</strong> {{ solicitudSeleccionada.pupilo.direccion }}</p>
+      <p><strong>Comuna:</strong> {{ solicitudSeleccionada.pupilo.comuna?.name }}</p>
+    </div>
+
+    <div>
+      <h4 style="margin-bottom:0.5rem;">Datos del Apoderado</h4>
+      <p><strong>Nombre:</strong> {{ solicitudSeleccionada.apoderado.nombre }} {{ solicitudSeleccionada.apoderado.apellidos }}</p>
+      <p><strong>Correo:</strong> {{ solicitudSeleccionada.apoderado.correo }}</p>
+      <p><strong>Teléfono:</strong> {{ solicitudSeleccionada.apoderado.telefono }}</p>
+    </div>
+
+    <div>
+      <h4 style="margin-bottom:0.5rem;">Estado</h4>
+      <p-tag
+        [value]="solicitudSeleccionada.estado || 'pendiente'"
+        [severity]="getEstadoSeverity(solicitudSeleccionada.estado || 'pendiente')">
+      </p-tag>
+      <p style="margin-top:0.5rem;"><strong>Fecha de registro:</strong> {{ solicitudSeleccionada.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+
+    <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+      <p-button
+        label="Aprobar"
+        icon="pi pi-check"
+        severity="success"
+        (onClick)="aprobar(solicitudSeleccionada._id); modalSolicitudVisible=false"
+        [disabled]="solicitudSeleccionada.estado === 'aprobado'">
+      </p-button>
+      <p-button
+        label="Rechazar"
+        icon="pi pi-times"
+        severity="danger"
+        (onClick)="rechazar(solicitudSeleccionada._id); modalSolicitudVisible=false"
+        [disabled]="solicitudSeleccionada.estado === 'rechazado'">
+      </p-button>
+    </div>
+
+  </div>
+</p-dialog>
+
+<!-- MODAL ESTUDIANTE -->
+<p-dialog [header]="estudianteEditando ? 'Editar Estudiante' : 'Nuevo Estudiante'" [(visible)]="modalEstudianteVisible" [modal]="true" [style]="{width:'min(95vw,520px)'}" [draggable]="false" [resizable]="false">
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Nombre *</label>
+        <input pInputText [(ngModel)]="estudianteForm.nombre" style="width:100%;" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">RUT</label>
+        <input pInputText [(ngModel)]="estudianteForm.rut" style="width:100%;" placeholder="12.345.678-9" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">División</label>
+        <input pInputText [(ngModel)]="estudianteForm.division" style="width:100%;" placeholder="Ej: Sub-15" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Fecha de Ingreso</label>
+        <input type="date" [(ngModel)]="estudianteForm.fechaIngreso" style="width:100%; padding:0.5rem; border:1px solid #ced4da; border-radius:6px;" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Teléfono</label>
+        <input pInputText [(ngModel)]="estudianteForm.telefono" style="width:100%;" placeholder="+56912345678" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Email</label>
+        <input pInputText [(ngModel)]="estudianteForm.email" style="width:100%;" placeholder="correo@ejemplo.com" />
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+      <p-button label="Cancelar" severity="secondary" (onClick)="modalEstudianteVisible=false"></p-button>
+      <p-button label="Guardar" icon="pi pi-save" (onClick)="guardarEstudiante()"></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- MODAL PROFESOR -->
+<p-dialog [header]="profesorEditando ? 'Editar Profesor' : 'Nuevo Profesor'" [(visible)]="modalProfesorVisible" [modal]="true" [style]="{width:'min(95vw,520px)'}" [draggable]="false" [resizable]="false">
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Nombre *</label>
+        <input pInputText [(ngModel)]="profesorForm.nombre" style="width:100%;" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Especialidad</label>
+        <input pInputText [(ngModel)]="profesorForm.especialidad" style="width:100%;" placeholder="Ej: Entrenador Sub-15" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Experiencia</label>
+        <input pInputText [(ngModel)]="profesorForm.experiencia" style="width:100%;" placeholder="Ej: 5 años" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Teléfono</label>
+        <input pInputText [(ngModel)]="profesorForm.telefono" style="width:100%;" placeholder="+56912345678" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
+        <label style="font-weight:600;">Divisiones <small style="font-weight:400;">(separadas por coma)</small></label>
+        <input pInputText [(ngModel)]="profesorForm.divisionesTexto" style="width:100%;" placeholder="Sub-13, Sub-15" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
+        <label style="font-weight:600;">Email</label>
+        <input pInputText [(ngModel)]="profesorForm.email" style="width:100%;" placeholder="correo@ejemplo.com" />
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+      <p-button label="Cancelar" severity="secondary" (onClick)="modalProfesorVisible=false"></p-button>
+      <p-button label="Guardar" icon="pi pi-save" (onClick)="guardarProfesor()"></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- MODAL DIVISIÓN -->
+<p-dialog [header]="divisionEditando ? 'Editar División' : 'Nueva División'" [(visible)]="modalDivisionVisible" [modal]="true" [style]="{width:'min(95vw,480px)'}" [draggable]="false" [resizable]="false">
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Nombre *</label>
+        <input pInputText [(ngModel)]="divisionForm.nombre" style="width:100%;" placeholder="Ej: Sub-15" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Categoría</label>
+        <input pInputText [(ngModel)]="divisionForm.categoria" style="width:100%;" placeholder="Ej: Juvenil" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
+        <label style="font-weight:600;">Profesor Principal</label>
+        <input pInputText [(ngModel)]="divisionForm.profesorPrincipal" style="width:100%;" placeholder="Nombre del profesor" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">N° Estudiantes</label>
+        <input pInputText type="number" [(ngModel)]="divisionForm.estudiantes" style="width:100%;" min="0" />
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+      <p-button label="Cancelar" severity="secondary" (onClick)="modalDivisionVisible=false"></p-button>
+      <p-button label="Guardar" icon="pi pi-save" (onClick)="guardarDivision()"></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- MODAL PARTIDO -->
+<p-dialog [header]="partidoEditando ? 'Editar Partido' : 'Nuevo Partido'" [(visible)]="modalPartidoVisible" [modal]="true" [style]="{width:'min(95vw,560px)'}" [draggable]="false" [resizable]="false">
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Local</label>
+        <input pInputText [(ngModel)]="partidoForm.local" style="width:100%;" placeholder="Santiago Wanderers" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Visitante *</label>
+        <input pInputText [(ngModel)]="partidoForm.visitante" style="width:100%;" placeholder="Nombre del equipo visitante" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Fecha</label>
+        <input type="date" [(ngModel)]="partidoForm.fecha" style="width:100%; padding:0.5rem; border:1px solid rgba(57,211,83,0.22); border-radius:6px;" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Hora</label>
+        <input pInputText [(ngModel)]="partidoForm.hora" style="width:100%;" placeholder="Ej: 18:00" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Resultado <small style="font-weight:400;">(si ya se jugó)</small></label>
+        <input pInputText [(ngModel)]="partidoForm.resultado" style="width:100%;" placeholder="Ej: 2-1" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Sede / Estadio</label>
+        <input pInputText [(ngModel)]="partidoForm.sede" style="width:100%;" placeholder="Ej: Estadio Elías Figueroa" />
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
+        <label style="font-weight:600;">Tipo</label>
+        <p-select [options]="tipoPartidoOpciones" [(ngModel)]="partidoForm.tipo" optionLabel="label" optionValue="value" style="width:100%;"></p-select>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+      <p-button label="Cancelar" severity="secondary" (onClick)="modalPartidoVisible=false"></p-button>
+      <p-button label="Guardar" icon="pi pi-save" (onClick)="guardarPartido()"></p-button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- MODAL NOTICIA -->
+<p-dialog
+  [header]="noticiaEditando ? 'Editar Noticia' : 'Nueva Noticia'"
+  [(visible)]="modalNoticiaVisible"
+  [modal]="true"
+  [style]="{ width: 'min(95vw, 560px)' }"
+  [draggable]="false"
+  [resizable]="false">
+
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">Título *</label>
+      <input pInputText [(ngModel)]="noticiaForm.titulo" style="width:100%;" />
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">Resumen <small style="font-weight:400;">(se muestra en la tarjeta)</small></label>
+      <textarea [(ngModel)]="noticiaForm.descripcion" rows="2"
+        style="width:100%; padding:0.5rem; border:1px solid rgba(57,211,83,0.22); border-radius:6px; font-family:inherit; font-size:1rem; resize:vertical;"></textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">Contenido completo <small style="font-weight:400;">(se muestra al hacer "Leer más")</small></label>
+      <textarea [(ngModel)]="noticiaForm.contenido" rows="5"
+        style="width:100%; padding:0.5rem; border:1px solid rgba(57,211,83,0.22); border-radius:6px; font-family:inherit; font-size:1rem; resize:vertical;"></textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">Fecha</label>
+      <input type="date" [(ngModel)]="noticiaForm.fecha" style="width:100%; padding:0.5rem; border:1px solid #ced4da; border-radius:6px;" />
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">URL de imagen</label>
+      <input pInputText [(ngModel)]="noticiaForm.imagenUrl" style="width:100%;" placeholder="assets/noticias/imagen.jpg" />
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <label style="font-weight:600;">Categoría</label>
+      <p-select
+        [options]="categoriasOpciones"
+        [(ngModel)]="noticiaForm.categoria"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar categoría"
+        style="width:100%;">
+      </p-select>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
+      <p-button label="Cancelar" severity="secondary" (onClick)="modalNoticiaVisible = false"></p-button>
+      <p-button label="Guardar" icon="pi pi-save" (onClick)="guardarNoticia()"></p-button>
+    </div>
+
+  </div>
+</p-dialog>
+
+<!-- MODAL VOUCHER -->
+<p-dialog
+  header="Voucher de pago"
+  [(visible)]="modalVoucherVisible"
+  [modal]="true"
+  [style]="{ width: 'min(95vw, 820px)' }"
+  [draggable]="false"
+  [resizable]="false">
+  <div *ngIf="pagoSeleccionado">
+    <p><strong>Alumno:</strong> {{ pagoSeleccionado.alumno }}</p>
+    <p><strong>Sede:</strong> {{ pagoSeleccionado.sede }}</p>
+    <img [src]="pagoSeleccionado.voucherBase64" alt="Voucher de pago" style="max-width: 100%;" />
+  </div>
+</p-dialog>

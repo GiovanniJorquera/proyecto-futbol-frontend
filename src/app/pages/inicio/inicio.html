@@ -1,0 +1,271 @@
+<!-- ========= HEADER ========= -->
+<header class="page-header">
+  <h1>{{ siteConfig.tituloHeader }}</h1>
+  <nav class="header-nav">
+    <button pButton type="button" label="Postular" icon="pi pi-user-plus" size="small" (click)="navegarFormulario()"></button>
+    <button pButton type="button" label="Subir Voucher" icon="pi pi-receipt" size="small" severity="secondary" (click)="navegarRegistro()"></button>
+    <button pButton type="button" label="Iniciar Sesión" icon="pi pi-sign-in" size="small" severity="secondary" (click)="navegarLogin()"></button>
+  </nav>
+</header>
+
+<!-- ========= HERO ========= -->
+<section class="hero-section">
+  <ng-container *ngIf="siteConfig.imagenesCarrusel.length > 0; else heroFallback">
+    <p-carousel
+      [value]="siteConfig.imagenesCarrusel"
+      [numVisible]="1"
+      [numScroll]="1"
+      [circular]="true"
+      [autoplayInterval]="5000"
+      [showNavigators]="true"
+      [showIndicators]="true"
+      styleClass="hero-carousel">
+      <ng-template let-img pTemplate="item">
+        <div class="hero-slide">
+          <img [src]="img" alt="Imagen del club" />
+        </div>
+      </ng-template>
+    </p-carousel>
+  </ng-container>
+
+  <ng-template #heroFallback>
+    <div class="hero-fallback">
+      <img [src]="imgDestacada" alt="Imagen destacada del club" />
+      <div class="hero-overlay">
+        <span class="hero-kicker">Santiago Wanderers</span>
+        <h1 class="hero-title">{{ siteConfig.tituloBienvenida }}</h1>
+        <p class="hero-sub">{{ siteConfig.subtituloBienvenida }}</p>
+      </div>
+    </div>
+  </ng-template>
+</section>
+
+<!-- Welcome strip (only shown when carousel is active) -->
+<div class="welcome-strip" *ngIf="siteConfig.imagenesCarrusel.length > 0">
+  <h1>{{ siteConfig.tituloBienvenida }}</h1>
+  <p>{{ siteConfig.subtituloBienvenida }}</p>
+</div>
+
+<!-- ========= SECTIONS NAV ========= -->
+<nav class="sections-nav" aria-label="Secciones de la página">
+  <button
+    type="button"
+    [class.active]="seccionActiva === 'noticias'"
+    (click)="scrollTo('noticias')">
+    Noticias
+  </button>
+  <button
+    type="button"
+    [class.active]="seccionActiva === 'partidos'"
+    (click)="scrollTo('partidos')">
+    Partidos
+  </button>
+  <button
+    type="button"
+    [class.active]="seccionActiva === 'galerias'"
+    (click)="scrollTo('galerias')">
+    Galería
+  </button>
+  <button
+    type="button"
+    [class.active]="seccionActiva === 'planteles'"
+    (click)="scrollTo('planteles')">
+    Planteles
+  </button>
+</nav>
+
+<!-- ========= NOTICIAS ========= -->
+<section id="noticias" class="content-section">
+  <div class="section-inner">
+    <h2 class="section-heading">Últimas Noticias</h2>
+
+    <div class="news-grid" *ngIf="noticias.length > 0; else noNoticias">
+      <article class="news-card" *ngFor="let noticia of noticias">
+        <div class="news-card-img-wrap">
+          <img
+            class="news-card-img"
+            [src]="noticia.imagenUrl"
+            [alt]="noticia.titulo" />
+        </div>
+        <div class="news-card-body">
+          <div class="news-card-meta">
+            <span class="news-tag">{{ noticia.categoria }}</span>
+            <span class="news-date">{{ noticia.fecha | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <h3 class="news-card-title">{{ noticia.titulo }}</h3>
+          <p class="news-card-desc">{{ noticia.descripcion }}</p>
+          <button class="leer-mas-btn" type="button" (click)="verNoticia(noticia)">
+            Leer más <i class="pi pi-arrow-right"></i>
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #noNoticias>
+      <p class="section-empty">No hay noticias disponibles por el momento.</p>
+    </ng-template>
+  </div>
+</section>
+
+<!-- ========= PARTIDOS ========= -->
+<section id="partidos" class="content-section section-alt">
+  <div class="section-inner">
+    <h2 class="section-heading">Partidos</h2>
+
+    <div class="partidos-list" *ngIf="partidos.length > 0; else noPartidos">
+      <div class="partido-card" *ngFor="let partido of partidos">
+        <div class="partido-header">
+          <span class="partido-tipo" [class.resultado]="partido.tipo === 'resultado'">
+            {{ partido.tipo === 'resultado' ? 'Resultado' : 'Próximo partido' }}
+          </span>
+          <span class="partido-fecha">
+            {{ partido.fecha | date:'dd/MM/yyyy' }}
+            <ng-container *ngIf="partido.hora">&nbsp;{{ partido.hora }}</ng-container>
+          </span>
+        </div>
+
+        <div class="partido-teams">
+          <span class="team">{{ partido.local }}</span>
+          <span class="partido-vs" [class.con-resultado]="partido.resultado">
+            {{ partido.resultado || 'vs' }}
+          </span>
+          <span class="team">{{ partido.visitante }}</span>
+        </div>
+
+        <div class="partido-footer" *ngIf="partido.sede">
+          <i class="pi pi-map-marker"></i>
+          {{ partido.sede }}
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noPartidos>
+      <p class="section-empty">No hay partidos registrados por el momento.</p>
+    </ng-template>
+  </div>
+</section>
+
+<!-- ========= GALERÍA ========= -->
+<section id="galerias" class="content-section">
+  <div class="section-inner">
+    <h2 class="section-heading">Galería</h2>
+
+    <ng-container *ngIf="siteConfig.imagenesGaleria.length > 0; else noGaleria">
+      <p-galleria
+        [value]="siteConfig.imagenesGaleria"
+        [numVisible]="5"
+        [circular]="true"
+        [showItemNavigators]="true"
+        [showThumbnails]="true"
+        thumbnailsPosition="bottom"
+        styleClass="galeria-component">
+        <ng-template let-item pTemplate="item">
+          <img class="galeria-img-main" [src]="item.url" [alt]="item.descripcion || 'Imagen galería'" />
+        </ng-template>
+        <ng-template let-item pTemplate="thumbnail">
+          <img class="galeria-thumb" [src]="item.url" [alt]="item.descripcion || 'Miniatura'" />
+        </ng-template>
+      </p-galleria>
+    </ng-container>
+
+    <ng-template #noGaleria>
+      <p class="section-empty">No hay imágenes en la galería todavía.</p>
+    </ng-template>
+  </div>
+</section>
+
+<!-- ========= PLANTELES ========= -->
+<section id="planteles" class="content-section section-alt">
+  <div class="section-inner">
+    <h2 class="section-heading">Planteles &amp; Cuerpo Técnico</h2>
+
+    <div class="planteles-grid" *ngIf="profesores.length > 0; else noPlanteles">
+      <div class="plantel-card" *ngFor="let prof of profesores">
+        <div class="plantel-avatar">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="plantel-info">
+          <span class="plantel-nombre">{{ prof.nombre }}</span>
+          <span class="plantel-rol">{{ prof.especialidad || prof.rol || 'Entrenador' }}</span>
+          <span class="plantel-exp" *ngIf="prof.experiencia">{{ prof.experiencia }} de experiencia</span>
+          <div class="plantel-divisiones" *ngIf="prof.divisiones && prof.divisiones.length > 0">
+            <span class="division-tag" *ngFor="let div of prof.divisiones">{{ div }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noPlanteles>
+      <p class="section-empty">No hay información de plantel disponible.</p>
+    </ng-template>
+  </div>
+</section>
+
+<!-- ========= FLOATING BUTTON ========= -->
+<button
+  *ngIf="!mostrarPostulaciones"
+  type="button"
+  class="floating-popup-button"
+  (click)="abrirPopup()"
+  aria-label="Abrir postulaciones">
+  P
+</button>
+
+<!-- ========= DIALOG: POSTULACIONES ========= -->
+<p-dialog
+  [(visible)]="mostrarPostulaciones"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="postulaciones-dialog"
+  header="Postulaciones aqui"
+  (onHide)="cerrarPopup()">
+  <div class="postulaciones-dialog-content">
+    <h1>Inscríbete en el club y comienza tu proceso de postulación.</h1>
+    <img src="media/1449849007-sub.jpg" alt="Imagen de inscripción del club" />
+    <button pButton type="button" label="Quiero postular" class="dialog-action" (click)="navegarFormulario()"></button>
+  </div>
+</p-dialog>
+
+<!-- ========= DIALOG: IMAGEN DESTACADA ========= -->
+<p-dialog
+  [(visible)]="mostrarImagenPopup"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="imagen-popup-dialog"
+  header="Imagen destacada"
+  (onHide)="cerrarImagenPopup()">
+  <div class="imagen-popup-content">
+    <img [src]="imgDestacada" alt="Jugador de fútbol del club en formato ampliado" />
+    <p>La imagen destacada del equipo en vista ampliada.</p>
+  </div>
+</p-dialog>
+
+<!-- ========= DIALOG: DETALLE NOTICIA ========= -->
+<p-dialog
+  [(visible)]="mostrarDetalleNoticia"
+  header="Noticia"
+  [modal]="true"
+  [style]="{ width: 'min(96vw, 780px)' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="noticia-dialog">
+  <div *ngIf="noticiaSeleccionada" class="noticia-detalle">
+    <img
+      *ngIf="noticiaSeleccionada.imagenUrl"
+      class="noticia-detalle-img"
+      [src]="noticiaSeleccionada.imagenUrl"
+      [alt]="noticiaSeleccionada.titulo" />
+    <div class="noticia-detalle-meta">
+      <span class="news-tag">{{ noticiaSeleccionada.categoria }}</span>
+      <span class="news-date">{{ noticiaSeleccionada.fecha | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <h2 class="noticia-detalle-titulo">{{ noticiaSeleccionada.titulo }}</h2>
+    <p class="noticia-detalle-texto">
+      {{ noticiaSeleccionada.contenido || noticiaSeleccionada.descripcion }}
+    </p>
+  </div>
+</p-dialog>

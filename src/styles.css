@@ -1,0 +1,23 @@
+/* Global app reset */
+html,
+body {
+	width: 100%;
+	min-height: 100%;
+	margin: 0;
+	background: #0a0d0a;
+	overflow-x: hidden;
+}
+
+body {
+	color: #f4f7f3;
+	font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+}
+
+app-root {
+	display: block;
+	min-height: 100vh;
+	background:
+		radial-gradient(circle at top left, rgba(42, 181, 76, 0.18), transparent 32%),
+		radial-gradient(circle at top right, rgba(42, 181, 76, 0.12), transparent 28%),
+		linear-gradient(180deg, #0a0d0a 0%, #0f140f 45%, #121812 100%);
+}

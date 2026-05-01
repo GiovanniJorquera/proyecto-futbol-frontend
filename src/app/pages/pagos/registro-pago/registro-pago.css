@@ -1,0 +1,95 @@
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 0.75rem 1.25rem;
+  background: rgba(6, 10, 6, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(42, 181, 76, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #39d353;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.header-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.registro-page {
+  max-width: 720px;
+  margin: 1rem auto;
+  padding: 0 1rem 2rem;
+}
+
+.registro-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field small {
+  color: #b3261e;
+}
+
+.field input[type='date'],
+.field input[type='file'],
+.field input[type='number'] {
+  border: 1px solid #cdd5df;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: #000000;
+}
+
+.preview {
+  border: 1px dashed #adc4b4;
+  border-radius: 12px;
+  padding: 0.75rem;
+  background: #f6faf7;
+}
+
+.preview img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.msg {
+  margin: 0;
+  font-weight: 600;
+}
+
+.msg.ok {
+  color: #1d7f3e;
+}
+
+.msg.error {
+  color: #b3261e;
+}
+
+@media (max-width: 640px) {
+  .registro-page {
+    margin-top: 0.5rem;
+    padding: 0 0.75rem 1.5rem;
+  }
+}
