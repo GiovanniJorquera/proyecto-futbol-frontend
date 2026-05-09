@@ -1,0 +1,139 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0b6623, #14532d);
+  color: #1f2937;
+}
+
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 60px;
+}
+
+.card {
+  width: min(940px, 100%);
+  padding: 32px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+}
+
+.subtitulo {
+  color: #0b6623;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.seccion {
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 24px;
+  background: #f9fafb;
+  color: #0b6623;
+}
+
+.seccion h3 {
+  margin-bottom: 16px;
+  color: #0b6623;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 700;
+  color: #1f4316;
+  font-size: 0.95rem;
+}
+
+input,
+p-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #39d353;
+  transition: 0.2s;
+  color: #0b6623;
+  background: #fafafa;
+}
+
+input:focus,
+.p-dropdown .p-dropdown-label:focus,
+.p-select .p-select-label:focus {
+  outline: none;
+  border-color: #39d353;
+  box-shadow: 0 0 0 4px rgba(57, 211, 83, 0.12);
+}
+
+:host ::ng-deep span.p-select-label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  flex: 1 1 auto;
+  width: 1%;
+  padding: var(--p-select-padding-y) var(--p-select-padding-x);
+  text-overflow: ellipsis;
+  cursor: pointer;
+  color: #0b6623 !important;
+  background: transparent !important;
+  border: 0 none;
+  outline: 0 none;
+  font-size: 1rem;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label,
+:host ::ng-deep span.p-select-label,
+:host ::ng-deep .p-select .p-select-label {
+  background: #fafafa !important;
+}
+
+.p-select {
+  width: 100%;
+  display: flex;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #39d353;
+  transition: 0.2s;
+  color: #0b6623;
+  background: #fafafa;
+}
+
+.boton {
+  width: 100%;
+  margin-top: 28px;
+  background: linear-gradient(135deg, #0b6623, #39d353);
+  border: none;
+  height: 52px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.boton:hover {
+  opacity: 0.95;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+}
+
+.input-error {
+  border: 2px solid #b91c1c !important;
+}

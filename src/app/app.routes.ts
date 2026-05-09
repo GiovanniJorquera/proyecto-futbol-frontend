@@ -11,6 +11,12 @@ export const routes: Routes = [
     loadComponent: () => import('./formulario/formulario').then(m => m.FormularioComponent)
   },
   {
+    path: 'ficha-temporada',
+    loadComponent: () =>
+      import('./ficha-temporada/ficha-temporada')
+        .then(m => m.FichaTemporadaComponent)
+  },
+  {
     path: 'login',
     loadComponent: () => import('./login/login').then(m => m.LoginComponent)
   },
@@ -21,11 +27,15 @@ export const routes: Routes = [
   },
   {
     path: 'pagos/registro',
-    loadComponent: () => import('./pages/pagos/registro-pago/registro-pago').then(m => m.RegistroPagoComponent)
+    loadComponent: () =>
+      import('./pages/pagos/registro-pago/registro-pago')
+        .then(m => m.RegistroPagoComponent)
   },
   {
     path: 'pagos/validacion',
-    loadComponent: () => import('./pages/pagos/validacion-pagos/validacion-pagos').then(m => m.ValidacionPagosComponent),
+    loadComponent: () =>
+      import('./pages/pagos/validacion-pagos/validacion-pagos')
+        .then(m => m.ValidacionPagosComponent),
     canActivate: [authGuard]
   },
   {

@@ -25,7 +25,7 @@ import { ToastModule } from 'primeng/toast';
     ToastModule,
   ],
   templateUrl: './formulario.html',
-  styleUrl: './formulario.css'
+  styleUrls: ['./formulario.css']
 })
 export class FormularioComponent {
 

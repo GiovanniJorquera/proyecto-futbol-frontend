@@ -1,0 +1,159 @@
+<p-toast position="top-center"></p-toast>
+
+<div class="form-wrapper">
+  <p-card class="card">
+
+    <h2 class="subtitulo">Ficha de Temporada</h2>
+
+    <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()">
+
+      <div class="seccion">
+        <h3>Datos del Jugador</h3>
+
+        <div class="grid">
+
+          <div class="campo">
+            <label>Nombre</label>
+            <input
+              pInputText
+              formControlName="nombre"
+              [ngClass]="{'input-error': campoInvalido('nombre')}" />
+            <small *ngIf="campoInvalido('nombre')" class="error">
+              El nombre es obligatorio
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Dirección</label>
+            <input
+              pInputText
+              formControlName="direccion"
+              [ngClass]="{'input-error': campoInvalido('direccion')}" />
+            <small *ngIf="campoInvalido('direccion')" class="error">
+              La dirección es obligatoria
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Ciudad</label>
+            <input
+              pInputText
+              formControlName="ciudad"
+              [ngClass]="{'input-error': campoInvalido('ciudad')}" />
+            <small *ngIf="campoInvalido('ciudad')" class="error">
+              La ciudad es obligatoria
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Fecha nacimiento</label>
+            <input
+              type="date"
+              formControlName="fechaNacimiento"
+              [ngClass]="{'input-error': campoInvalido('fechaNacimiento')}" />
+            <small *ngIf="campoInvalido('fechaNacimiento')" class="error">
+              La fecha de nacimiento es obligatoria
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Cédula</label>
+            <input
+              pInputText
+              formControlName="cedula"
+              [ngClass]="{'input-error': campoInvalido('cedula')}" />
+            <small *ngIf="campoInvalido('cedula')" class="error">
+              La cédula es obligatoria
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Club amateur</label>
+            <input pInputText formControlName="clubAmateur" />
+          </div>
+
+          <div class="campo">
+            <label>Talla</label>
+            <input pInputText formControlName="talla" />
+          </div>
+
+          <div class="campo">
+            <label>Números favoritos</label>
+            <input pInputText formControlName="numerosFavoritos" />
+          </div>
+
+          <div class="campo">
+            <label>Nombre camiseta</label>
+            <input pInputText formControlName="nombreCamiseta" />
+          </div>
+
+          <div class="campo">
+            <label>Posición</label>
+            <p-select
+              [options]="posiciones"
+              optionLabel="name"
+              formControlName="posicion"
+              placeholder="Seleccione posición">
+            </p-select>
+          </div>
+
+          <div class="campo">
+            <label>Pie hábil</label>
+            <p-select
+              [options]="pies"
+              optionLabel="name"
+              formControlName="pieHabil"
+              placeholder="Seleccione pie">
+            </p-select>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>Datos del Apoderado</h3>
+
+        <div formGroupName="apoderado" class="grid">
+
+          <div class="campo">
+            <label>Nombre</label>
+            <input
+              pInputText
+              formControlName="nombre"
+              [ngClass]="{'input-error': campoApoderadoInvalido('nombre')}" />
+            <small *ngIf="campoApoderadoInvalido('nombre')" class="error">
+              El nombre del apoderado es obligatorio
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Correo</label>
+            <input
+              pInputText
+              formControlName="correo"
+              [ngClass]="{'input-error': campoApoderadoInvalido('correo')}" />
+            <small *ngIf="campoApoderadoInvalido('correo')" class="error">
+              El correo del apoderado es obligatorio y debe ser válido
+            </small>
+          </div>
+
+          <div class="campo">
+            <label>Whatsapp</label>
+            <input pInputText formControlName="whatsapp" />
+          </div>
+
+        </div>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        class="boton"
+        [label]="enviando ? 'Guardando...' : 'Guardar ficha'"
+        [disabled]="enviando">
+      </button>
+
+    </form>
+
+  </p-card>
+</div>

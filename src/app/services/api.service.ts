@@ -132,4 +132,7 @@ export class ApiService {
   updateEstadoPago(id: string, estado: string): Observable<Pago> {
     return this.http.patch<Pago>(`${this.apiUrl}/pagos/${id}/estado`, { estado }, this.authHeaders);
   }
+  crearFichaTemporada(data: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/ficha-temporada`, data);
+}
 }

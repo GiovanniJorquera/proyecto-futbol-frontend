@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 import { EstadoPago, Pago } from '../models/pago';
 import { AuthService } from './auth.service';
 
@@ -42,7 +43,7 @@ function fromMongoPago(pago: PagoMongoResponse): Pago {
   providedIn: 'root',
 })
 export class PagosService {
-  private readonly apiUrl = 'http://localhost:3000/pagos';
+  private readonly apiUrl = `${environment.apiUrl}/pagos`;
   private readonly authService = inject(AuthService);
 
   constructor(private readonly http: HttpClient) {}

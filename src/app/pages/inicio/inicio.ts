@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { ButtonModule } from 'primeng/button';
 import { CarouselModule } from 'primeng/carousel';
 import { DialogModule } from 'primeng/dialog';
@@ -41,9 +42,10 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
     return this.siteConfig.imagenDestacada || 'media/KevinVasquez.png';
   }
 
+  private readonly apiUrl = environment.apiUrl;
+
   noticias: Noticia[] = [
     {
-      _id: '1',
       titulo: 'Inscripciones Abiertas 2026',
       descripcion:
         'Ya puedes inscribir a tus hijos para el ciclo de invierno en nuestra sede de Viña del Mar. Los cupos son limitados.',
@@ -75,7 +77,7 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.temaOscuro = localStorage.getItem('inicio-tema') === 'oscuro';
 
-    this.http.get<any>('http://localhost:3000/config').subscribe({
+    this.http.get<any>(`${this.apiUrl}/config`).subscribe({
       next: (config) => {
         if (config.tituloHeader) this.siteConfig.tituloHeader = config.tituloHeader;
         if (config.tituloBienvenida) this.siteConfig.tituloBienvenida = config.tituloBienvenida;
@@ -95,21 +97,21 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
       error: () => {},
     });
 
-    this.http.get<Noticia[]>('http://localhost:3000/noticias').subscribe({
+    this.http.get<Noticia[]>(`${this.apiUrl}/noticias`).subscribe({
       next: (data) => {
         if (data && data.length > 0) this.noticias = data;
       },
       error: () => {},
     });
 
-    this.http.get<Partido[]>('http://localhost:3000/partidos').subscribe({
+    this.http.get<Partido[]>(`${this.apiUrl}/partidos`).subscribe({
       next: (data) => {
         if (data && data.length > 0) this.partidos = data;
       },
       error: () => {},
     });
 
-    this.http.get<any[]>('http://localhost:3000/planteles').subscribe({
+    this.http.get<any[]>(`${this.apiUrl}/planteles`).subscribe({
       next: (data) => {
         if (data && data.length > 0) this.profesores = data;
       },
