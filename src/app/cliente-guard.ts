@@ -8,4 +8,8 @@ export const clienteGuard: CanActivateFn = () => {
 
   if (auth.isLoggedIn() && auth.getRol() === 'cliente') return true;
   return router.createUrlTree(['/login']);
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 22a3e76 (Entrega 2)

@@ -51,4 +51,8 @@ export class AuthService {
   getRol(): string | null {
     return this.getUsuario()?.rol ?? null;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 22a3e76 (Entrega 2)

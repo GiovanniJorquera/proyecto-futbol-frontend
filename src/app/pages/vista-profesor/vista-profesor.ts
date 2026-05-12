@@ -177,4 +177,8 @@ export class VistaProfesorComponent implements OnInit {
   get totalJustificado(): number {
     return this.registros.filter(r => r.estado === 'justificado').length;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 22a3e76 (Entrega 2)

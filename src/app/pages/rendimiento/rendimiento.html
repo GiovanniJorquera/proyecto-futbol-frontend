@@ -1,0 +1,87 @@
+<div class="form-wrapper">
+  <p-card class="card">
+    <h2 class="subtitulo">Evaluación de Rendimiento</h2>
+
+    <form [formGroup]="formulario" (ngSubmit)="guardarRendimiento()">
+
+      <div class="seccion">
+        <h3>Calificaciones</h3>
+
+        <div class="grid">
+          <div class="campo">
+            <label>Velocidad</label>
+            <input pInputText type="number" formControlName="velocidad" min="1" max="10" />
+          </div>
+
+          <div class="campo">
+            <label>Resistencia</label>
+            <input pInputText type="number" formControlName="resistencia" min="1" max="10" />
+          </div>
+
+          <div class="campo">
+            <label>Técnica</label>
+            <input pInputText type="number" formControlName="tecnica" min="1" max="10" />
+          </div>
+
+          <div class="campo">
+            <label>Disciplina</label>
+            <input pInputText type="number" formControlName="disciplina" min="1" max="10" />
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>Comentario</h3>
+        <div class="campo">
+          <textarea pInputTextarea formControlName="comentario" rows="4" placeholder="Agrega una nota opcional..."></textarea>
+        </div>
+      </div>
+
+      <button pButton type="submit" label="Guardar evaluación" class="boton"></button>
+    </form>
+
+    <div class="seccion resumen-seccion">
+      <h3>Resumen</h3>
+      <div class="grid">
+        <div class="campo">
+          <p><strong>Promedio general:</strong></p>
+          <p>{{ resumen.promedioGeneral || 0 }}</p>
+        </div>
+        <div class="campo">
+          <p><strong>Total evaluaciones:</strong></p>
+          <p>{{ resumen.totalEvaluaciones || 0 }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="seccion">
+      <h3>Historial de evaluaciones</h3>
+
+      <div *ngIf="rendimientos.length === 0" class="empty">
+        No hay evaluaciones registradas.
+      </div>
+
+      <div *ngFor="let r of rendimientos" class="historial-card">
+        <div class="historial-row">
+          <span>Velocidad</span><strong>{{ r.velocidad }}</strong>
+        </div>
+        <div class="historial-row">
+          <span>Resistencia</span><strong>{{ r.resistencia }}</strong>
+        </div>
+        <div class="historial-row">
+          <span>Técnica</span><strong>{{ r.tecnica }}</strong>
+        </div>
+        <div class="historial-row">
+          <span>Disciplina</span><strong>{{ r.disciplina }}</strong>
+        </div>
+        <div class="historial-row">
+          <span>Promedio</span><strong>{{ r.promedio }}</strong>
+        </div>
+        <div class="historial-row comentario-row">
+          <span>Comentario</span>
+          <p>{{ r.comentario || 'Sin comentario' }}</p>
+        </div>
+      </div>
+    </div>
+  </p-card>
+</div>
