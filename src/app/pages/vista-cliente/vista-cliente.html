@@ -1,0 +1,326 @@
+<header class="page-header">
+  <h1>Santiago Wanderers</h1>
+  <nav class="header-nav">
+    <span class="bienvenida" *ngIf="usuario">Hola, {{ usuario.nombre }}</span>
+    <button type="button" class="theme-toggle" (click)="toggleTema()" [title]="temaOscuro ? 'Modo claro' : 'Modo oscuro'">
+      <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
+    <button type="button" class="btn-cerrar" (click)="cerrarSesion()">
+      <i class="pi pi-sign-out"></i> Cerrar sesión
+    </button>
+  </nav>
+</header>
+
+<div class="cliente-body">
+
+  <!-- Cargando -->
+  <div class="estado-msg" *ngIf="cargando">
+    <i class="pi pi-spin pi-spinner"></i> Cargando información...
+  </div>
+
+  <!-- Error -->
+  <div class="estado-msg error-msg" *ngIf="!cargando && error">
+    <i class="pi pi-exclamation-triangle"></i> {{ error }}
+  </div>
+
+  <!-- Contenido -->
+  <ng-container *ngIf="!cargando && ficha">
+
+    <!-- Sección: Perfil jugador -->
+    <section class="content-section">
+      <div class="section-inner">
+        <h2 class="section-heading">Ficha del Jugador</h2>
+
+        <div class="jugador-hero">
+          <div class="jugador-avatar">
+            <i class="pi pi-user"></i>
+          </div>
+          <div class="jugador-identidad">
+            <h2 class="jugador-nombre">{{ ficha.nombre }}</h2>
+            <div class="jugador-tags">
+              <span class="tag categoria">{{ ficha.categoria }}</span>
+              <span class="tag posicion" *ngIf="ficha.posicion">{{ ficha.posicion }}</span>
+              <span class="tag pie" *ngIf="ficha.pieHabil">{{ ficha.pieHabil }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid de info -->
+        <div class="info-grid">
+
+          <div class="info-card">
+            <h3 class="info-card-title"><i class="pi pi-id-card"></i> Datos Personales</h3>
+            <ul class="info-list">
+              <li *ngIf="ficha.fechaNacimiento">
+                <span class="lbl">Edad</span>
+                <span class="val">{{ calcularEdad(ficha.fechaNacimiento) }} años</span>
+              </li>
+              <li *ngIf="ficha.cedula">
+                <span class="lbl">RUT</span>
+                <span class="val">{{ ficha.cedula }}</span>
+              </li>
+              <li *ngIf="ficha.talla">
+                <span class="lbl">Talla</span>
+                <span class="val">{{ ficha.talla }}</span>
+              </li>
+              <li *ngIf="ficha.nombreCamiseta">
+                <span class="lbl">Nombre camiseta</span>
+                <span class="val">{{ ficha.nombreCamiseta }}</span>
+              </li>
+              <li *ngIf="ficha.numerosFavoritos?.length">
+                <span class="lbl">Números favoritos</span>
+                <span class="val">{{ ficha.numerosFavoritos.join(', ') }}</span>
+              </li>
+              <li *ngIf="ficha.direccion">
+                <span class="lbl">Dirección</span>
+                <span class="val">{{ ficha.direccion }}, {{ ficha.ciudad }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3 class="info-card-title"><i class="pi pi-book"></i> Educación</h3>
+            <ul class="info-list">
+              <li *ngIf="ficha.establecimiento">
+                <span class="lbl">Establecimiento</span>
+                <span class="val">{{ ficha.establecimiento }}</span>
+              </li>
+              <li *ngIf="ficha.curso">
+                <span class="lbl">Curso</span>
+                <span class="val">{{ ficha.curso }}</span>
+              </li>
+              <li *ngIf="ficha.clubAmateur">
+                <span class="lbl">Club amateur</span>
+                <span class="val">{{ ficha.clubAmateur }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3 class="info-card-title"><i class="pi pi-chart-bar"></i> Historial Deportivo</h3>
+            <ul class="info-list">
+              <li *ngIf="ficha.aniosJugando">
+                <span class="lbl">Años jugando</span>
+                <span class="val">{{ ficha.aniosJugando }}</span>
+              </li>
+              <li *ngIf="ficha.otrosDeportes">
+                <span class="lbl">Otros deportes</span>
+                <span class="val">{{ ficha.otrosDeportes }}</span>
+              </li>
+              <li *ngIf="ficha.otrasEscuelas">
+                <span class="lbl">Otras escuelas</span>
+                <span class="val">{{ ficha.otrasEscuelas }}</span>
+              </li>
+              <li *ngIf="ficha.actitudSocial">
+                <span class="lbl">Actitud social</span>
+                <span class="val">{{ ficha.actitudSocial }}</span>
+              </li>
+              <li *ngIf="ficha.actitudAdversidad">
+                <span class="lbl">Ante adversidad</span>
+                <span class="val">{{ ficha.actitudAdversidad }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="info-card">
+            <h3 class="info-card-title"><i class="pi pi-users"></i> Apoderado</h3>
+            <ul class="info-list">
+              <li *ngIf="ficha.apoderado?.nombre">
+                <span class="lbl">Nombre</span>
+                <span class="val">{{ ficha.apoderado.nombre }}</span>
+              </li>
+              <li *ngIf="ficha.apoderado?.correo">
+                <span class="lbl">Correo</span>
+                <span class="val">{{ ficha.apoderado.correo }}</span>
+              </li>
+              <li *ngIf="ficha.apoderado?.whatsapp">
+                <span class="lbl">WhatsApp</span>
+                <span class="val">{{ ficha.apoderado.whatsapp }}</span>
+              </li>
+              <li *ngIf="ficha.apoderado?.vinculo">
+                <span class="lbl">Vínculo</span>
+                <span class="val">{{ ficha.apoderado.vinculo }}</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Pago mensual -->
+    <section class="content-section alt-section">
+      <div class="section-inner">
+        <h2 class="section-heading">Pago Mensual</h2>
+
+        <div class="pago-grid">
+
+          <!-- Tarjeta estado: exento por beca -->
+          <div *ngIf="estadoPago === 'exento'" class="pago-card pago-pagado">
+            <div class="pago-card-header">
+              <i class="pi pi-star-fill"></i>
+              <span class="pago-mes-label">Beca activa</span>
+              <span class="pago-badge badge-ok">Exento</span>
+            </div>
+            <div class="pago-monto ok-text"><i class="pi pi-check"></i> Sin cuota mensual</div>
+          </div>
+
+          <!-- Tarjeta estado: pagado -->
+          <div *ngIf="estadoPago === 'pagado'" class="pago-card pago-pagado">
+            <div class="pago-card-header">
+              <i class="pi pi-check-circle"></i>
+              <span class="pago-mes-label">{{ mesesNombres[(pagosMensuales?.mesActual?.mes || 1) - 1] }} {{ pagosMensuales?.mesActual?.anio }}</span>
+              <span class="pago-badge badge-ok">Pagado</span>
+            </div>
+            <div class="pago-monto ok-text"><i class="pi pi-check"></i> Mes al día</div>
+          </div>
+
+          <!-- Tarjeta estado: pendiente (debe $20.000) -->
+          <div *ngIf="estadoPago === 'pendiente'" class="pago-card pago-pendiente">
+            <div class="pago-card-header">
+              <i class="pi pi-exclamation-circle"></i>
+              <span class="pago-mes-label">Cuota mensual</span>
+              <span class="pago-badge badge-warn">Pendiente</span>
+            </div>
+            <div class="pago-monto">
+              Debes: <strong>$20.000</strong>
+            </div>
+            <div style="margin-top:0.85rem;">
+              <button type="button" class="btn-voucher" (click)="mostrarFormVoucher = !mostrarFormVoucher">
+                <i class="pi pi-receipt"></i> {{ mostrarFormVoucher ? 'Cancelar' : 'Enviar comprobante de pago' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Historial últimos meses (si API respondió) -->
+          <div class="pago-historial" *ngIf="pagosMensuales?.historial?.length > 0">
+            <h4 class="historial-title"><i class="pi pi-history"></i> Historial reciente</h4>
+            <div class="historial-list">
+              <div class="historial-item" *ngFor="let p of pagosMensuales.historial">
+                <span class="hist-mes">{{ mesesNombres[p.mes - 1] }} {{ p.anio }}</span>
+                <span class="hist-badge" [class.badge-ok]="p.estado === 'pagado'" [class.badge-warn]="p.estado !== 'pagado'">
+                  {{ p.estado === 'pagado' ? 'Pagado' : 'Pendiente' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Formulario voucher inline -->
+        <div class="voucher-form-wrap" *ngIf="mostrarFormVoucher && estadoPago === 'pendiente'">
+          <h4 class="voucher-form-title"><i class="pi pi-upload"></i> Subir comprobante de pago</h4>
+
+          <div class="voucher-prefill">
+            <span class="voucher-pre-lbl">Jugador:</span>
+            <strong>{{ ficha?.nombre }}</strong>
+            <span class="voucher-pre-lbl" style="margin-left:1rem;">RUT:</span>
+            <strong>{{ ficha?.cedula || 'No registrado' }}</strong>
+          </div>
+
+          <div class="voucher-fields">
+            <div class="voucher-field">
+              <label>Sede</label>
+              <select [(ngModel)]="voucherForm.sede" class="voucher-select">
+                <option value="">— Selecciona sede —</option>
+                <option *ngFor="let s of voucherSedes" [value]="s.value">{{ s.label }}</option>
+              </select>
+            </div>
+            <div class="voucher-field">
+              <label>Monto ($)</label>
+              <input type="number" [(ngModel)]="voucherForm.montoPagado" class="voucher-input" min="1" />
+            </div>
+            <div class="voucher-field">
+              <label>Fecha del pago</label>
+              <input type="date" [(ngModel)]="voucherForm.fecha" class="voucher-input" />
+            </div>
+            <div class="voucher-field full-width">
+              <label>Comprobante (imagen)</label>
+              <input type="file" accept="image/*" (change)="onVoucherFileSelected($event)" class="voucher-file" />
+            </div>
+          </div>
+
+          <div class="voucher-preview" *ngIf="voucherPreview">
+            <img [src]="voucherPreview" alt="Vista previa del comprobante" />
+          </div>
+
+          <div class="alerta-error" *ngIf="tipoMensajeVoucher === 'error'">
+            <i class="pi pi-exclamation-triangle"></i> {{ mensajeVoucher }}
+          </div>
+
+          <div style="margin-top:1rem;">
+            <button type="button" class="btn-enviar-voucher" (click)="enviarVoucher()" [disabled]="enviandoVoucher">
+              <i class="pi pi-send" *ngIf="!enviandoVoucher"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="enviandoVoucher"></i>
+              {{ enviandoVoucher ? 'Enviando...' : 'Enviar comprobante' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirmación voucher enviado -->
+        <div class="alerta-ok" *ngIf="tipoMensajeVoucher === 'ok'" style="margin-top:1rem;">
+          <i class="pi pi-check-circle"></i> {{ mensajeVoucher }}
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Sección: Rendimiento -->
+    <section class="content-section">
+      <div class="section-inner">
+        <h2 class="section-heading">Rendimiento del Jugador</h2>
+
+        <div *ngIf="!rendimiento" class="empty-msg">
+          <i class="pi pi-spin pi-spinner"></i>
+          <p>Cargando rendimiento...</p>
+        </div>
+
+        <div *ngIf="rendimiento && !rendimiento.promedio" class="empty-msg">
+          <i class="pi pi-chart-bar"></i>
+          <p>Aún no hay sesiones de entrenamiento registradas.</p>
+        </div>
+
+        <div *ngIf="rendimiento?.promedio">
+          <div class="rend-promedio-grid">
+
+            <div class="rend-card">
+              <div class="rend-label"><i class="pi pi-bolt"></i> Físico</div>
+              <div class="rend-bar-wrap">
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.fisico)"></div>
+              </div>
+              <div class="rend-valor">{{ rendimiento.promedio.fisico }}<span class="rend-max">/5</span></div>
+            </div>
+
+            <div class="rend-card">
+              <div class="rend-label"><i class="pi pi-star"></i> Técnico</div>
+              <div class="rend-bar-wrap">
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.tecnico)"></div>
+              </div>
+              <div class="rend-valor">{{ rendimiento.promedio.tecnico }}<span class="rend-max">/5</span></div>
+            </div>
+
+            <div class="rend-card">
+              <div class="rend-label"><i class="pi pi-heart"></i> Psicológico</div>
+              <div class="rend-bar-wrap">
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.psicologico)"></div>
+              </div>
+              <div class="rend-valor">{{ rendimiento.promedio.psicologico }}<span class="rend-max">/5</span></div>
+            </div>
+
+            <div class="rend-card">
+              <div class="rend-label"><i class="pi pi-compass"></i> Estratégico</div>
+              <div class="rend-bar-wrap">
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.estrategico)"></div>
+              </div>
+              <div class="rend-valor">{{ rendimiento.promedio.estrategico }}<span class="rend-max">/5</span></div>
+            </div>
+
+          </div>
+          <p class="rend-sesiones"><i class="pi pi-calendar"></i> Basado en <strong>{{ rendimiento.promedio.sesiones }}</strong> sesión{{ rendimiento.promedio.sesiones === 1 ? '' : 'es' }} de entrenamiento</p>
+        </div>
+
+      </div>
+    </section>
+
+  </ng-container>
+</div>

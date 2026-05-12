@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, HostBinding, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ButtonModule } from 'primeng/button';
@@ -44,76 +44,66 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly apiUrl = environment.apiUrl;
 
-  noticias: Noticia[] = [
-    {
-      titulo: 'Inscripciones Abiertas 2026',
-      descripcion:
-        'Ya puedes inscribir a tus hijos para el ciclo de invierno en nuestra sede de Viña del Mar. Los cupos son limitados.',
-      contenido:
-        'Ya puedes inscribir a tus hijos para el ciclo de invierno en nuestra sede de Viña del Mar. Los cupos son limitados y se asignan por orden de llegada. El proceso incluye evaluación técnica, entrega de implementos y charla informativa con el cuerpo técnico. No pierdas esta oportunidad de ser parte del proyecto deportivo más importante de la región.',
-      fecha: '2026-04-20',
-      imagenUrl: 'media/1449849007-sub.jpg',
-      categoria: 'Evento',
-    },
-    {
-      _id: '2',
-      titulo: 'Gran Victoria Sub-15',
-      descripcion:
-        'Nuestros alumnos destacaron en el torneo regional frente a Playa Ancha con una actuación memorable.',
-      contenido:
-        'Nuestros alumnos de la categoría Sub-15 protagonizaron una actuación memorable en el torneo regional disputado en la cancha principal del club. Con un resultado de 3-1 frente a Playa Ancha, el equipo demostró la calidad de trabajo que se viene realizando durante toda la temporada. El entrenador destacó el espíritu colectivo y la disciplina táctica del grupo.',
-      fecha: '2026-04-18',
-      imagenUrl: 'media/KevinVasquez.png',
-      categoria: 'Partido',
-    },
-  ];
+  noticias: Noticia[] = [];
 
   partidos: Partido[] = [];
 
   profesores: any[] = [];
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private cdr: ChangeDetectorRef, private zone: NgZone) {}
 
   ngOnInit(): void {
     this.temaOscuro = localStorage.getItem('inicio-tema') === 'oscuro';
 
     this.http.get<any>(`${this.apiUrl}/config`).subscribe({
       next: (config) => {
-        if (config.tituloHeader) this.siteConfig.tituloHeader = config.tituloHeader;
-        if (config.tituloBienvenida) this.siteConfig.tituloBienvenida = config.tituloBienvenida;
-        if (config.subtituloBienvenida)
-          this.siteConfig.subtituloBienvenida = config.subtituloBienvenida;
-        if (config.imagenDestacada) this.siteConfig.imagenDestacada = config.imagenDestacada;
-        if (Array.isArray(config.imagenesCarrusel) && config.imagenesCarrusel.length > 0)
-          this.siteConfig.imagenesCarrusel = config.imagenesCarrusel;
-        if (Array.isArray(config.imagenesGaleria) && config.imagenesGaleria.length > 0)
-          this.siteConfig.imagenesGaleria = config.imagenesGaleria;
-        this.siteConfig.mostrarPopup = config.mostrarPopup ?? true;
-        if (config.imagenPopup) this.siteConfig.imagenPopup = config.imagenPopup;
-        if (config.tituloPopup) this.siteConfig.tituloPopup = config.tituloPopup;
-        if (config.cuerpoPopup) this.siteConfig.cuerpoPopup = config.cuerpoPopup;
-        if (this.siteConfig.mostrarPopup) this.mostrarPostulaciones = true;
+        this.zone.run(() => {
+          if (config.tituloHeader) this.siteConfig.tituloHeader = config.tituloHeader;
+          if (config.tituloBienvenida) this.siteConfig.tituloBienvenida = config.tituloBienvenida;
+          if (config.subtituloBienvenida)
+            this.siteConfig.subtituloBienvenida = config.subtituloBienvenida;
+          if (config.imagenDestacada) this.siteConfig.imagenDestacada = config.imagenDestacada;
+          if (Array.isArray(config.imagenesCarrusel) && config.imagenesCarrusel.length > 0)
+            this.siteConfig.imagenesCarrusel = config.imagenesCarrusel;
+          if (Array.isArray(config.imagenesGaleria) && config.imagenesGaleria.length > 0)
+            this.siteConfig.imagenesGaleria = config.imagenesGaleria;
+          this.siteConfig.mostrarPopup = config.mostrarPopup ?? true;
+          if (config.imagenPopup) this.siteConfig.imagenPopup = config.imagenPopup;
+          if (config.tituloPopup) this.siteConfig.tituloPopup = config.tituloPopup;
+          if (config.cuerpoPopup) this.siteConfig.cuerpoPopup = config.cuerpoPopup;
+          if (this.siteConfig.mostrarPopup) this.mostrarPostulaciones = true;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {},
     });
 
     this.http.get<Noticia[]>(`${this.apiUrl}/noticias`).subscribe({
       next: (data) => {
-        if (data && data.length > 0) this.noticias = data;
+        this.zone.run(() => {
+          if (data && data.length > 0) this.noticias = data;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {},
     });
 
     this.http.get<Partido[]>(`${this.apiUrl}/partidos`).subscribe({
       next: (data) => {
-        if (data && data.length > 0) this.partidos = data;
+        this.zone.run(() => {
+          if (data && data.length > 0) this.partidos = data;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {},
     });
 
     this.http.get<any[]>(`${this.apiUrl}/planteles`).subscribe({
       next: (data) => {
-        if (data && data.length > 0) this.profesores = data;
+        this.zone.run(() => {
+          if (data && data.length > 0) this.profesores = data;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {},
     });

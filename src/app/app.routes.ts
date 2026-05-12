@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth-guard';
+import { clienteGuard } from './cliente-guard';
+import { profesorGuard } from './profesor-guard';
 
 export const routes: Routes = [
   {
@@ -37,6 +39,16 @@ export const routes: Routes = [
       import('./pages/pagos/validacion-pagos/validacion-pagos')
         .then(m => m.ValidacionPagosComponent),
     canActivate: [authGuard]
+  },
+  {
+    path: 'vista-cliente',
+    loadComponent: () => import('./pages/vista-cliente/vista-cliente').then(m => m.VistaClienteComponent),
+    canActivate: [clienteGuard]
+  },
+  {
+    path: 'vista-profesor',
+    loadComponent: () => import('./pages/vista-profesor/vista-profesor').then(m => m.VistaProfesorComponent),
+    canActivate: [profesorGuard]
   },
   {
     path: '',

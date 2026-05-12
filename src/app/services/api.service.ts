@@ -133,6 +133,57 @@ export class ApiService {
     return this.http.patch<Pago>(`${this.apiUrl}/pagos/${id}/estado`, { estado }, this.authHeaders);
   }
   crearFichaTemporada(data: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/ficha-temporada`, data);
-}
+    return this.http.post(`${this.apiUrl}/ficha-temporada`, data);
+  }
+
+  getMiFicha(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/cliente/mi-ficha`, this.authHeaders);
+  }
+
+  crearClienteFicha(fichaId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/crear-cliente-ficha/${fichaId}`, {}, this.authHeaders);
+  }
+
+  getPerfilProfesor(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/profesor/mi-perfil`, this.authHeaders);
+  }
+
+  getMisFichas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/profesor/mis-fichas`, this.authHeaders);
+  }
+
+  getAsistenciasProfesor(fecha?: string): Observable<any[]> {
+    const url = fecha
+      ? `${this.apiUrl}/profesor/asistencias?fecha=${fecha}`
+      : `${this.apiUrl}/profesor/asistencias`;
+    return this.http.get<any[]>(url, this.authHeaders);
+  }
+
+  guardarAsistenciasLote(fecha: string, registros: { jugadorId: string; estado: string }[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/profesor/asistencias/lote`, { fecha, registros }, this.authHeaders);
+  }
+
+  marcarPagoMensual(fichaId: string, estado: 'pagado' | 'pendiente'): Observable<any> {
+    return this.http.put(`${this.apiUrl}/admin/pago-mensual/${fichaId}`, { estado }, this.authHeaders);
+  }
+
+  getMisPagosMensuales(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/cliente/mis-pagos-mensuales`, this.authHeaders);
+  }
+
+  getMiRendimiento(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/cliente/mi-rendimiento`, this.authHeaders);
+  }
+
+  guardarRendimientoProfesor(fecha: string, registros: any[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/profesor/rendimiento`, { fecha, registros }, this.authHeaders);
+  }
+
+  getRendimientoProfesorFecha(fecha: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/profesor/rendimiento?fecha=${fecha}`, this.authHeaders);
+  }
+
+  getRendimientoJugador(jugadorId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${jugadorId}`, this.authHeaders);
+  }
 }

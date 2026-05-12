@@ -11,10 +11,13 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   login(user: string, password: string): Observable<boolean> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { user, password }).pipe(
+    return this.http.post<{ token: string; usuario: any }>(`${this.apiUrl}/login`, { user, password }).pipe(
       tap(response => {
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('token', response.token);
+          if (response.usuario) {
+            localStorage.setItem('usuario', JSON.stringify(response.usuario));
+          }
         }
       }),
       map(() => true),
@@ -25,6 +28,7 @@ export class AuthService {
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
     }
   }
 
@@ -36,5 +40,15 @@ export class AuthService {
   getToken(): string | null {
     if (!isPlatformBrowser(this.platformId)) return null;
     return localStorage.getItem('token');
+  }
+
+  getUsuario(): any {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    const u = localStorage.getItem('usuario');
+    try { return u ? JSON.parse(u) : null; } catch { return null; }
+  }
+
+  getRol(): string | null {
+    return this.getUsuario()?.rol ?? null;
   }
 }

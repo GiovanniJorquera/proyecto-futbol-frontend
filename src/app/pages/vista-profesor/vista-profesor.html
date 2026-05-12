@@ -1,0 +1,290 @@
+<header class="page-header">
+  <div class="header-left">
+    <h1>Santiago Wanderers</h1>
+    <span class="rol-badge">Profesor</span>
+  </div>
+  <nav class="header-nav">
+    <span class="bienvenida" *ngIf="usuario">{{ usuario.nombre }}</span>
+    <button type="button" class="theme-toggle" (click)="toggleTema()" [title]="temaOscuro ? 'Modo claro' : 'Modo oscuro'">
+      <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
+    </button>
+    <button type="button" class="btn-cerrar" (click)="cerrarSesion()">
+      <i class="pi pi-sign-out"></i> Cerrar sesión
+    </button>
+  </nav>
+</header>
+
+<div class="profesor-body">
+
+  <!-- Cargando -->
+  <div class="estado-msg" *ngIf="cargando">
+    <i class="pi pi-spin pi-spinner"></i> Cargando información...
+  </div>
+
+  <!-- Error -->
+  <div class="estado-msg error-msg" *ngIf="!cargando && error">
+    <i class="pi pi-exclamation-triangle"></i> {{ error }}
+  </div>
+
+  <ng-container *ngIf="!cargando && !error">
+
+    <!-- Info del profesor -->
+    <div class="profesor-banner">
+      <div class="profesor-avatar">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="profesor-info">
+        <h2 class="profesor-nombre">{{ profesor?.nombre }} {{ profesor?.apellido }}</h2>
+        <div class="profesor-meta">
+          <span class="tag" *ngIf="profesor?.especialidad">{{ profesor.especialidad }}</span>
+          <span class="tag division" *ngFor="let d of profesor?.divisiones">{{ d }}</span>
+        </div>
+      </div>
+      <div class="profesor-stats">
+        <div class="stat">
+          <span class="stat-num">{{ fichas.length }}</span>
+          <span class="stat-lbl">Jugadores</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">{{ profesor?.divisiones?.length || 0 }}</span>
+          <span class="stat-lbl">Sub-divisiones</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn" [class.active]="tabActiva === 'jugadores'" (click)="tabActiva = 'jugadores'">
+        <i class="pi pi-users"></i> Mis Jugadores
+      </button>
+      <button class="tab-btn" [class.active]="tabActiva === 'asistencia'" (click)="tabActiva = 'asistencia'">
+        <i class="pi pi-check-square"></i> Registrar Asistencia
+      </button>
+      <button class="tab-btn" [class.active]="tabActiva === 'rendimiento'" (click)="tabActiva = 'rendimiento'">
+        <i class="pi pi-chart-bar"></i> Rendimiento
+      </button>
+    </div>
+
+    <!-- TAB: MIS JUGADORES -->
+    <div class="tab-content" *ngIf="tabActiva === 'jugadores'">
+      <div class="section-inner">
+
+        <div class="empty-msg" *ngIf="fichas.length === 0">
+          <i class="pi pi-inbox"></i>
+          <p>No hay jugadores en tus sub-divisiones aún.</p>
+        </div>
+
+        <div class="jugadores-grid" *ngIf="fichas.length > 0">
+          <div class="jugador-card" *ngFor="let f of fichas">
+            <div class="jugador-card-header">
+              <div class="jc-avatar"><i class="pi pi-user"></i></div>
+              <div>
+                <p class="jc-nombre">{{ f.nombre }}</p>
+                <div class="jc-tags">
+                  <span class="tag division">{{ f.categoria }}</span>
+                  <span class="tag" *ngIf="f.posicion">{{ f.posicion }}</span>
+                </div>
+              </div>
+            </div>
+            <ul class="jc-list">
+              <li *ngIf="f.fechaNacimiento">
+                <span class="lbl">Edad</span>
+                <span class="val">{{ calcularEdad(f.fechaNacimiento) }} años</span>
+              </li>
+              <li *ngIf="f.cedula">
+                <span class="lbl">RUT</span>
+                <span class="val">{{ f.cedula }}</span>
+              </li>
+              <li *ngIf="f.pieHabil">
+                <span class="lbl">Pie hábil</span>
+                <span class="val">{{ f.pieHabil }}</span>
+              </li>
+              <li *ngIf="f.establecimiento">
+                <span class="lbl">Establecimiento</span>
+                <span class="val">{{ f.establecimiento }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: REGISTRAR ASISTENCIA -->
+    <div class="tab-content" *ngIf="tabActiva === 'asistencia'">
+      <div class="section-inner">
+
+        <div class="asistencia-header">
+          <h3 class="asistencia-titulo"><i class="pi pi-calendar"></i> Selecciona la fecha</h3>
+          <div class="fecha-row">
+            <input
+              type="date"
+              class="fecha-input"
+              [(ngModel)]="fechaSeleccionada"
+            />
+            <button
+              class="btn-cargar"
+              (click)="cargarAsistenciaFecha()"
+              [disabled]="!fechaSeleccionada || cargandoAsistencia"
+            >
+              <i class="pi pi-refresh" *ngIf="!cargandoAsistencia"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="cargandoAsistencia"></i>
+              Cargar lista
+            </button>
+          </div>
+        </div>
+
+        <!-- Sin fecha seleccionada -->
+        <div class="empty-msg" *ngIf="!fechaSeleccionada">
+          <i class="pi pi-calendar-times"></i>
+          <p>Selecciona una fecha para registrar asistencia.</p>
+        </div>
+
+        <!-- Lista de asistencia -->
+        <div *ngIf="fechaSeleccionada && registros.length > 0">
+
+          <!-- Resumen rápido -->
+          <div class="resumen-bar">
+            <span class="resumen-item asistio">
+              <i class="pi pi-check-circle"></i> {{ totalAsistio }} asistieron
+            </span>
+            <span class="resumen-item ausente">
+              <i class="pi pi-times-circle"></i> {{ totalAusente }} ausentes
+            </span>
+            <span class="resumen-item justificado">
+              <i class="pi pi-info-circle"></i> {{ totalJustificado }} justificados
+            </span>
+          </div>
+
+          <div class="asistencia-lista">
+            <div class="asistencia-row" *ngFor="let r of registros">
+              <div class="asis-jugador">
+                <span class="asis-nombre">{{ r.nombre }}</span>
+                <span class="tag division">{{ r.categoria }}</span>
+              </div>
+              <div class="asis-btns">
+                <button
+                  class="btn-estado"
+                  [class.asistio]="r.estado === 'asistio'"
+                  (click)="setEstado(r, 'asistio')"
+                  title="Asistió"
+                >
+                  <i class="pi pi-check"></i> Asistió
+                </button>
+                <button
+                  class="btn-estado"
+                  [class.ausente]="r.estado === 'ausente'"
+                  (click)="setEstado(r, 'ausente')"
+                  title="Ausente"
+                >
+                  <i class="pi pi-times"></i> Ausente
+                </button>
+                <button
+                  class="btn-estado"
+                  [class.justificado]="r.estado === 'justificado'"
+                  (click)="setEstado(r, 'justificado')"
+                  title="Justificado"
+                >
+                  <i class="pi pi-info-circle"></i> Justificado
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Éxito -->
+          <div class="alerta-ok" *ngIf="asistenciaGuardada">
+            <i class="pi pi-check-circle"></i> Asistencia guardada correctamente.
+          </div>
+
+          <!-- Error -->
+          <div class="alerta-error" *ngIf="errorAsistencia">
+            <i class="pi pi-exclamation-triangle"></i> {{ errorAsistencia }}
+          </div>
+
+          <div class="guardar-row">
+            <button class="btn-guardar" (click)="guardarAsistencia()" [disabled]="guardando">
+              <i class="pi pi-save" *ngIf="!guardando"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="guardando"></i>
+              {{ guardando ? 'Guardando...' : 'Guardar asistencia' }}
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Sin jugadores en las sub-divisiones -->
+        <div class="empty-msg" *ngIf="fechaSeleccionada && !cargandoAsistencia && registros.length === 0">
+          <i class="pi pi-users"></i>
+          <p>No hay jugadores registrados en tus sub-divisiones.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: RENDIMIENTO -->
+    <div class="tab-content" *ngIf="tabActiva === 'rendimiento'">
+      <div class="section-inner">
+        <div class="asistencia-header">
+          <h3 class="asistencia-titulo"><i class="pi pi-chart-bar"></i> Selecciona la fecha del entrenamiento</h3>
+          <div class="fecha-row">
+            <input type="date" class="fecha-input" [(ngModel)]="fechaRendimiento" />
+            <button class="btn-cargar" (click)="cargarRendimientoFecha()" [disabled]="!fechaRendimiento">
+              <i class="pi pi-refresh"></i> Cargar
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-msg" *ngIf="!fechaRendimiento">
+          <i class="pi pi-calendar-times"></i>
+          <p>Selecciona una fecha para registrar el rendimiento.</p>
+        </div>
+
+        <div *ngIf="fechaRendimiento && registrosRendimiento.length > 0">
+          <div class="rend-header-row" style="display:grid; grid-template-columns:1fr 80px 80px 90px 90px; gap:0.5rem; padding:0.4rem 0.75rem; font-size:0.78rem; font-weight:700; color:rgba(233,247,234,0.5); text-transform:uppercase; letter-spacing:0.06em;">
+            <span>Jugador</span><span>Físico</span><span>Técnico</span><span>Psicológico</span><span>Estratégico</span>
+          </div>
+          <div class="asistencia-lista">
+            <div class="rend-row" *ngFor="let r of registrosRendimiento" style="display:grid; grid-template-columns:1fr 80px 80px 90px 90px; gap:0.5rem; align-items:center; padding:0.6rem 0.75rem; border-bottom:1px solid rgba(57,211,83,0.07);">
+              <div>
+                <span class="asis-nombre">{{ r.nombre }}</span>
+                <span class="tag division" style="margin-left:0.4rem; font-size:0.75rem;">{{ r.categoria }}</span>
+              </div>
+              <select [(ngModel)]="r.fisico" class="rend-select">
+                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
+              </select>
+              <select [(ngModel)]="r.tecnico" class="rend-select">
+                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
+              </select>
+              <select [(ngModel)]="r.psicologico" class="rend-select">
+                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
+              </select>
+              <select [(ngModel)]="r.estrategico" class="rend-select">
+                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="alerta-ok" *ngIf="rendimientoGuardado">
+            <i class="pi pi-check-circle"></i> Rendimiento guardado correctamente.
+          </div>
+          <div class="alerta-error" *ngIf="errorRendimiento">
+            <i class="pi pi-exclamation-triangle"></i> {{ errorRendimiento }}
+          </div>
+
+          <div class="guardar-row">
+            <button class="btn-guardar" (click)="guardarRendimiento()" [disabled]="guardandoRendimiento">
+              <i class="pi pi-save" *ngIf="!guardandoRendimiento"></i>
+              <i class="pi pi-spin pi-spinner" *ngIf="guardandoRendimiento"></i>
+              {{ guardandoRendimiento ? 'Guardando...' : 'Guardar rendimiento' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-msg" *ngIf="fechaRendimiento && registrosRendimiento.length === 0">
+          <i class="pi pi-users"></i>
+          <p>No hay jugadores en tus sub-divisiones.</p>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

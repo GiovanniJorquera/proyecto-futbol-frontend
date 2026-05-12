@@ -15,13 +15,16 @@ body {
 	font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
 }
 
-/* Global PrimeNG select panel (para appendTo="body" dentro de dialogs) */
+/* ── PRIMENG OVERLAYS GLOBALES (appendTo="body") ──────── */
+
+/* Select / Dropdown panel */
 .p-select-overlay,
 .p-select-panel {
   background: #111a11 !important;
   border: 1px solid rgba(57, 211, 83, 0.22) !important;
   border-radius: 8px !important;
   z-index: 9999 !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.55) !important;
 }
 .p-select-overlay .p-select-option,
 .p-select-panel .p-select-option {
@@ -36,6 +39,72 @@ body {
 .p-select-overlay .p-select-option.p-selected,
 .p-select-panel .p-select-option.p-selected {
   background: rgba(57, 211, 83, 0.18) !important;
+  color: #39d353 !important;
+}
+
+/* Dialog global */
+.p-dialog {
+  border: 1px solid rgba(57, 211, 83, 0.18) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.65) !important;
+}
+.p-dialog .p-dialog-header {
+  background: #0c140c !important;
+  color: #39d353 !important;
+  border-bottom: 1px solid rgba(57, 211, 83, 0.16) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  border-radius: 18px 18px 0 0 !important;
+}
+.p-dialog .p-dialog-content {
+  background: linear-gradient(180deg, #111a11, #0d130d) !important;
+  color: #f4f7f3 !important;
+}
+.p-dialog .p-dialog-footer {
+  background: #0c140c !important;
+  border-top: 1px solid rgba(57, 211, 83, 0.1) !important;
+  border-radius: 0 0 18px 18px !important;
+}
+.p-dialog .p-dialog-header-close {
+  color: #39d353 !important;
+}
+.p-dialog .p-dialog-header-close:hover {
+  background: rgba(57, 211, 83, 0.12) !important;
+}
+.p-dialog input,
+.p-dialog input[pInputText],
+.p-dialog .p-inputtext {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+  border-radius: 8px !important;
+}
+.p-dialog input[type='date'] {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  color: #f4f7f3 !important;
+  color-scheme: dark;
+}
+.p-dialog label {
+  color: rgba(233,247,234,0.78) !important;
+}
+.p-dialog textarea,
+.p-dialog .p-textarea {
+  border-color: rgba(57, 211, 83, 0.22) !important;
+  background: rgba(255,255,255,0.06) !important;
+  color: #f4f7f3 !important;
+}
+/* Dialog mask/backdrop */
+.p-dialog-mask {
+  z-index: 1000 !important;
+}
+/* Confirm dialog */
+.p-confirmdialog .p-dialog-content {
+  background: linear-gradient(180deg, #111a11, #0d130d) !important;
+  color: #f4f7f3 !important;
+}
+.p-confirmdialog .p-dialog-header {
+  background: #0c140c !important;
   color: #39d353 !important;
 }
 

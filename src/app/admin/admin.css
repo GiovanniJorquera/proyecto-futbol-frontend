@@ -85,6 +85,10 @@
   gap: 1.5rem;
 }
 
+.tab-content[hidden] {
+  display: none !important;
+}
+
 /* ── SECTION HEADER ─────────────────────────────── */
 .sec-header {
   display: flex;

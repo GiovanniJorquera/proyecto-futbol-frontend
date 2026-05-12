@@ -11,9 +11,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TextareaModule } from 'primeng/textarea';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { catchError, of, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -24,8 +23,8 @@ import { AuthService } from '../services/auth.service';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ToggleButtonModule, TextareaModule, ConfirmDialogModule, ToastModule],
-  providers: [ConfirmationService, MessageService],
+  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ToggleButtonModule, TextareaModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -83,17 +82,64 @@ export class AdminComponent implements OnInit {
 
   limpiarFiltros() { this.filtros = { texto: '', estado: null, comuna: null, edadMin: null, edadMax: null }; }
 
-  /* ── ESTUDIANTES ──────────────────────────────── */
-  estudiantes: any[] = [];
-  estudianteForm = { nombre: '', rut: '', division: '', fechaIngreso: '', telefono: '', email: '' };
-  estudianteEditando: any = null;
-  modalEstudianteVisible = false;
+  /* ── FILTROS ─────────────────────────────────── */
+  filtrosFichas     = { texto: '', categoria: null as string | null, conCuenta: null as boolean | null };
+  filtrosProfesores = { texto: '', division: null as string | null };
+  filtrosDivisiones = { texto: '' };
+  filtrosPartidos   = { texto: '', tipo: null as string | null };
+
+  /* ── FICHAS DE TEMPORADA / JUGADORES ─────────── */
+  fichas: any[] = [];
+  cargandoFichas = false;
+  tabFichasLoaded = false;
+  tabJugadoresLoaded = false;
+  fichaSeleccionada: any = null;
+  modalFichaVisible = false;
+  credencialesCliente: { email: string; passwordTemporal: string } | null = null;
+  modalCredencialesVisible = false;
+  modalEditarFichaVisible = false;
+  fichaEditandoForm: any = {};
+
+  /* Filtros jugadores (tab separado) */
+  filtrosJugadores = { texto: '', categoria: null as string | null, posicion: null as string | null };
+
+  /* Rendimiento */
+  modalRendimientoVisible = false;
+  rendimientoJugador: any[] = [];
+  cargandoRendimiento = false;
+
+  posicionOpciones = [
+    { label: '— Sin posición —', value: '' },
+    { label: 'Arquero', value: 'Arquero' },
+    { label: 'Defensa', value: 'Defensa' },
+    { label: 'Mediocampista', value: 'Mediocampista' },
+    { label: 'Delantero', value: 'Delantero' },
+  ];
+  pieHabilOpciones = [
+    { label: '— Sin especificar —', value: '' },
+    { label: 'Derecho', value: 'Derecho' },
+    { label: 'Izquierdo', value: 'Izquierdo' },
+    { label: 'Ambidiestro', value: 'Ambidiestro' },
+  ];
+  actitudSocialOpciones = [
+    { label: '— Sin especificar —', value: '' },
+    { label: 'Introvertido', value: 'Introvertido' },
+    { label: 'Extrovertido', value: 'Extrovertido' },
+    { label: 'Mixto', value: 'Mixto' },
+  ];
+  cuentaOpciones = [
+    { label: 'Todos', value: null },
+    { label: 'Con acceso al portal', value: true },
+    { label: 'Sin acceso al portal', value: false },
+  ];
 
   /* ── PROFESORES ───────────────────────────────── */
   profesores: any[] = [];
-  profesorForm = { nombre: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '', email: '' };
+  profesorForm = { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '' };
   profesorEditando: any = null;
   modalProfesorVisible = false;
+  credencialesProfesor: { email: string; passwordTemporal: string } | null = null;
+  modalCredencialesProfesorVisible = false;
 
   /* ── DIVISIONES ───────────────────────────────── */
   divisiones: any[] = [];
@@ -118,6 +164,7 @@ export class AdminComponent implements OnInit {
     { label: 'Próximo partido', value: 'proximo' },
     { label: 'Resultado', value: 'resultado' },
   ];
+
 
   /* ── INICIO (config + noticias) ───────────────── */
   activeTab = 'solicitudes';
@@ -144,12 +191,26 @@ export class AdminComponent implements OnInit {
     { label: 'Entrenamiento', value: 'Entrenamiento' },
   ];
 
+  /* ── CONFIRMACIÓN PERSONALIZADA ──────────────────── */
+  confirmarVisible = false;
+  confirmarHeader  = '';
+  confirmarMensaje = '';
+  confirmarLabel   = 'Confirmar';
+  confirmarSeverity: 'success' | 'danger' | 'secondary' = 'danger';
+  private confirmarCallback: (() => void) | null = null;
+
+  ejecutarConfirmar() {
+    this.confirmarVisible = false;
+    const cb = this.confirmarCallback;
+    this.confirmarCallback = null;
+    if (cb) cb();
+  }
+
   constructor(
     private http: HttpClient,
     private router: Router,
     private pagosService: PagosService,
     private authService: AuthService,
-    private confirmationService: ConfirmationService,
     private messageService: MessageService,
   ) {}
 
@@ -157,7 +218,6 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
     this.cargarSolicitudes();
-    this.cargarEstudiantes();
     this.cargarProfesores();
     this.cargarDivisiones();
     this.cargarPartidos();
@@ -175,8 +235,18 @@ export class AdminComponent implements OnInit {
     this.messageService.add({ severity, summary, detail, life: 4000 });
   }
 
-  private confirmar(msg: string, header: string, icon: string, acceptLabel: string, acceptClass: string, onAccept: () => void) {
-    this.confirmationService.confirm({ message: msg, header, icon, acceptLabel, rejectLabel: 'Cancelar', acceptButtonStyleClass: acceptClass, accept: onAccept });
+  private confirmar(msg: string, header: string, _icon: string, acceptLabel: string, acceptClass: string, onAccept: () => void) {
+    const severityMap: Record<string, 'success' | 'danger' | 'secondary'> = {
+      'p-button-success':   'success',
+      'p-button-danger':    'danger',
+      'p-button-primary':   'danger',
+    };
+    this.confirmarHeader   = header;
+    this.confirmarMensaje  = msg;
+    this.confirmarLabel    = acceptLabel;
+    this.confirmarSeverity = severityMap[acceptClass] ?? 'danger';
+    this.confirmarCallback = onAccept;
+    this.confirmarVisible  = true;
   }
 
   /* ── SOLICITUDES ──────────────────────────────── */
@@ -208,42 +278,6 @@ export class AdminComponent implements OnInit {
 
   verDetalle(solicitud: any) { this.solicitudSeleccionada = solicitud; this.modalSolicitudVisible = true; }
 
-  /* ── ESTUDIANTES ──────────────────────────────── */
-  cargarEstudiantes() {
-    this.http.get<any[]>(`${this.apiUrl}/estudiantes`, this.authHeaders()).subscribe({
-      next: (data) => this.estudiantes = data,
-      error: () => {}
-    });
-  }
-
-  abrirModalEstudiante(e?: any) {
-    this.estudianteEditando = e || null;
-    this.estudianteForm = e
-      ? { nombre: e.nombre, rut: e.rut, division: e.division, fechaIngreso: e.fechaIngreso, telefono: e.telefono, email: e.email }
-      : { nombre: '', rut: '', division: '', fechaIngreso: '', telefono: '', email: '' };
-    this.modalEstudianteVisible = true;
-  }
-
-  guardarEstudiante() {
-    if (!this.estudianteForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
-    const req = this.estudianteEditando
-      ? this.http.put(`${this.apiUrl}/estudiantes/${this.estudianteEditando._id}`, this.estudianteForm, this.authHeaders())
-      : this.http.post(`${this.apiUrl}/estudiantes`, this.estudianteForm, this.authHeaders());
-    req.subscribe({
-      next: () => { this.modalEstudianteVisible = false; this.toast('success', 'Guardado', `Estudiante ${this.estudianteEditando ? 'actualizado' : 'agregado'}.`); this.cargarEstudiantes(); },
-      error: () => this.toast('error', 'Error', 'No se pudo guardar el estudiante.')
-    });
-  }
-
-  eliminarEstudiante(id: string) {
-    this.confirmar('¿Eliminar este estudiante?', 'Eliminar estudiante', 'pi pi-trash', 'Sí, eliminar', 'p-button-danger', () => {
-      this.http.delete(`${this.apiUrl}/estudiantes/${id}`, this.authHeaders()).subscribe({
-        next: () => { this.toast('success', 'Eliminado', 'Estudiante eliminado.'); this.cargarEstudiantes(); },
-        error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
-      });
-    });
-  }
-
   /* ── PROFESORES ───────────────────────────────── */
   cargarProfesores() {
     this.http.get<any[]>(`${this.apiUrl}/profesores`, this.authHeaders()).subscribe({
@@ -255,21 +289,44 @@ export class AdminComponent implements OnInit {
   abrirModalProfesor(p?: any) {
     this.profesorEditando = p || null;
     this.profesorForm = p
-      ? { nombre: p.nombre, especialidad: p.especialidad, experiencia: p.experiencia, divisionesTexto: (p.divisiones || []).join(', '), telefono: p.telefono, email: p.email }
-      : { nombre: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '', email: '' };
+      ? { nombre: p.nombre, apellido: p.apellido || '', rut: p.rut || '', especialidad: p.especialidad || '', experiencia: p.experiencia || '', divisionesTexto: (p.divisiones || []).join(', '), telefono: p.telefono || '' }
+      : { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '' };
     this.modalProfesorVisible = true;
   }
 
   guardarProfesor() {
     if (!this.profesorForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
-    const data = { ...this.profesorForm, divisiones: this.profesorForm.divisionesTexto.split(',').map(d => d.trim()).filter(Boolean) };
-    const req = this.profesorEditando
-      ? this.http.put(`${this.apiUrl}/profesores/${this.profesorEditando._id}`, data, this.authHeaders())
-      : this.http.post(`${this.apiUrl}/profesores`, data, this.authHeaders());
-    req.subscribe({
-      next: () => { this.modalProfesorVisible = false; this.toast('success', 'Guardado', `Profesor ${this.profesorEditando ? 'actualizado' : 'agregado'}.`); this.cargarProfesores(); },
-      error: () => this.toast('error', 'Error', 'No se pudo guardar el profesor.')
-    });
+    const divisiones = this.profesorForm.divisionesTexto.split(',').map(d => d.trim()).filter(Boolean);
+
+    if (this.profesorEditando) {
+      const data = { ...this.profesorForm, divisiones };
+      this.http.put(`${this.apiUrl}/profesores/${this.profesorEditando._id}`, data, this.authHeaders()).subscribe({
+        next: () => { this.modalProfesorVisible = false; this.toast('success', 'Guardado', 'Profesor actualizado.'); this.cargarProfesores(); },
+        error: () => this.toast('error', 'Error', 'No se pudo actualizar el profesor.')
+      });
+    } else {
+      if (!this.profesorForm.apellido || !this.profesorForm.rut) {
+        this.toast('warn', 'Campos requeridos', 'Apellido y RUT son obligatorios para crear el acceso.'); return;
+      }
+      const data = {
+        nombre: this.profesorForm.nombre,
+        apellido: this.profesorForm.apellido,
+        rut: this.profesorForm.rut,
+        especialidad: this.profesorForm.especialidad,
+        experiencia: this.profesorForm.experiencia,
+        telefono: this.profesorForm.telefono,
+        divisiones
+      };
+      this.http.post<any>(`${this.apiUrl}/profesores/crear-acceso`, data, this.authHeaders()).subscribe({
+        next: (res) => {
+          this.modalProfesorVisible = false;
+          this.credencialesProfesor = res.credenciales;
+          this.modalCredencialesProfesorVisible = true;
+          this.cargarProfesores();
+        },
+        error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear el profesor.')
+      });
+    }
   }
 
   eliminarProfesor(id: string) {
@@ -366,6 +423,22 @@ export class AdminComponent implements OnInit {
       this.pagosAprobados = pagos;
       this.cargandoAprobados = false;
     });
+  }
+
+  vincularPagoMensual(pago: Pago): void {
+    this.confirmar(
+      `¿Marcar el pago de <strong>${pago.alumno}</strong> como pagado este mes en Ficha-Temporada?`,
+      'Vincular pago mensual', 'pi pi-link', 'Sí, vincular', 'p-button-success',
+      () => {
+        this.http.post<any>(`${this.apiUrl}/admin/vincular-pago-mensual/${pago.id}`, {}, this.authHeaders()).subscribe({
+          next: () => {
+            this.toast('success', 'Vinculado', 'Pago mensual marcado como pagado.');
+            if (this.fichas.length > 0) this.cargarFichas();
+          },
+          error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo vincular el pago.')
+        });
+      }
+    );
   }
 
   rechazarPagoAprobado(pago: Pago): void {
@@ -610,8 +683,268 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  /* ── FICHAS DE TEMPORADA ─────────────────────── */
+  cargarFichas() {
+    this.cargandoFichas = true;
+    this.http.get<any[]>(`${this.apiUrl}/ficha-temporada`, this.authHeaders()).subscribe({
+      next: (data) => { this.fichas = data; this.cargandoFichas = false; },
+      error: () => { this.toast('error', 'Error', 'No se pudieron cargar las fichas.'); this.cargandoFichas = false; }
+    });
+  }
+
+  verDetalleFicha(ficha: any) { this.fichaSeleccionada = ficha; this.modalFichaVisible = true; }
+
+  abrirEditarFicha(ficha: any) {
+    this.fichaSeleccionada = ficha;
+    this.fichaEditandoForm = {
+      nombre: ficha.nombre || '',
+      fechaNacimiento: ficha.fechaNacimiento ? ficha.fechaNacimiento.split('T')[0] : '',
+      cedula: ficha.cedula || '',
+      direccion: ficha.direccion || '',
+      ciudad: ficha.ciudad || '',
+      establecimiento: ficha.establecimiento || '',
+      curso: ficha.curso || '',
+      clubAmateur: ficha.clubAmateur || '',
+      talla: ficha.talla || '',
+      nombreCamiseta: ficha.nombreCamiseta || '',
+      posicion: ficha.posicion || '',
+      pieHabil: ficha.pieHabil || '',
+      numerosFavoritosTexto: (ficha.numerosFavoritos || []).join(', '),
+      aniosJugando: ficha.aniosJugando || '',
+      otrosDeportes: ficha.otrosDeportes || '',
+      otrasEscuelas: ficha.otrasEscuelas || '',
+      actitudSocial: ficha.actitudSocial || '',
+      actitudAdversidad: ficha.actitudAdversidad || '',
+      beca: ficha.beca || false,
+      apoderado: {
+        nombre: ficha.apoderado?.nombre || '',
+        direccion: ficha.apoderado?.direccion || '',
+        ciudad: ficha.apoderado?.ciudad || '',
+        rut: ficha.apoderado?.rut || '',
+        correo: ficha.apoderado?.correo || '',
+        telefonoCasa: ficha.apoderado?.telefonoCasa || '',
+        whatsapp: ficha.apoderado?.whatsapp || '',
+        vinculo: ficha.apoderado?.vinculo || '',
+      }
+    };
+    this.modalFichaVisible = false;
+    this.modalEditarFichaVisible = true;
+  }
+
+  guardarEdicionFicha() {
+    if (!this.fichaEditandoForm.nombre?.trim()) {
+      this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return;
+    }
+    const datos = {
+      ...this.fichaEditandoForm,
+      numerosFavoritos: this.fichaEditandoForm.numerosFavoritosTexto
+        ? this.fichaEditandoForm.numerosFavoritosTexto.split(',').map((n: string) => Number(n.trim())).filter((n: number) => !isNaN(n))
+        : []
+    };
+    delete datos.numerosFavoritosTexto;
+    this.http.put<any>(`${this.apiUrl}/ficha-temporada/${this.fichaSeleccionada._id}`, datos, this.authHeaders()).subscribe({
+      next: () => { this.modalEditarFichaVisible = false; this.toast('success', 'Guardado', 'Jugador actualizado correctamente.'); this.cargarFichas(); },
+      error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo guardar.')
+    });
+  }
+
+  eliminarFicha(id: string) {
+    this.modalEditarFichaVisible = false;
+    this.confirmar(
+      '¿Estás seguro de <strong>eliminar</strong> a este jugador? Se eliminará la ficha y el acceso al portal si existía.',
+      'Eliminar jugador', 'pi pi-exclamation-triangle', 'Sí, eliminar', 'p-button-danger',
+      () => {
+        this.http.delete(`${this.apiUrl}/ficha-temporada/${id}`, this.authHeaders()).subscribe({
+          next: () => {
+            this.modalEditarFichaVisible = false;
+            this.modalFichaVisible = false;
+            this.toast('success', 'Eliminado', 'Jugador eliminado correctamente.');
+            this.cargarFichas();
+          },
+          error: () => this.toast('error', 'Error', 'No se pudo eliminar el jugador.')
+        });
+      }
+    );
+  }
+
+  crearCuentaCliente(fichaId: string) {
+    this.modalFichaVisible = false;
+    this.confirmar(
+      '¿Crear cuenta de acceso al portal para el apoderado de esta ficha?',
+      'Crear cuenta cliente', 'pi pi-user-plus', 'Sí, crear', 'p-button-success',
+      () => {
+        this.http.post<any>(`${this.apiUrl}/admin/crear-cliente-ficha/${fichaId}`, {}, this.authHeaders()).subscribe({
+          next: (res) => {
+            this.credencialesCliente = { email: res.email, passwordTemporal: res.passwordTemporal };
+            this.modalFichaVisible = false;
+            this.modalCredencialesVisible = true;
+          },
+          error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear la cuenta.')
+        });
+      }
+    );
+  }
+
   /* ── HELPERS ──────────────────────────────────── */
-  setActiveTab(tab: string) { this.activeTab = tab; }
+  setActiveTab(tab: string) {
+    if (this.activeTab === tab) return;
+    this.activeTab = tab;
+    if (tab === 'fichas' || tab === 'jugadores') {
+      if (tab === 'fichas') this.tabFichasLoaded = true;
+      if (tab === 'jugadores') this.tabJugadoresLoaded = true;
+      if (this.fichas.length === 0 && !this.cargandoFichas) this.cargarFichas();
+    }
+    this.modalSolicitudVisible = false;
+    this.modalProfesorVisible = false;
+    this.modalCredencialesProfesorVisible = false;
+    this.modalDivisionVisible = false;
+    this.modalPartidoVisible = false;
+    this.modalNoticiaVisible = false;
+    this.modalFichaVisible = false;
+    this.modalEditarFichaVisible = false;
+    this.modalCredencialesVisible = false;
+    this.modalRendimientoVisible = false;
+    this.modalVoucherVisible = false;
+    this.confirmarVisible = false;
+  }
+
+  /* Ficha-Temporada */
+  get fichasFiltradas() {
+    return this.fichas.filter((f: any) => {
+      const t = this.filtrosFichas.texto.trim().toLowerCase();
+      if (t) {
+        const n = (f.nombre || '').toLowerCase();
+        const c = (f.cedula || '').toLowerCase();
+        const a = (f.apoderado?.nombre || '').toLowerCase();
+        if (!n.includes(t) && !c.includes(t) && !a.includes(t)) return false;
+      }
+      if (this.filtrosFichas.categoria && f.categoria !== this.filtrosFichas.categoria) return false;
+      if (this.filtrosFichas.conCuenta !== null && f.tieneCuenta !== this.filtrosFichas.conCuenta) return false;
+      return true;
+    });
+  }
+  get totalConCuenta() { return this.fichas.filter((f: any) => f.tieneCuenta).length; }
+  get totalBeca()      { return this.fichas.filter((f: any) => f.beca).length; }
+  limpiarFiltrosFichas() { this.filtrosFichas = { texto: '', categoria: null, conCuenta: null }; }
+
+  toggleBeca(ficha: any) {
+    const nuevaBeca = !ficha.beca;
+    this.http.put<any>(`${this.apiUrl}/ficha-temporada/${ficha._id}`, { beca: nuevaBeca }, this.authHeaders()).subscribe({
+      next: () => {
+        ficha.beca = nuevaBeca;
+        this.toast('success', 'Beca actualizada', nuevaBeca ? 'Beca activada (sin cobro mensual).' : 'Beca desactivada.');
+      },
+      error: () => this.toast('error', 'Error', 'No se pudo actualizar la beca.')
+    });
+  }
+
+  marcarPago(ficha: any, estado: 'pagado' | 'pendiente') {
+    this.http.put<any>(`${this.apiUrl}/admin/pago-mensual/${ficha._id}`, { estado }, this.authHeaders()).subscribe({
+      next: () => {
+        ficha.pagoMesActual = estado;
+        this.toast('success', 'Pago actualizado', estado === 'pagado' ? 'Marcado como pagado.' : 'Marcado como pendiente.');
+      },
+      error: () => this.toast('error', 'Error', 'No se pudo actualizar el pago.')
+    });
+  }
+
+  /* Jugadores (tab separado) */
+  get jugadoresFiltrados() {
+    return this.fichas.filter((f: any) => {
+      const t = this.filtrosJugadores.texto.trim().toLowerCase();
+      if (t) {
+        const n = (f.nombre || '').toLowerCase();
+        const c = (f.cedula || '').toLowerCase();
+        if (!n.includes(t) && !c.includes(t)) return false;
+      }
+      if (this.filtrosJugadores.categoria && f.categoria !== this.filtrosJugadores.categoria) return false;
+      if (this.filtrosJugadores.posicion && f.posicion !== this.filtrosJugadores.posicion) return false;
+      return true;
+    });
+  }
+
+  get posicionJugadorOpciones() {
+    const pos = [...new Set(this.fichas.map((f: any) => f.posicion).filter(Boolean))];
+    return [{ label: 'Todas', value: null }, ...pos.map(p => ({ label: p as string, value: p as string }))];
+  }
+
+  limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null }; }
+
+  verRendimiento(ficha: any) {
+    this.fichaSeleccionada = ficha;
+    this.cargandoRendimiento = true;
+    this.modalRendimientoVisible = true;
+    this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${ficha._id}`, this.authHeaders()).subscribe({
+      next: (data) => { this.rendimientoJugador = data; this.cargandoRendimiento = false; },
+      error: () => { this.rendimientoJugador = []; this.cargandoRendimiento = false; }
+    });
+  }
+
+  get promedioRendimiento() {
+    const r = this.rendimientoJugador;
+    if (!r.length) return null;
+    const avg = (k: string) => +(r.reduce((s: number, x: any) => s + (x[k] || 0), 0) / r.length).toFixed(1);
+    return { fisico: avg('fisico'), tecnico: avg('tecnico'), psicologico: avg('psicologico'), estrategico: avg('estrategico') };
+  }
+
+  /* Categorías */
+  get categoriaJugadorOpciones() {
+    const cats = ['Sub-6','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Libre'];
+    return [{ label: 'Todas', value: null }, ...cats.map(c => ({ label: c, value: c }))];
+  }
+
+  /* Profesores */
+  get divisionProfesorOpciones() {
+    const divs = [...new Set(this.profesores.flatMap((p: any) => p.divisiones || []))];
+    return [{ label: 'Todas', value: null }, ...divs.map(d => ({ label: d as string, value: d as string }))];
+  }
+  get profesoresFiltrados() {
+    return this.profesores.filter((p: any) => {
+      const t = this.filtrosProfesores.texto.trim().toLowerCase();
+      if (t) {
+        const n = `${p.nombre || ''} ${p.apellido || ''}`.toLowerCase();
+        const e = (p.especialidad || '').toLowerCase();
+        if (!n.includes(t) && !e.includes(t)) return false;
+      }
+      if (this.filtrosProfesores.division && !(p.divisiones || []).includes(this.filtrosProfesores.division)) return false;
+      return true;
+    });
+  }
+  limpiarFiltrosProfesores() { this.filtrosProfesores = { texto: '', division: null }; }
+
+  /* Divisiones */
+  get divisionesFiltradas() {
+    const t = this.filtrosDivisiones.texto.trim().toLowerCase();
+    if (!t) return this.divisiones;
+    return this.divisiones.filter(d =>
+      (d.nombre || '').toLowerCase().includes(t) ||
+      (d.categoria || '').toLowerCase().includes(t) ||
+      (d.profesorPrincipal || '').toLowerCase().includes(t)
+    );
+  }
+  limpiarFiltrosDivisiones() { this.filtrosDivisiones = { texto: '' }; }
+
+  /* Partidos */
+  get tipoPartidoFiltroOpciones() {
+    return [
+      { label: 'Todos', value: null },
+      { label: 'Próximo partido', value: 'proximo' },
+      { label: 'Resultado', value: 'resultado' },
+    ];
+  }
+  get partidosFiltrados() {
+    return this.partidos.filter((p: any) => {
+      const t = this.filtrosPartidos.texto.trim().toLowerCase();
+      if (t) {
+        const l = (p.local || '').toLowerCase();
+        const v = (p.visitante || '').toLowerCase();
+        if (!l.includes(t) && !v.includes(t)) return false;
+      }
+      if (this.filtrosPartidos.tipo && p.tipo !== this.filtrosPartidos.tipo) return false;
+      return true;
+    });
+  }
+  limpiarFiltrosPartidos() { this.filtrosPartidos = { texto: '', tipo: null }; }
 
   getEstadoSeverity(estado: string): 'warn' | 'success' | 'danger' | 'secondary' {
     if (estado === 'aprobado') return 'success';

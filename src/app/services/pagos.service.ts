@@ -13,6 +13,7 @@ export interface CrearPagoDto {
   monto: number;
   fecha: string;
   voucherBase64: string;
+  fichaId?: string;
 }
 
 interface PagoMongoResponse {

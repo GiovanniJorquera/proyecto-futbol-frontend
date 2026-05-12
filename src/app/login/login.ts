@@ -39,7 +39,10 @@ export class LoginComponent {
     this.authService.login(user, password).subscribe(ok => {
       this.cargando = false;
       if (ok) {
-        this.router.navigate(['/admin']);
+        const rol = this.authService.getRol();
+        if (rol === 'cliente') this.router.navigate(['/vista-cliente']);
+        else if (rol === 'profesor') this.router.navigate(['/vista-profesor']);
+        else this.router.navigate(['/admin']);
       } else {
         this.errorMessage = 'Usuario o contraseña incorrectos';
       }
