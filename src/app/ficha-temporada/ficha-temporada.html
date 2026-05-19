@@ -1,70 +1,120 @@
 <p-toast position="top-center"></p-toast>
 
-<div class="form-wrapper">
+<!-- ESTADOS: cargando / inválido / usado / expirado / enviado -->
+<div class="estado-wrap" *ngIf="estado !== 'valido'">
+  <div class="estado-card"
+       [class.estado-error]="estado !== 'cargando' && estado !== 'enviado'"
+       [class.estado-ok]="estado === 'enviado'">
+
+    <ng-container *ngIf="estado === 'cargando'">
+      <i class="pi pi-spin pi-spinner estado-icon"></i>
+      <p>{{ mensajeCarga }}</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'enviado'">
+      <i class="pi pi-check-circle estado-icon"></i>
+      <h2>¡Ficha enviada!</h2>
+      <p>Tu ficha fue registrada correctamente. El administrador la revisará pronto.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'usado'">
+      <i class="pi pi-ban estado-icon"></i>
+      <h2>Link ya utilizado</h2>
+      <p>Este link de registro ya fue usado. Contacta al administrador para obtener uno nuevo.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'expirado'">
+      <i class="pi pi-clock estado-icon"></i>
+      <h2>Link expirado</h2>
+      <p>Este link estuvo disponible por 48 horas y ya venció. Contacta al administrador para obtener uno nuevo.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'invalido'">
+      <i class="pi pi-times-circle estado-icon"></i>
+      <h2>Link inválido</h2>
+      <p>{{ mensajeError || 'Este link no existe o no es válido.' }}</p>
+      <div *ngIf="esTimeout" style="margin-top:14px">
+        <button pButton label="Reintentar" icon="pi pi-refresh" severity="secondary" (click)="reintentar()"></button>
+      </div>
+    </ng-container>
+
+  </div>
+</div>
+
+<!-- FORMULARIO -->
+<div class="form-wrapper" *ngIf="estado === 'valido'">
   <p-card class="card">
 
     <h2 class="subtitulo">Ficha de Temporada</h2>
 
     <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()">
 
+      <!-- JUGADOR -->
       <div class="seccion">
         <h3>Datos del Jugador/a</h3>
-
         <div class="grid">
 
           <div class="campo">
-            <label>Nombre</label>
-            <input
-              pInputText
-              formControlName="nombre"
+            <label>Nombre completo <span class="req">*</span></label>
+            <input pInputText formControlName="nombre"
               [ngClass]="{'input-error': campoInvalido('nombre')}" />
-            <small *ngIf="campoInvalido('nombre')" class="error">
-              El nombre es obligatorio
-            </small>
+            <small *ngIf="campoInvalido('nombre')" class="error">El nombre es obligatorio</small>
           </div>
 
           <div class="campo">
-            <label>Dirección</label>
-            <input
-              pInputText
-              formControlName="direccion"
-              [ngClass]="{'input-error': campoInvalido('direccion')}" />
-            <small *ngIf="campoInvalido('direccion')" class="error">
-              La dirección es obligatoria
-            </small>
-          </div>
-
-          <div class="campo">
-            <label>Ciudad</label>
-            <input
-              pInputText
-              formControlName="ciudad"
-              [ngClass]="{'input-error': campoInvalido('ciudad')}" />
-            <small *ngIf="campoInvalido('ciudad')" class="error">
-              La ciudad es obligatoria
-            </small>
-          </div>
-
-          <div class="campo">
-            <label>Fecha nacimiento</label>
-            <input
-              type="date"
-              formControlName="fechaNacimiento"
-              [ngClass]="{'input-error': campoInvalido('fechaNacimiento')}" />
-            <small *ngIf="campoInvalido('fechaNacimiento')" class="error">
-              La fecha de nacimiento es obligatoria
-            </small>
-          </div>
-
-          <div class="campo">
-            <label>Cédula</label>
-            <input
-              pInputText
-              formControlName="cedula"
+            <label>Cédula / RUT <span class="req">*</span></label>
+            <input pInputText formControlName="cedula" placeholder="12345678-9"
               [ngClass]="{'input-error': campoInvalido('cedula')}" />
-            <small *ngIf="campoInvalido('cedula')" class="error">
-              La cédula es obligatoria
-            </small>
+            <small *ngIf="campoInvalido('cedula')" class="error">La cédula es obligatoria</small>
+          </div>
+
+          <div class="campo">
+            <label>Fecha de nacimiento <span class="req">*</span></label>
+            <input type="date" formControlName="fechaNacimiento"
+              [ngClass]="{'input-error': campoInvalido('fechaNacimiento')}" />
+            <small *ngIf="campoInvalido('fechaNacimiento')" class="error">La fecha de nacimiento es obligatoria</small>
+          </div>
+
+          <div class="campo">
+            <label>Posición</label>
+            <p-select [options]="posiciones" optionLabel="name" formControlName="posicion"
+              placeholder="Seleccione posición" appendTo="body"></p-select>
+          </div>
+
+          <div class="campo">
+            <label>Pie hábil</label>
+            <p-select [options]="pies" optionLabel="name" formControlName="pieHabil"
+              placeholder="Seleccione pie" appendTo="body"></p-select>
+          </div>
+
+          <div class="campo">
+            <label>Talla</label>
+            <input pInputText formControlName="talla" placeholder="Ej: 1.65 m" />
+          </div>
+
+          <div class="campo">
+            <label>Nombre en camiseta</label>
+            <input pInputText formControlName="nombreCamiseta" />
+          </div>
+
+          <div class="campo">
+            <label>Números favoritos</label>
+            <input pInputText formControlName="numerosFavoritos" placeholder="Ej: 7, 10, 11" />
+          </div>
+
+          <div class="campo">
+            <label>Años jugando fútbol</label>
+            <input pInputText formControlName="aniosJugando" type="number" min="0" />
+          </div>
+
+          <div class="campo">
+            <label>Establecimiento educacional</label>
+            <input pInputText formControlName="establecimiento" />
+          </div>
+
+          <div class="campo">
+            <label>Curso</label>
+            <input pInputText formControlName="curso" />
           </div>
 
           <div class="campo">
@@ -73,73 +123,54 @@
           </div>
 
           <div class="campo">
-            <label>Talla</label>
-            <input pInputText formControlName="talla" />
+            <label>Actitud social</label>
+            <input pInputText formControlName="actitudSocial" />
           </div>
 
           <div class="campo">
-            <label>Números favoritos</label>
-            <input pInputText formControlName="numerosFavoritos" />
+            <label>Dirección <span class="req">*</span></label>
+            <input pInputText formControlName="direccion" placeholder="Calle y número"
+              [ngClass]="{'input-error': campoInvalido('direccion')}" />
+            <small *ngIf="campoInvalido('direccion')" class="error">La dirección es obligatoria</small>
           </div>
 
           <div class="campo">
-            <label>Nombre camiseta</label>
-            <input pInputText formControlName="nombreCamiseta" />
-          </div>
-
-          <div class="campo">
-            <label>Posición</label>
-            <p-select
-              [options]="posiciones"
-              optionLabel="name"
-              formControlName="posicion"
-              placeholder="Seleccione posición">
-            </p-select>
-          </div>
-
-          <div class="campo">
-            <label>Pie hábil</label>
-            <p-select
-              [options]="pies"
-              optionLabel="name"
-              formControlName="pieHabil"
-              placeholder="Seleccione pie">
-            </p-select>
+            <label>Ciudad <span class="req">*</span></label>
+            <input pInputText formControlName="ciudad"
+              [ngClass]="{'input-error': campoInvalido('ciudad')}" />
+            <small *ngIf="campoInvalido('ciudad')" class="error">La ciudad es obligatoria</small>
           </div>
 
         </div>
       </div>
 
+      <!-- APODERADO -->
       <div class="seccion">
         <h3>Datos del Apoderado/a</h3>
-
         <div formGroupName="apoderado" class="grid">
 
           <div class="campo">
-            <label>Nombre</label>
-            <input
-              pInputText
-              formControlName="nombre"
+            <label>Nombre completo <span class="req">*</span></label>
+            <input pInputText formControlName="nombre"
               [ngClass]="{'input-error': campoApoderadoInvalido('nombre')}" />
-            <small *ngIf="campoApoderadoInvalido('nombre')" class="error">
-              El nombre del apoderado es obligatorio
-            </small>
+            <small *ngIf="campoApoderadoInvalido('nombre')" class="error">El nombre del apoderado es obligatorio</small>
           </div>
 
           <div class="campo">
-            <label>Correo</label>
-            <input
-              pInputText
-              formControlName="correo"
+            <label>Correo electrónico <span class="req">*</span></label>
+            <input pInputText formControlName="correo" type="email"
               [ngClass]="{'input-error': campoApoderadoInvalido('correo')}" />
-            <small *ngIf="campoApoderadoInvalido('correo')" class="error">
-              El correo del apoderado es obligatorio y debe ser válido
-            </small>
+            <small *ngIf="campoApoderadoInvalido('correo')" class="error">El correo es obligatorio y debe ser válido</small>
           </div>
 
           <div class="campo">
-            <label>Whatsapp (Numero de teléfono)</label>
-            <input pInputText formControlName="whatsapp" />
+            <label>WhatsApp</label>
+            <input pInputText formControlName="whatsapp" placeholder="+56 9 1234 5678" />
+          </div>
+
+          <div class="campo">
+            <label>Vínculo con el jugador</label>
+            <input pInputText formControlName="vinculo" placeholder="Ej: Padre, Madre, Tutor" />
           </div>
 
         </div>

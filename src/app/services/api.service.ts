@@ -19,6 +19,10 @@ export class ApiService {
     };
   }
 
+  ping(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/ping`);
+  }
+
   getConfig(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/config`);
   }

@@ -51,7 +51,7 @@ export const routes: Routes = [
   },
   {
     path: 'registrar/:token',
-    loadComponent: () => import('./pages/registro-invitado/registro-invitado').then(m => m.RegistroInvitadoComponent)
+    loadComponent: () => import('./ficha-temporada/ficha-temporada').then(m => m.FichaTemporadaComponent)
   },
   {
     path: '',

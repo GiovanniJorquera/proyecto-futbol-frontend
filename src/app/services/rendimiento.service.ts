@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,17 +11,21 @@ export class RendimientoService {
 
   private apiUrl = `${environment.apiUrl}/rendimientos`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private auth: AuthService) {}
+
+  private get headers() {
+    return { headers: new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken() ?? ''}` }) };
+  }
 
   crearRendimiento(data: any): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+    return this.http.post(this.apiUrl, data, this.headers);
   }
 
   obtenerRendimientos(jugadorId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${jugadorId}`);
+    return this.http.get(`${this.apiUrl}/${jugadorId}`, this.headers);
   }
 
   obtenerResumen(jugadorId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/resumen/${jugadorId}`);
+    return this.http.get(`${this.apiUrl}/resumen/${jugadorId}`, this.headers);
   }
 }

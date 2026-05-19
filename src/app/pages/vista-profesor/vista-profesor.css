@@ -579,7 +579,213 @@
 }
 .rend-select:focus { border-color: var(--accent); }
 
+/* RENDIMIENTO INDIVIDUAL */
+.rend-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.rend-lista-panel {
+  background: var(--surface);
+  border: 1px solid var(--bdr);
+  border-radius: 14px;
+  padding: 1rem;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.rend-lista-panel h3 { margin: 0 0 .85rem; }
+
+.rend-jugador-item {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .6rem .75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s;
+  margin-bottom: .3rem;
+  border: 1px solid transparent;
+}
+.rend-jugador-item:hover { background: var(--accent-a); }
+.rend-jugador-item.rend-jugador-activo {
+  background: var(--accent-a);
+  border-color: var(--accent);
+}
+
+.jc-avatar-sm {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--accent-a);
+  border: 1px solid var(--bdr);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.jc-avatar-sm .pi { color: var(--accent); font-size: 1rem; }
+
+.rend-detalle-panel {
+  background: var(--surface);
+  border: 1px solid var(--bdr);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+}
+
+.rend-resumen-bar {
+  display: flex;
+  gap: 1.5rem;
+  padding: .75rem 1rem;
+  background: var(--accent-a);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.rend-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .1rem;
+}
+.rend-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.rend-stat-lbl {
+  font-size: .72rem;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.rend-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+  margin-bottom: 1.1rem;
+}
+
+.rend-form-full { grid-column: 1 / -1; }
+
+.rend-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.rend-form-field label {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.rend-range {
+  font-weight: 400;
+  color: var(--lbl-clr);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.rend-number-input {
+  width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.rend-number-input:focus { border-color: var(--accent); }
+
+.rend-textarea {
+  width: 100%;
+  padding: .6rem .9rem;
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: .9rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.rend-textarea:focus { border-color: var(--accent); }
+
+/* Historial */
+.rend-historial {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--bdr);
+}
+
+.rend-hist-titulo {
+  margin: 0 0 1rem;
+  color: var(--heading);
+  font-size: .95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+.rend-hist-titulo .pi { color: var(--accent); }
+
+.rend-hist-card {
+  padding: .85rem 1rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  margin-bottom: .65rem;
+}
+
+.rend-hist-scores {
+  display: flex;
+  gap: .9rem;
+  flex-wrap: wrap;
+  font-size: .88rem;
+  color: var(--text);
+  margin-bottom: .4rem;
+}
+
+.rend-hist-avg {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.rend-hist-comentario {
+  margin: .3rem 0;
+  font-size: .85rem;
+  color: var(--text-sub);
+  font-style: italic;
+}
+
+.rend-hist-fecha {
+  font-size: .78rem;
+  color: var(--lbl-clr);
+}
+
 /* RESPONSIVE */
+@media (max-width: 768px) {
+  .rend-layout { grid-template-columns: 1fr; }
+  .rend-lista-panel { position: static; max-height: none; }
+}
+
 @media (max-width: 640px) {
   .profesor-banner { flex-direction: column; text-align: center; }
   .profesor-stats { justify-content: center; }
@@ -590,4 +796,5 @@
   .asis-btns { width: 100%; justify-content: flex-start; }
   .guardar-row { justify-content: stretch; }
   .btn-guardar { width: 100%; justify-content: center; }
+  .rend-form-grid { grid-template-columns: 1fr; }
 }

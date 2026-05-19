@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { RendimientoService } from '../../services/rendimiento.service';
 
 interface RegistroAsistencia {
   jugadorId: string;
@@ -34,7 +35,7 @@ export class VistaProfesorComponent implements OnInit {
   fechaSeleccionada = '';
   registros: RegistroAsistencia[] = [];
 
-  // Rendimiento
+  // Rendimiento (batch por fecha — conservado)
   fechaRendimiento = '';
   registrosRendimiento: any[] = [];
   guardandoRendimiento = false;
@@ -45,10 +46,21 @@ export class VistaProfesorComponent implements OnInit {
   asistenciaGuardada = false;
   errorAsistencia = '';
 
+  // Rendimiento individual (Giovanni)
+  jugadorSeleccionadoRend: any = null;
+  rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+  rendHistorial: any[] = [];
+  rendResumen: any = {};
+  guardandoRendInd = false;
+  rendIndGuardado = false;
+  errorRendInd = '';
+  cargandoRendHist = false;
+
   constructor(
     private api: ApiService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private rendimientoService: RendimientoService
   ) {}
 
   ngOnInit() {
@@ -159,6 +171,49 @@ export class VistaProfesorComponent implements OnInit {
     this.api.guardarRendimientoProfesor(this.fechaRendimiento, this.registrosRendimiento).subscribe({
       next: () => { this.guardandoRendimiento = false; this.rendimientoGuardado = true; },
       error: () => { this.guardandoRendimiento = false; this.errorRendimiento = 'Error al guardar. Intente nuevamente.'; }
+    });
+  }
+
+  seleccionarJugadorRend(f: any) {
+    this.jugadorSeleccionadoRend = f;
+    this.rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+    this.rendIndGuardado = false;
+    this.errorRendInd = '';
+    this.cargarHistorialRend();
+  }
+
+  cargarHistorialRend() {
+    if (!this.jugadorSeleccionadoRend) return;
+    this.cargandoRendHist = true;
+    this.rendimientoService.obtenerRendimientos(this.jugadorSeleccionadoRend._id).subscribe({
+      next: (data) => { this.rendHistorial = data; this.cargandoRendHist = false; },
+      error: () => { this.cargandoRendHist = false; }
+    });
+    this.rendimientoService.obtenerResumen(this.jugadorSeleccionadoRend._id).subscribe({
+      next: (data) => { this.rendResumen = data; }
+    });
+  }
+
+  guardarRendimientoIndividual() {
+    this.guardandoRendInd = true;
+    this.errorRendInd = '';
+    this.rendIndGuardado = false;
+    const data = {
+      jugadorId: this.jugadorSeleccionadoRend._id,
+      profesorId: this.profesor?._id,
+      ...this.rendForm
+    };
+    this.rendimientoService.crearRendimiento(data).subscribe({
+      next: () => {
+        this.guardandoRendInd = false;
+        this.rendIndGuardado = true;
+        this.rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+        this.cargarHistorialRend();
+      },
+      error: () => {
+        this.guardandoRendInd = false;
+        this.errorRendInd = 'Error al guardar. Intente nuevamente.';
+      }
     });
   }
 

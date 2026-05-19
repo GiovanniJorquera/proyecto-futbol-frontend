@@ -222,67 +222,124 @@
 
     <!-- TAB: RENDIMIENTO -->
     <div class="tab-content" *ngIf="tabActiva === 'rendimiento'">
-      <div class="section-inner">
-        <div class="asistencia-header">
-          <h3 class="asistencia-titulo"><i class="pi pi-chart-bar"></i> Selecciona la fecha del entrenamiento</h3>
-          <div class="fecha-row">
-            <input type="date" class="fecha-input" [(ngModel)]="fechaRendimiento" />
-            <button class="btn-cargar" (click)="cargarRendimientoFecha()" [disabled]="!fechaRendimiento">
-              <i class="pi pi-refresh"></i> Cargar
-            </button>
-          </div>
-        </div>
+      <div class="section-inner rend-layout">
 
-        <div class="empty-msg" *ngIf="!fechaRendimiento">
-          <i class="pi pi-calendar-times"></i>
-          <p>Selecciona una fecha para registrar el rendimiento.</p>
-        </div>
+        <!-- Panel izquierdo: lista de jugadores -->
+        <div class="rend-lista-panel">
+          <h3 class="asistencia-titulo"><i class="pi pi-users"></i> Selecciona un jugador</h3>
 
-        <div *ngIf="fechaRendimiento && registrosRendimiento.length > 0">
-          <div class="rend-header-row" style="display:grid; grid-template-columns:1fr 80px 80px 90px 90px; gap:0.5rem; padding:0.4rem 0.75rem; font-size:0.78rem; font-weight:700; color:rgba(233,247,234,0.5); text-transform:uppercase; letter-spacing:0.06em;">
-            <span>Jugador</span><span>Físico</span><span>Técnico</span><span>Psicológico</span><span>Estratégico</span>
+          <div class="empty-msg" *ngIf="fichas.length === 0">
+            <i class="pi pi-inbox"></i>
+            <p>No hay jugadores en tus sub-divisiones.</p>
           </div>
-          <div class="asistencia-lista">
-            <div class="rend-row" *ngFor="let r of registrosRendimiento" style="display:grid; grid-template-columns:1fr 80px 80px 90px 90px; gap:0.5rem; align-items:center; padding:0.6rem 0.75rem; border-bottom:1px solid rgba(57,211,83,0.07);">
-              <div>
-                <span class="asis-nombre">{{ r.nombre }}</span>
-                <span class="tag division" style="margin-left:0.4rem; font-size:0.75rem;">{{ r.categoria }}</span>
-              </div>
-              <select [(ngModel)]="r.fisico" class="rend-select">
-                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
-              </select>
-              <select [(ngModel)]="r.tecnico" class="rend-select">
-                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
-              </select>
-              <select [(ngModel)]="r.psicologico" class="rend-select">
-                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
-              </select>
-              <select [(ngModel)]="r.estrategico" class="rend-select">
-                <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{ n }}</option>
-              </select>
+
+          <div class="rend-jugador-item"
+               *ngFor="let f of fichas"
+               [class.rend-jugador-activo]="jugadorSeleccionadoRend?._id === f._id"
+               (click)="seleccionarJugadorRend(f)">
+            <div class="jc-avatar jc-avatar-sm"><i class="pi pi-user"></i></div>
+            <div>
+              <p class="jc-nombre">{{ f.nombre }}</p>
+              <span class="tag division">{{ f.categoria }}</span>
             </div>
           </div>
-
-          <div class="alerta-ok" *ngIf="rendimientoGuardado">
-            <i class="pi pi-check-circle"></i> Rendimiento guardado correctamente.
-          </div>
-          <div class="alerta-error" *ngIf="errorRendimiento">
-            <i class="pi pi-exclamation-triangle"></i> {{ errorRendimiento }}
-          </div>
-
-          <div class="guardar-row">
-            <button class="btn-guardar" (click)="guardarRendimiento()" [disabled]="guardandoRendimiento">
-              <i class="pi pi-save" *ngIf="!guardandoRendimiento"></i>
-              <i class="pi pi-spin pi-spinner" *ngIf="guardandoRendimiento"></i>
-              {{ guardandoRendimiento ? 'Guardando...' : 'Guardar rendimiento' }}
-            </button>
-          </div>
         </div>
 
-        <div class="empty-msg" *ngIf="fechaRendimiento && registrosRendimiento.length === 0">
-          <i class="pi pi-users"></i>
-          <p>No hay jugadores en tus sub-divisiones.</p>
+        <!-- Panel derecho: formulario + historial -->
+        <div class="rend-detalle-panel">
+
+          <div class="empty-msg" *ngIf="!jugadorSeleccionadoRend">
+            <i class="pi pi-arrow-left"></i>
+            <p>Selecciona un jugador para evaluar su rendimiento.</p>
+          </div>
+
+          <ng-container *ngIf="jugadorSeleccionadoRend">
+
+            <h3 class="asistencia-titulo">
+              <i class="pi pi-chart-bar"></i>
+              Evaluación — {{ jugadorSeleccionadoRend.nombre }}
+            </h3>
+
+            <!-- Resumen -->
+            <div class="rend-resumen-bar" *ngIf="rendResumen.totalEvaluaciones">
+              <div class="rend-stat">
+                <span class="rend-stat-num">{{ rendResumen.promedioGeneral }}</span>
+                <span class="rend-stat-lbl">Promedio</span>
+              </div>
+              <div class="rend-stat">
+                <span class="rend-stat-num">{{ rendResumen.totalEvaluaciones }}</span>
+                <span class="rend-stat-lbl">Evaluaciones</span>
+              </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="rend-form-grid">
+              <div class="rend-form-field">
+                <label>Velocidad <span class="rend-range">(1–10)</span></label>
+                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.velocidad" min="1" max="10" />
+              </div>
+              <div class="rend-form-field">
+                <label>Resistencia <span class="rend-range">(1–10)</span></label>
+                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.resistencia" min="1" max="10" />
+              </div>
+              <div class="rend-form-field">
+                <label>Técnica <span class="rend-range">(1–10)</span></label>
+                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.tecnica" min="1" max="10" />
+              </div>
+              <div class="rend-form-field">
+                <label>Disciplina <span class="rend-range">(1–10)</span></label>
+                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.disciplina" min="1" max="10" />
+              </div>
+              <div class="rend-form-field rend-form-full">
+                <label>Comentario</label>
+                <textarea class="rend-textarea" [(ngModel)]="rendForm.comentario" rows="3" placeholder="Observaciones opcionales..."></textarea>
+              </div>
+            </div>
+
+            <div class="alerta-ok" *ngIf="rendIndGuardado">
+              <i class="pi pi-check-circle"></i> Evaluación guardada correctamente.
+            </div>
+            <div class="alerta-error" *ngIf="errorRendInd">
+              <i class="pi pi-exclamation-triangle"></i> {{ errorRendInd }}
+            </div>
+
+            <div class="guardar-row">
+              <button class="btn-guardar" (click)="guardarRendimientoIndividual()" [disabled]="guardandoRendInd">
+                <i class="pi pi-save" *ngIf="!guardandoRendInd"></i>
+                <i class="pi pi-spin pi-spinner" *ngIf="guardandoRendInd"></i>
+                {{ guardandoRendInd ? 'Guardando...' : 'Guardar evaluación' }}
+              </button>
+            </div>
+
+            <!-- Historial -->
+            <div class="rend-historial">
+              <h4 class="rend-hist-titulo"><i class="pi pi-history"></i> Historial</h4>
+
+              <div class="empty-msg" *ngIf="!cargandoRendHist && rendHistorial.length === 0">
+                <i class="pi pi-inbox"></i>
+                <p>Sin evaluaciones previas.</p>
+              </div>
+
+              <div class="empty-msg" *ngIf="cargandoRendHist">
+                <i class="pi pi-spin pi-spinner"></i>
+              </div>
+
+              <div class="rend-hist-card" *ngFor="let r of rendHistorial">
+                <div class="rend-hist-scores">
+                  <span><strong>Vel:</strong> {{ r.velocidad }}</span>
+                  <span><strong>Res:</strong> {{ r.resistencia }}</span>
+                  <span><strong>Téc:</strong> {{ r.tecnica }}</span>
+                  <span><strong>Dis:</strong> {{ r.disciplina }}</span>
+                  <span class="rend-hist-avg"><strong>Prom:</strong> {{ r.promedio }}</span>
+                </div>
+                <p class="rend-hist-comentario" *ngIf="r.comentario">{{ r.comentario }}</p>
+                <span class="rend-hist-fecha">{{ r.fecha | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+          </ng-container>
         </div>
+
       </div>
     </div>
 

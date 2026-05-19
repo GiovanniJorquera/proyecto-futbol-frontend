@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   Validators
 } from '@angular/forms';
+import { timeout } from 'rxjs/operators';
 
 import { MessageService } from 'primeng/api';
 import { ApiService } from '../services/api.service';
@@ -33,10 +34,17 @@ import { ToastModule } from 'primeng/toast';
   templateUrl: './ficha-temporada.html',
   styleUrls: ['./ficha-temporada.css']
 })
-export class FichaTemporadaComponent {
+export class FichaTemporadaComponent implements OnInit {
 
   formulario!: FormGroup;
   enviando = false;
+
+  token = '';
+  estado: 'cargando' | 'valido' | 'invalido' | 'expirado' | 'usado' | 'enviado' = 'cargando';
+  mensajeError = '';
+  esTimeout = false;
+  mensajeCarga = 'Validando link...';
+  private intentos = 0;
 
   posiciones = [
     { name: 'Arquero' },
@@ -54,42 +62,80 @@ export class FichaTemporadaComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private apiService: ApiService,
     private messageService: MessageService
-  ) {
+  ) {}
+
+  ngOnInit() {
+    this.token = this.route.snapshot.paramMap.get('token') ?? '';
+
     this.formulario = this.fb.group({
-      nombre: ['', Validators.required],
-      direccion: ['', Validators.required],
-      ciudad: ['', Validators.required],
+      nombre:          ['', Validators.required],
+      cedula:          ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
-      cedula: ['', Validators.required],
-
+      posicion:        [null],
+      pieHabil:        [null],
+      talla:           [''],
+      nombreCamiseta:  [''],
+      numerosFavoritos:[''],
+      aniosJugando:    [''],
       establecimiento: [''],
-      curso: [''],
-      clubAmateur: [''],
-      talla: [''],
-      numerosFavoritos: [''],
-      nombreCamiseta: [''],
-
-      posicion: [null],
-      pieHabil: [null],
-
-      aniosJugando: [''],
-      otrosDeportes: [''],
-      otrasEscuelas: [''],
-      actitudSocial: [''],
-      actitudAdversidad: [''],
+      curso:           [''],
+      clubAmateur:     [''],
+      actitudSocial:   [''],
+      direccion:       ['', Validators.required],
+      ciudad:          ['', Validators.required],
 
       apoderado: this.fb.group({
-        nombre: ['', Validators.required],
-        direccion: [''],
-        ciudad: [''],
-        rut: [''],
-        correo: ['', [Validators.required, Validators.email]],
-        telefonoCasa: [''],
-        whatsapp: [''],
+        nombre:  ['', Validators.required],
+        correo:  ['', [Validators.required, Validators.email]],
+        whatsapp:[''],
         vinculo: ['']
       })
+    });
+
+    if (!this.token) {
+      this.estado = 'invalido';
+      this.mensajeError = 'Link inválido.';
+      return;
+    }
+
+    this.validarToken();
+  }
+
+  reintentar() {
+    this.estado = 'cargando';
+    this.mensajeError = '';
+    this.esTimeout = false;
+    this.intentos = 0;
+    this.mensajeCarga = 'Validando link...';
+    this.validarToken();
+  }
+
+  private validarToken() {
+    this.intentos++;
+    this.apiService.validarInvitacion(this.token).pipe(timeout(40000)).subscribe({
+      next: () => { this.estado = 'valido'; },
+      error: (err) => {
+        if (err?.name === 'TimeoutError') {
+          if (this.intentos < 2) {
+            this.mensajeCarga = 'El servidor está iniciando, reintentando...';
+            setTimeout(() => this.validarToken(), 3000);
+            return;
+          }
+          this.estado = 'invalido';
+          this.esTimeout = true;
+          this.mensajeError = 'El servidor tardó en responder. Intenta nuevamente.';
+          return;
+        }
+        this.esTimeout = false;
+        const msg: string = err?.error?.mensaje ?? '';
+        if (msg.includes('utilizado')) { this.estado = 'usado'; }
+        else if (msg.includes('expirado')) { this.estado = 'expirado'; }
+        else { this.estado = 'invalido'; }
+        this.mensajeError = msg || 'Link no válido.';
+      }
     });
   }
 
@@ -106,14 +152,12 @@ export class FichaTemporadaComponent {
   enviarFormulario() {
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
-
       this.messageService.add({
         severity: 'warn',
         summary: 'Formulario incompleto',
         detail: 'Completa los campos obligatorios.',
         life: 4000
       });
-
       return;
     }
 
@@ -122,34 +166,29 @@ export class FichaTemporadaComponent {
     const payload = {
       ...this.formulario.value,
       posicion: this.formulario.value.posicion?.name || '',
-      pieHabil: this.formulario.value.pieHabil?.name || ''
+      pieHabil: this.formulario.value.pieHabil?.name || '',
+      invitacionToken: this.token
     };
 
     this.apiService.crearFichaTemporada(payload).subscribe({
       next: () => {
         this.enviando = false;
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Ficha registrada',
-          detail: 'Jugador incorporado correctamente.',
-          life: 3000
-        });
-
-        this.formulario.reset();
-
-        setTimeout(() => this.router.navigate(['/inicio']), 2000);
+        this.estado = 'enviado';
       },
-
-      error: () => {
+      error: (err) => {
         this.enviando = false;
-
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo guardar la ficha.',
-          life: 4000
-        });
+        const msg: string = err?.error?.mensaje ?? '';
+        if (msg.includes('utilizado') || msg.includes('expirado')) {
+          this.estado = 'usado';
+          this.mensajeError = msg;
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo guardar la ficha. Intenta nuevamente.',
+            life: 4000
+          });
+        }
       }
     });
   }
