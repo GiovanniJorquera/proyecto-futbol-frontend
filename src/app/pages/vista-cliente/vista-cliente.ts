@@ -153,4 +153,8 @@ export class VistaClienteComponent implements OnInit {
     if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
     return edad;
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 22a3e76 (Entrega 2)
