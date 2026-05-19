@@ -115,29 +115,27 @@
       <div class="section-inner">
 
         <div class="asistencia-header">
-          <h3 class="asistencia-titulo"><i class="pi pi-calendar"></i> Selecciona la fecha</h3>
-          <div class="fecha-row">
-            <input
-              type="date"
-              class="fecha-input"
-              [(ngModel)]="fechaSeleccionada"
-            />
+          <h3 class="asistencia-titulo"><i class="pi pi-calendar"></i> Día de entrenamiento</h3>
+          <p class="semana-label">{{ semanaLabel }}</p>
+          <div class="dias-semana">
             <button
-              class="btn-cargar"
-              (click)="cargarAsistenciaFecha()"
-              [disabled]="!fechaSeleccionada || cargandoAsistencia"
+              class="btn-dia"
+              *ngFor="let d of diasEntrenamiento"
+              [class.btn-dia-activo]="fechaSeleccionada === d.fechaISO"
+              [disabled]="cargandoAsistencia"
+              (click)="seleccionarDia(d.fechaISO)"
             >
-              <i class="pi pi-refresh" *ngIf="!cargandoAsistencia"></i>
-              <i class="pi pi-spin pi-spinner" *ngIf="cargandoAsistencia"></i>
-              Cargar lista
+              <span class="btn-dia-num">{{ d.dia }}</span>
+              <span class="btn-dia-nombre">({{ d.diaNombre }})</span>
+              <i class="pi pi-spin pi-spinner btn-dia-spinner" *ngIf="cargandoAsistencia && fechaSeleccionada === d.fechaISO"></i>
             </button>
           </div>
         </div>
 
-        <!-- Sin fecha seleccionada -->
+        <!-- Sin día seleccionado -->
         <div class="empty-msg" *ngIf="!fechaSeleccionada">
           <i class="pi pi-calendar-times"></i>
-          <p>Selecciona una fecha para registrar asistencia.</p>
+          <p>Selecciona un día para registrar la asistencia.</p>
         </div>
 
         <!-- Lista de asistencia -->

@@ -82,6 +82,42 @@ export class VistaProfesorComponent implements OnInit {
     });
   }
 
+  get diasEntrenamiento(): { dia: number; diaNombre: string; fechaISO: string; fecha: Date }[] {
+    const hoy = new Date();
+    const dow = hoy.getDay(); // 0=Dom, 1=Lun, ..., 6=Sab
+    const diasDesdeElLunes = dow === 0 ? 6 : dow - 1;
+    const lunes = new Date(hoy);
+    lunes.setHours(0, 0, 0, 0);
+    lunes.setDate(hoy.getDate() - diasDesdeElLunes);
+
+    const toISO = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dia = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dia}`;
+    };
+
+    const miercoles = new Date(lunes); miercoles.setDate(lunes.getDate() + 2);
+    const viernes   = new Date(lunes); viernes.setDate(lunes.getDate() + 4);
+
+    return [
+      { dia: miercoles.getDate(), diaNombre: 'Miércoles', fechaISO: toISO(miercoles), fecha: miercoles },
+      { dia: viernes.getDate(),   diaNombre: 'Viernes',   fechaISO: toISO(viernes),   fecha: viernes   },
+    ];
+  }
+
+  get semanaLabel(): string {
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const [mie, vie] = this.diasEntrenamiento;
+    return `Miércoles ${mie.dia} y Viernes ${vie.dia} de ${meses[mie.fecha.getMonth()]} ${mie.fecha.getFullYear()}`;
+  }
+
+  seleccionarDia(fechaISO: string) {
+    if (this.cargandoAsistencia) return;
+    this.fechaSeleccionada = fechaISO;
+    this.cargarAsistenciaFecha();
+  }
+
   cargarAsistenciaFecha() {
     if (!this.fechaSeleccionada) return;
     this.cargandoAsistencia = true;

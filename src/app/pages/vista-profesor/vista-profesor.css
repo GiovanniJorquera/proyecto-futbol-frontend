@@ -425,6 +425,77 @@
 .btn-cargar:hover:not(:disabled) { background: var(--accent); color: #fff; }
 .btn-cargar:disabled { opacity: .5; cursor: not-allowed; }
 
+/* DÍAS DE ENTRENAMIENTO */
+.semana-label {
+  margin: 0 0 1rem;
+  font-size: .88rem;
+  color: var(--text-sub);
+  font-weight: 500;
+}
+
+.dias-semana {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  padding: 1.25rem 2.75rem;
+  background: var(--surface);
+  border: 2px solid var(--bdr);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: border-color .18s, background .18s, box-shadow .18s;
+  color: var(--text);
+  font-family: inherit;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.btn-dia:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-a);
+  box-shadow: var(--shadow-h);
+}
+.btn-dia:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-dia-activo {
+  border-color: var(--accent) !important;
+  background: var(--accent-a) !important;
+  box-shadow: 0 0 0 3px rgba(30,122,48,.15) !important;
+}
+:host.dark .btn-dia-activo {
+  box-shadow: 0 0 0 3px rgba(57,211,83,.15) !important;
+}
+
+.btn-dia-num {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.btn-dia-nombre {
+  font-size: .88rem;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+.btn-dia-activo .btn-dia-nombre { color: var(--accent); }
+
+.btn-dia-spinner {
+  font-size: .9rem;
+  color: var(--accent);
+  margin-top: .15rem;
+}
+
+@media (max-width: 480px) {
+  .btn-dia { padding: 1rem 2rem; }
+  .btn-dia-num { font-size: 2.2rem; }
+}
+
 /* RESUMEN BAR */
 .resumen-bar {
   display: flex;
