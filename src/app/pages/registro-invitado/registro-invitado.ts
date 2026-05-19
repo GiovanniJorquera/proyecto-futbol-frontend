@@ -45,20 +45,20 @@ export class RegistroInvitadoComponent implements OnInit {
     this.token = this.route.snapshot.paramMap.get('token') ?? '';
     this.formulario = this.fb.group({
       apoderado: this.fb.group({
-        nombre: ['', Validators.required],
-        apellidos: ['', Validators.required],
-        correo: ['', [Validators.required, Validators.email]],
-        telefono: ['', [Validators.required, Validators.pattern(/^\+?56?\s?9\s?\d{4}\s?\d{4}$/)]]
+        nombre:    ['', [Validators.required, Validators.maxLength(80)]],
+        apellidos: ['', [Validators.required, Validators.maxLength(80)]],
+        correo:    ['', [Validators.required, Validators.email, Validators.maxLength(100)]],
+        telefono:  ['', [Validators.required, Validators.pattern(/^\+?56?\s?9\s?\d{4}\s?\d{4}$/), Validators.maxLength(20)]]
       }),
       pupilo: this.fb.group({
-        nombre: ['', Validators.required],
-        apellidoPaterno: ['', Validators.required],
-        apellidoMaterno: ['', Validators.required],
-        rut: ['', [Validators.required, this.validarRut.bind(this)]],
+        nombre:          ['', [Validators.required, Validators.maxLength(80)]],
+        apellidoPaterno: ['', [Validators.required, Validators.maxLength(80)]],
+        apellidoMaterno: ['', [Validators.required, Validators.maxLength(80)]],
+        rut:             ['', [Validators.required, Validators.maxLength(15), this.validarRut.bind(this)]],
         fechaNacimiento: ['', Validators.required],
-        genero: [null, Validators.required],
-        direccion: ['', Validators.required],
-        comuna: [null, Validators.required]
+        genero:          [null, Validators.required],
+        direccion:       ['', [Validators.required, Validators.maxLength(150)]],
+        comuna:          [null, Validators.required]
       })
     });
 

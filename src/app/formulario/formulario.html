@@ -25,9 +25,10 @@
 
           <div class="campo">
             <label for="">Nombre</label>
-            <input 
+            <input
             pInputText
             formControlName="nombre"
+            maxlength="80"
             [ngClass]="{'input-error':campoInvalido('apoderado','nombre')}"
             />
             <small *ngIf="campoInvalido('apoderado','nombre')" class="error">
@@ -37,9 +38,10 @@
 
           <div class="campo">
             <label for="">Apellidos</label>
-            <input 
+            <input
             pInputText
             formControlName="apellidos"
+            maxlength="80"
             [ngClass]="{'input-error':campoInvalido('apoderado','apellidos')}"
             />
             <small *ngIf="campoInvalido('apoderado','apellidos')" class="error">
@@ -51,9 +53,10 @@
             <label>Correo</label>
             <input
               pInputText
-             formControlName="correo"
+              formControlName="correo"
+              maxlength="100"
               [ngClass]="{'input-error': campoInvalido('apoderado','correo')}"
-                />
+            />
             <small *ngIf="campoInvalido('apoderado','correo')" class="error">
               Ingrese un correo válido
             </small>
@@ -63,9 +66,10 @@
             <label>Teléfono</label>
             <input
               pInputText
-             formControlName="telefono"
+              formControlName="telefono"
+              maxlength="20"
               [ngClass]="{'input-error': campoInvalido('apoderado','telefono')}"
-                />
+            />
             <small *ngIf="campoInvalido('apoderado','telefono')" class="error">
               Ingrese un teléfono válido (ej: +56912345678)
             </small>
@@ -81,9 +85,10 @@
 
           <div class="campo">
             <label for="">Nombre</label>
-            <input 
+            <input
             pInputText
             formControlName="nombre"
+            maxlength="80"
             [ngClass]="{'input-error':campoInvalido('pupilo','nombre')}"
             />
             <small *ngIf="campoInvalido('pupilo','nombre')" class="error">
@@ -93,9 +98,10 @@
 
           <div class="campo">
             <label>Apellido Paterno</label>
-            <input 
+            <input
             pInputText
             formControlName="apellidoPaterno"
+            maxlength="80"
             [ngClass]="{'input-error':campoInvalido('pupilo','apellidoPaterno')}"
             />
             <small *ngIf="campoInvalido('pupilo','apellidoPaterno')" class="error">
@@ -105,9 +111,10 @@
 
           <div class="campo">
             <label>Apellido Materno</label>
-            <input 
+            <input
               pInputText
               formControlName="apellidoMaterno"
+              maxlength="80"
               [ngClass]="{'input-error':campoInvalido('pupilo','apellidoMaterno')}"
             />
             <small *ngIf="campoInvalido('pupilo','apellidoMaterno')" class="error">
@@ -120,6 +127,7 @@
             <input
               pInputText
               formControlName="rut"
+              maxlength="15"
               [ngClass]="{'input-error': campoInvalido('pupilo','rut') || rutInvalido}"
             />
             <small *ngIf="campoInvalido('pupilo','rut')" class="error">
@@ -147,7 +155,7 @@
 
           <div class="campo">
             <label>Dirección</label>
-            <input pInputText formControlName="direccion" />
+            <input pInputText formControlName="direccion" maxlength="150" />
           </div>
 
           <div class="campo">

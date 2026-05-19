@@ -53,25 +53,25 @@
 
         <div class="reg-field">
           <label>Nombre <span class="req">*</span></label>
-          <input pInputText formControlName="nombre" placeholder="Nombre" [class.ng-invalid]="campoInvalido('apoderado','nombre')" />
+          <input pInputText formControlName="nombre" placeholder="Nombre" maxlength="80" [class.ng-invalid]="campoInvalido('apoderado','nombre')" />
           <small *ngIf="campoInvalido('apoderado','nombre')" class="reg-error">Campo requerido</small>
         </div>
 
         <div class="reg-field">
           <label>Apellidos <span class="req">*</span></label>
-          <input pInputText formControlName="apellidos" placeholder="Apellidos" [class.ng-invalid]="campoInvalido('apoderado','apellidos')" />
+          <input pInputText formControlName="apellidos" placeholder="Apellidos" maxlength="80" [class.ng-invalid]="campoInvalido('apoderado','apellidos')" />
           <small *ngIf="campoInvalido('apoderado','apellidos')" class="reg-error">Campo requerido</small>
         </div>
 
         <div class="reg-field">
           <label>Correo electrónico <span class="req">*</span></label>
-          <input pInputText formControlName="correo" type="email" placeholder="correo@ejemplo.cl" [class.ng-invalid]="campoInvalido('apoderado','correo')" />
+          <input pInputText formControlName="correo" type="email" placeholder="correo@ejemplo.cl" maxlength="100" [class.ng-invalid]="campoInvalido('apoderado','correo')" />
           <small *ngIf="campoInvalido('apoderado','correo')" class="reg-error">Correo inválido</small>
         </div>
 
         <div class="reg-field">
           <label>Teléfono <span class="req">*</span></label>
-          <input pInputText formControlName="telefono" placeholder="+56 9 1234 5678" [class.ng-invalid]="campoInvalido('apoderado','telefono')" />
+          <input pInputText formControlName="telefono" placeholder="+56 9 1234 5678" maxlength="20" [class.ng-invalid]="campoInvalido('apoderado','telefono')" />
           <small *ngIf="campoInvalido('apoderado','telefono')" class="reg-error">Número inválido (ej: +56 9 1234 5678)</small>
         </div>
 
@@ -85,25 +85,25 @@
 
         <div class="reg-field">
           <label>Nombre <span class="req">*</span></label>
-          <input pInputText formControlName="nombre" placeholder="Nombre" [class.ng-invalid]="campoInvalido('pupilo','nombre')" />
+          <input pInputText formControlName="nombre" placeholder="Nombre" maxlength="80" [class.ng-invalid]="campoInvalido('pupilo','nombre')" />
           <small *ngIf="campoInvalido('pupilo','nombre')" class="reg-error">Campo requerido</small>
         </div>
 
         <div class="reg-field">
           <label>Apellido paterno <span class="req">*</span></label>
-          <input pInputText formControlName="apellidoPaterno" placeholder="Apellido paterno" [class.ng-invalid]="campoInvalido('pupilo','apellidoPaterno')" />
+          <input pInputText formControlName="apellidoPaterno" placeholder="Apellido paterno" maxlength="80" [class.ng-invalid]="campoInvalido('pupilo','apellidoPaterno')" />
           <small *ngIf="campoInvalido('pupilo','apellidoPaterno')" class="reg-error">Campo requerido</small>
         </div>
 
         <div class="reg-field">
           <label>Apellido materno <span class="req">*</span></label>
-          <input pInputText formControlName="apellidoMaterno" placeholder="Apellido materno" [class.ng-invalid]="campoInvalido('pupilo','apellidoMaterno')" />
+          <input pInputText formControlName="apellidoMaterno" placeholder="Apellido materno" maxlength="80" [class.ng-invalid]="campoInvalido('pupilo','apellidoMaterno')" />
           <small *ngIf="campoInvalido('pupilo','apellidoMaterno')" class="reg-error">Campo requerido</small>
         </div>
 
         <div class="reg-field">
           <label>RUT <span class="req">*</span></label>
-          <input pInputText formControlName="rut" placeholder="12345678-9" [class.ng-invalid]="campoInvalido('pupilo','rut')" />
+          <input pInputText formControlName="rut" placeholder="12345678-9" maxlength="15" [class.ng-invalid]="campoInvalido('pupilo','rut')" />
           <small *ngIf="campoInvalido('pupilo','rut')" class="reg-error">RUT inválido</small>
         </div>
 
@@ -122,7 +122,7 @@
 
         <div class="reg-field reg-field-full">
           <label>Dirección <span class="req">*</span></label>
-          <input pInputText formControlName="direccion" placeholder="Calle y número" [class.ng-invalid]="campoInvalido('pupilo','direccion')" />
+          <input pInputText formControlName="direccion" placeholder="Calle y número" maxlength="150" [class.ng-invalid]="campoInvalido('pupilo','direccion')" />
           <small *ngIf="campoInvalido('pupilo','direccion')" class="reg-error">Campo requerido</small>
         </div>
 
