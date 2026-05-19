@@ -114,6 +114,9 @@
           <label>Fecha de nacimiento <span class="req">*</span></label>
           <input pInputText type="date" formControlName="fechaNacimiento" [class.ng-invalid]="campoInvalido('pupilo','fechaNacimiento')" />
           <small *ngIf="campoInvalido('pupilo','fechaNacimiento')" class="reg-error">Campo requerido</small>
+          <div *ngIf="categoriaSugerida" class="reg-hint">
+            Por tu edad, te corresponde la categoría: <strong>{{ categoriaSugerida }}</strong>. La categoría definitiva será asignada automáticamente por el backend.
+          </div>
         </div>
 
         <div class="reg-field">
@@ -121,6 +124,9 @@
           <p-select formControlName="genero" [options]="generos" optionLabel="name" placeholder="Selecciona" appendTo="body"
             [class.ng-invalid]="campoInvalido('pupilo','genero')"></p-select>
           <small *ngIf="campoInvalido('pupilo','genero')" class="reg-error">Campo requerido</small>
+          <div *ngIf="ramaFemenina" class="reg-hint">
+            Como elegiste <strong>Femenino</strong>, esta jugadora irá a la rama femenina. El backend procesará la categoría y la rama final.
+          </div>
         </div>
 
         <div class="reg-field reg-field-full">

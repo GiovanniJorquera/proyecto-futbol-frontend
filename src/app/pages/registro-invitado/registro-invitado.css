@@ -119,11 +119,17 @@
   font-size: 0.8rem;
 }
 
-.reg-actions {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 16px;
-}
+  .reg-hint {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #eef7ff;
+    border: 1px solid #c8e1ff;
+    border-radius: 8px;
+    color: #1c4f91;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
 
 @media (max-width: 600px) {
   .reg-grid { grid-template-columns: 1fr; }

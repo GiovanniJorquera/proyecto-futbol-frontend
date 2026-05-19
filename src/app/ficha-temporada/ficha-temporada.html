@@ -73,6 +73,9 @@
             <input type="date" formControlName="fechaNacimiento"
               [ngClass]="{'input-error': campoInvalido('fechaNacimiento')}" />
             <small *ngIf="campoInvalido('fechaNacimiento')" class="error">La fecha de nacimiento es obligatoria</small>
+            <div *ngIf="categoriaSugerida" class="reg-hint">
+              Por tu edad, te corresponde la categoría: <strong>{{ categoriaSugerida }}</strong>. La categoría definitiva será calculada por el backend.
+            </div>
           </div>
 
           <div class="campo">

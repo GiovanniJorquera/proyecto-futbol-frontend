@@ -164,6 +164,17 @@ input:focus,
   opacity: 0.95;
 }
 
+.reg-hint {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(56, 142, 60, 0.08);
+  border: 1px solid rgba(56, 142, 60, 0.18);
+  color: #14532d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .error {
   color: #b91c1c;
   font-size: 0.85rem;

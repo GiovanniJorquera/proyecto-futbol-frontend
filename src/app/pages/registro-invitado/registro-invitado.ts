@@ -30,6 +30,8 @@ export class RegistroInvitadoComponent implements OnInit {
   formulario!: FormGroup;
   rutInvalido = false;
   enviando = false;
+  categoriaSugerida = '';
+  ramaFemenina = false;
 
   generos = [{ name: 'Masculino' }, { name: 'Femenino' }];
   comunas = [
@@ -77,6 +79,42 @@ export class RegistroInvitadoComponent implements OnInit {
     }
 
     this.validarToken();
+    this.registrarObservadoresCategoria();
+  }
+
+  private registrarObservadoresCategoria(): void {
+    this.formulario.get('pupilo.fechaNacimiento')?.valueChanges.subscribe(() => this.actualizarCategoriaSugerida());
+    this.formulario.get('pupilo.genero')?.valueChanges.subscribe(() => this.actualizarCategoriaSugerida());
+  }
+
+  private actualizarCategoriaSugerida(): void {
+    const fechaNacimiento = this.formulario.get('pupilo.fechaNacimiento')?.value;
+    const genero = this.formulario.get('pupilo.genero')?.value;
+    const edad = this.calcularEdad(fechaNacimiento);
+    this.categoriaSugerida = edad >= 0 ? this.obtenerCategoriaPorEdad(edad) : '';
+    this.ramaFemenina = genero?.name === 'Femenino';
+  }
+
+  private calcularEdad(fecha: string | null): number {
+    if (!fecha) return -1;
+    const nacimiento = new Date(fecha);
+    if (isNaN(nacimiento.getTime())) return -1;
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+    return edad;
+  }
+
+  private obtenerCategoriaPorEdad(edad: number): string {
+    if (edad <= 6) return 'Sub-6';
+    if (edad <= 8) return 'Sub-8';
+    if (edad <= 10) return 'Sub-10';
+    if (edad <= 12) return 'Sub-12';
+    if (edad <= 14) return 'Sub-14';
+    if (edad <= 16) return 'Sub-16';
+    if (edad <= 18) return 'Sub-18';
+    return 'Libre';
   }
 
   reintentar() {
