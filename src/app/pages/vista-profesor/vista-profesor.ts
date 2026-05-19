@@ -12,6 +12,7 @@ interface RegistroAsistencia {
   apellido: string;
   categoria: string;
   estado: 'asistio' | 'ausente' | 'justificado';
+  marcado: boolean;
 }
 
 @Component({
@@ -130,14 +131,15 @@ export class VistaProfesorComponent implements OnInit {
       nombre: f.nombre,
       apellido: f.apellido || '',
       categoria: f.categoria,
-      estado: 'asistio' as const
+      estado: 'asistio' as const,
+      marcado: false
     }));
 
     this.api.getAsistenciasProfesor(this.fechaSeleccionada).subscribe({
       next: (asistencias) => {
         asistencias.forEach(a => {
           const r = this.registros.find(r => r.jugadorId.toString() === a.jugadorId.toString());
-          if (r) r.estado = a.estado;
+          if (r) { r.estado = a.estado; r.marcado = true; }
         });
         this.cargandoAsistencia = false;
       },
@@ -149,17 +151,18 @@ export class VistaProfesorComponent implements OnInit {
     registro.estado = estado;
   }
 
-  getLetra(estado: string): string {
-    if (estado === 'ausente')     return 'A';
-    if (estado === 'justificado') return 'J';
+  getLetra(registro: RegistroAsistencia): string {
+    if (!registro.marcado) return '';
+    if (registro.estado === 'ausente')     return 'A';
+    if (registro.estado === 'justificado') return 'J';
     return 'P';
   }
 
   onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
     const key = event.key.toUpperCase();
-    if (key === 'P') { event.preventDefault(); this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
-    else if (key === 'A') { event.preventDefault(); this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
-    else if (key === 'J') { event.preventDefault(); this.setEstado(registro, 'justificado'); this.moverFoco(index + 1); }
+    if (key === 'P') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
+    else if (key === 'A') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
+    else if (key === 'J') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'justificado'); this.moverFoco(index + 1); }
     else if (key === 'ENTER' || key === 'ARROWDOWN') { event.preventDefault(); this.moverFoco(index + 1); }
     else if (key === 'ARROWUP') { event.preventDefault(); this.moverFoco(index - 1); }
   }
