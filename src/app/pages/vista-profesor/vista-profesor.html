@@ -260,40 +260,83 @@
               Evaluación — {{ jugadorSeleccionadoRend.nombre }}
             </h3>
 
-            <!-- Resumen -->
+            <!-- Resumen global -->
             <div class="rend-resumen-bar" *ngIf="rendResumen.totalEvaluaciones">
               <div class="rend-stat">
-                <span class="rend-stat-num">{{ rendResumen.promedioGeneral }}</span>
-                <span class="rend-stat-lbl">Promedio</span>
+                <span class="rend-stat-num">{{ rendResumen.promedioGeneral }}%</span>
+                <span class="rend-stat-lbl">Promedio general</span>
               </div>
               <div class="rend-stat">
                 <span class="rend-stat-num">{{ rendResumen.totalEvaluaciones }}</span>
                 <span class="rend-stat-lbl">Evaluaciones</span>
               </div>
+              <div class="rend-stat"><span class="rend-stat-num">{{ rendResumen.fisico }}%</span><span class="rend-stat-lbl">Físico</span></div>
+              <div class="rend-stat"><span class="rend-stat-num">{{ rendResumen.tecnico }}%</span><span class="rend-stat-lbl">Técnico</span></div>
+              <div class="rend-stat"><span class="rend-stat-num">{{ rendResumen.actitudinal }}%</span><span class="rend-stat-lbl">Actitudinal</span></div>
+              <div class="rend-stat"><span class="rend-stat-num">{{ rendResumen.estrategico }}%</span><span class="rend-stat-lbl">Estratégico</span></div>
             </div>
 
-            <!-- Formulario -->
-            <div class="rend-form-grid">
-              <div class="rend-form-field">
-                <label>Velocidad <span class="rend-range">(1–10)</span></label>
-                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.velocidad" min="1" max="10" />
+            <!-- Formulario con 4 categorías -->
+            <div class="rend-categorias">
+
+              <!-- FÍSICO -->
+              <div class="rend-cat-bloque">
+                <div class="rend-cat-header">
+                  <span class="rend-cat-titulo"><i class="pi pi-bolt"></i> Físico</span>
+                  <span class="rend-cat-prom">{{ promedioCat(rendForm.fisico) }}%</span>
+                </div>
+                <div class="rend-subitem"><label>Velocidad</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.velocidad"/><span>{{ rendForm.fisico.velocidad }}%</span></div>
+                <div class="rend-subitem"><label>Agilidad</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.agilidad"/><span>{{ rendForm.fisico.agilidad }}%</span></div>
+                <div class="rend-subitem"><label>Resistencia</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.resistencia"/><span>{{ rendForm.fisico.resistencia }}%</span></div>
+                <div class="rend-subitem"><label>Fuerza</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.fuerza"/><span>{{ rendForm.fisico.fuerza }}%</span></div>
+                <div class="rend-subitem"><label>Coordinación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.coordinacion"/><span>{{ rendForm.fisico.coordinacion }}%</span></div>
               </div>
-              <div class="rend-form-field">
-                <label>Resistencia <span class="rend-range">(1–10)</span></label>
-                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.resistencia" min="1" max="10" />
+
+              <!-- TÉCNICO -->
+              <div class="rend-cat-bloque">
+                <div class="rend-cat-header">
+                  <span class="rend-cat-titulo"><i class="pi pi-star"></i> Técnico</span>
+                  <span class="rend-cat-prom">{{ promedioCat(rendForm.tecnico) }}%</span>
+                </div>
+                <div class="rend-subitem"><label>Control y dominio</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.controlDominio"/><span>{{ rendForm.tecnico.controlDominio }}%</span></div>
+                <div class="rend-subitem"><label>Precisión en la ejecución</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.precisionEjecucion"/><span>{{ rendForm.tecnico.precisionEjecucion }}%</span></div>
+                <div class="rend-subitem"><label>Fluidez del movimiento</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.fluidezMovimiento"/><span>{{ rendForm.tecnico.fluidezMovimiento }}%</span></div>
+                <div class="rend-subitem"><label>Uso de perfiles</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.usoPerfiles"/><span>{{ rendForm.tecnico.usoPerfiles }}%</span></div>
+                <div class="rend-subitem"><label>Postura corporal</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.posturaCorporal"/><span>{{ rendForm.tecnico.posturaCorporal }}%</span></div>
               </div>
-              <div class="rend-form-field">
-                <label>Técnica <span class="rend-range">(1–10)</span></label>
-                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.tecnica" min="1" max="10" />
+
+              <!-- ACTITUDINAL -->
+              <div class="rend-cat-bloque">
+                <div class="rend-cat-header">
+                  <span class="rend-cat-titulo"><i class="pi pi-heart"></i> Actitudinal</span>
+                  <span class="rend-cat-prom">{{ promedioCat(rendForm.actitudinal) }}%</span>
+                </div>
+                <div class="rend-subitem"><label>Nivel de motivación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.motivacion"/><span>{{ rendForm.actitudinal.motivacion }}%</span></div>
+                <div class="rend-subitem"><label>Reacción ante el resultado</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.reaccionResultado"/><span>{{ rendForm.actitudinal.reaccionResultado }}%</span></div>
+                <div class="rend-subitem"><label>Apoyo al compañero</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.apoyoCompanero"/><span>{{ rendForm.actitudinal.apoyoCompanero }}%</span></div>
+                <div class="rend-subitem"><label>Deseos de superación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.deseosSuperacion"/><span>{{ rendForm.actitudinal.deseosSuperacion }}%</span></div>
+                <div class="rend-subitem"><label>Resiliencia ante una jugada</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.resiliencia"/><span>{{ rendForm.actitudinal.resiliencia }}%</span></div>
               </div>
-              <div class="rend-form-field">
-                <label>Disciplina <span class="rend-range">(1–10)</span></label>
-                <input type="number" class="rend-number-input" [(ngModel)]="rendForm.disciplina" min="1" max="10" />
+
+              <!-- ESTRATÉGICO -->
+              <div class="rend-cat-bloque">
+                <div class="rend-cat-header">
+                  <span class="rend-cat-titulo"><i class="pi pi-compass"></i> Estratégico</span>
+                  <span class="rend-cat-prom">{{ promedioCat(rendForm.estrategico) }}%</span>
+                </div>
+                <div class="rend-subitem"><label>Toma de decisiones</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.tomaDecisiones"/><span>{{ rendForm.estrategico.tomaDecisiones }}%</span></div>
+                <div class="rend-subitem"><label>Lectura de juego</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.lecturaJuego"/><span>{{ rendForm.estrategico.lecturaJuego }}%</span></div>
+                <div class="rend-subitem"><label>Ocupación del espacio</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.ocupacionEspacio"/><span>{{ rendForm.estrategico.ocupacionEspacio }}%</span></div>
+                <div class="rend-subitem"><label>Transiciones</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.transiciones"/><span>{{ rendForm.estrategico.transiciones }}%</span></div>
+                <div class="rend-subitem"><label>Cumplimiento del plan táctico</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.cumplimientoPlan"/><span>{{ rendForm.estrategico.cumplimientoPlan }}%</span></div>
               </div>
-              <div class="rend-form-field rend-form-full">
-                <label>Comentario</label>
-                <textarea class="rend-textarea" [(ngModel)]="rendForm.comentario" rows="3" placeholder="Observaciones opcionales..."></textarea>
-              </div>
+
+            </div>
+
+            <!-- Comentario -->
+            <div class="rend-form-field rend-form-full" style="margin-top:1rem">
+              <label style="font-size:.82rem;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.05em;">Comentario</label>
+              <textarea class="rend-textarea" [(ngModel)]="rendForm.comentario" rows="3" placeholder="Observaciones opcionales..."></textarea>
             </div>
 
             <div class="alerta-ok" *ngIf="rendIndGuardado">
@@ -303,7 +346,7 @@
               <i class="pi pi-exclamation-triangle"></i> {{ errorRendInd }}
             </div>
 
-            <div class="guardar-row">
+            <div class="guardar-row" style="margin-top:1rem">
               <button class="btn-guardar" (click)="guardarRendimientoIndividual()" [disabled]="guardandoRendInd">
                 <i class="pi pi-save" *ngIf="!guardandoRendInd"></i>
                 <i class="pi pi-spin pi-spinner" *ngIf="guardandoRendInd"></i>
@@ -314,26 +357,20 @@
             <!-- Historial -->
             <div class="rend-historial">
               <h4 class="rend-hist-titulo"><i class="pi pi-history"></i> Historial</h4>
-
+              <div class="empty-msg" *ngIf="cargandoRendHist"><i class="pi pi-spin pi-spinner"></i></div>
               <div class="empty-msg" *ngIf="!cargandoRendHist && rendHistorial.length === 0">
-                <i class="pi pi-inbox"></i>
-                <p>Sin evaluaciones previas.</p>
+                <i class="pi pi-inbox"></i><p>Sin evaluaciones previas.</p>
               </div>
-
-              <div class="empty-msg" *ngIf="cargandoRendHist">
-                <i class="pi pi-spin pi-spinner"></i>
-              </div>
-
               <div class="rend-hist-card" *ngFor="let r of rendHistorial">
+                <span class="rend-hist-fecha">{{ r.fecha | date:'dd/MM/yyyy' }}</span>
                 <div class="rend-hist-scores">
-                  <span><strong>Vel:</strong> {{ r.velocidad }}</span>
-                  <span><strong>Res:</strong> {{ r.resistencia }}</span>
-                  <span><strong>Téc:</strong> {{ r.tecnica }}</span>
-                  <span><strong>Dis:</strong> {{ r.disciplina }}</span>
-                  <span class="rend-hist-avg"><strong>Prom:</strong> {{ r.promedio }}</span>
+                  <span><strong>Fís:</strong> {{ r.fisico?.promedio || 0 }}%</span>
+                  <span><strong>Téc:</strong> {{ r.tecnico?.promedio || 0 }}%</span>
+                  <span><strong>Act:</strong> {{ r.actitudinal?.promedio || 0 }}%</span>
+                  <span><strong>Est:</strong> {{ r.estrategico?.promedio || 0 }}%</span>
+                  <span class="rend-hist-avg"><strong>Gral:</strong> {{ r.promedioGeneral || 0 }}%</span>
                 </div>
                 <p class="rend-hist-comentario" *ngIf="r.comentario">{{ r.comentario }}</p>
-                <span class="rend-hist-fecha">{{ r.fecha | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
 

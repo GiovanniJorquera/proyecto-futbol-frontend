@@ -4,9 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class RendimientoService {
 
   private apiUrl = `${environment.apiUrl}/rendimientos`;
@@ -21,11 +19,11 @@ export class RendimientoService {
     return this.http.post(this.apiUrl, data, this.headers);
   }
 
-  obtenerRendimientos(jugadorId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${jugadorId}`, this.headers);
+  obtenerRendimientos(jugadorId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${jugadorId}`, this.headers);
   }
 
   obtenerResumen(jugadorId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/resumen/${jugadorId}`, this.headers);
+    return this.http.get<any>(`${this.apiUrl}/resumen/${jugadorId}`, this.headers);
   }
 }

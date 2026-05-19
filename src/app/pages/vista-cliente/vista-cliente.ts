@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { PagosService } from '../../services/pagos.service';
+import { ChartModule } from 'primeng/chart';
 
 @Component({
   selector: 'app-vista-cliente',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChartModule],
   templateUrl: './vista-cliente.html',
   styleUrl: './vista-cliente.css'
 })
@@ -24,6 +25,9 @@ export class VistaClienteComponent implements OnInit {
   pagosMensuales: any = null;
   pagosMensualesError = false;
   rendimiento: any = null;
+
+  chartData: any = null;
+  chartOptions: any = null;
 
   mostrarFormVoucher = false;
   voucherSedes = [{ label: 'Sede 1', value: 'Sede 1' }, { label: 'Sede 2', value: 'Sede 2' }];
@@ -54,7 +58,53 @@ export class VistaClienteComponent implements OnInit {
       },
       error: () => { this.pagosMensualesError = true; this.pagosMensuales = { error: true }; }
     });
-    this.api.getMiRendimiento().subscribe({ next: (data) => { this.rendimiento = data; } });
+    this.api.getMiRendimiento().subscribe({
+      next: (data) => {
+        this.rendimiento = data;
+        this.buildChart(data);
+      }
+    });
+  }
+
+  buildChart(data: any) {
+    if (!data?.historial?.length) return;
+    const hist = data.historial;
+    const labels = hist.map((h: any) => {
+      const d = new Date(h.fecha);
+      return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+    });
+    const textColor = this.temaOscuro ? 'rgba(244,247,243,.7)' : 'rgba(20,50,20,.6)';
+    const gridColor = this.temaOscuro ? 'rgba(57,211,83,.1)' : 'rgba(30,122,48,.1)';
+
+    this.chartData = {
+      labels,
+      datasets: [
+        { label: 'Físico',      data: hist.map((h: any) => h.fisico),      borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Técnico',     data: hist.map((h: any) => h.tecnico),     borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.1)', tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Actitudinal', data: hist.map((h: any) => h.actitudinal), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Estratégico', data: hist.map((h: any) => h.estrategico), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+      ]
+    };
+
+    this.chartOptions = {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { labels: { color: textColor, font: { size: 13 } } },
+        tooltip: { callbacks: { label: (ctx: any) => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          ticks: { color: textColor, callback: (v: any) => `${v}%` },
+          grid: { color: gridColor }
+        },
+        x: {
+          ticks: { color: textColor },
+          grid: { color: gridColor }
+        }
+      }
+    };
   }
 
   cargarFicha() {
@@ -131,7 +181,7 @@ export class VistaClienteComponent implements OnInit {
   }
 
   promedioBarWidth(valor: number): string {
-    return `${((valor - 1) / 4) * 100}%`;
+    return `${valor}%`;
   }
 
   toggleTema() {

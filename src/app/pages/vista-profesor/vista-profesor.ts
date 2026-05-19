@@ -46,9 +46,9 @@ export class VistaProfesorComponent implements OnInit {
   asistenciaGuardada = false;
   errorAsistencia = '';
 
-  // Rendimiento individual (Giovanni)
+  // Rendimiento individual
   jugadorSeleccionadoRend: any = null;
-  rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+  rendForm = this.rendFormVacio();
   rendHistorial: any[] = [];
   rendResumen: any = {};
   guardandoRendInd = false;
@@ -174,9 +174,24 @@ export class VistaProfesorComponent implements OnInit {
     });
   }
 
+  rendFormVacio() {
+    return {
+      fisico:      { velocidad: 50, agilidad: 50, resistencia: 50, fuerza: 50, coordinacion: 50 },
+      tecnico:     { controlDominio: 50, precisionEjecucion: 50, fluidezMovimiento: 50, usoPerfiles: 50, posturaCorporal: 50 },
+      actitudinal: { motivacion: 50, reaccionResultado: 50, apoyoCompanero: 50, deseosSuperacion: 50, resiliencia: 50 },
+      estrategico: { tomaDecisiones: 50, lecturaJuego: 50, ocupacionEspacio: 50, transiciones: 50, cumplimientoPlan: 50 },
+      comentario: ''
+    };
+  }
+
+  promedioCat(cat: any): number {
+    const vals = Object.values(cat).filter(v => typeof v === 'number') as number[];
+    return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+  }
+
   seleccionarJugadorRend(f: any) {
     this.jugadorSeleccionadoRend = f;
-    this.rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+    this.rendForm = this.rendFormVacio();
     this.rendIndGuardado = false;
     this.errorRendInd = '';
     this.cargarHistorialRend();
@@ -199,15 +214,19 @@ export class VistaProfesorComponent implements OnInit {
     this.errorRendInd = '';
     this.rendIndGuardado = false;
     const data = {
-      jugadorId: this.jugadorSeleccionadoRend._id,
+      jugadorId:  this.jugadorSeleccionadoRend._id,
       profesorId: this.profesor?._id,
-      ...this.rendForm
+      fisico:      this.rendForm.fisico,
+      tecnico:     this.rendForm.tecnico,
+      actitudinal: this.rendForm.actitudinal,
+      estrategico: this.rendForm.estrategico,
+      comentario:  this.rendForm.comentario
     };
     this.rendimientoService.crearRendimiento(data).subscribe({
       next: () => {
         this.guardandoRendInd = false;
         this.rendIndGuardado = true;
-        this.rendForm = { velocidad: 5, resistencia: 5, tecnica: 5, disciplina: 5, comentario: '' };
+        this.rendForm = this.rendFormVacio();
         this.cargarHistorialRend();
       },
       error: () => {

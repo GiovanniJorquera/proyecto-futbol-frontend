@@ -281,42 +281,57 @@
         </div>
 
         <div *ngIf="rendimiento?.promedio">
+
+          <!-- Promedios por categoría -->
           <div class="rend-promedio-grid">
 
-            <div class="rend-card">
+            <div class="rend-card rend-fisico">
               <div class="rend-label"><i class="pi pi-bolt"></i> Físico</div>
               <div class="rend-bar-wrap">
-                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.fisico)"></div>
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.fisico)" style="background:#3b82f6"></div>
               </div>
-              <div class="rend-valor">{{ rendimiento.promedio.fisico }}<span class="rend-max">/5</span></div>
+              <div class="rend-valor" style="color:#3b82f6">{{ rendimiento.promedio.fisico }}<span class="rend-max">%</span></div>
             </div>
 
-            <div class="rend-card">
+            <div class="rend-card rend-tecnico">
               <div class="rend-label"><i class="pi pi-star"></i> Técnico</div>
               <div class="rend-bar-wrap">
-                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.tecnico)"></div>
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.tecnico)" style="background:#f59e0b"></div>
               </div>
-              <div class="rend-valor">{{ rendimiento.promedio.tecnico }}<span class="rend-max">/5</span></div>
+              <div class="rend-valor" style="color:#f59e0b">{{ rendimiento.promedio.tecnico }}<span class="rend-max">%</span></div>
             </div>
 
-            <div class="rend-card">
-              <div class="rend-label"><i class="pi pi-heart"></i> Psicológico</div>
+            <div class="rend-card rend-actitudinal">
+              <div class="rend-label"><i class="pi pi-heart"></i> Actitudinal</div>
               <div class="rend-bar-wrap">
-                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.psicologico)"></div>
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.actitudinal)" style="background:#8b5cf6"></div>
               </div>
-              <div class="rend-valor">{{ rendimiento.promedio.psicologico }}<span class="rend-max">/5</span></div>
+              <div class="rend-valor" style="color:#8b5cf6">{{ rendimiento.promedio.actitudinal }}<span class="rend-max">%</span></div>
             </div>
 
-            <div class="rend-card">
+            <div class="rend-card rend-estrategico">
               <div class="rend-label"><i class="pi pi-compass"></i> Estratégico</div>
               <div class="rend-bar-wrap">
-                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.estrategico)"></div>
+                <div class="rend-bar" [style.width]="promedioBarWidth(rendimiento.promedio.estrategico)" style="background:#10b981"></div>
               </div>
-              <div class="rend-valor">{{ rendimiento.promedio.estrategico }}<span class="rend-max">/5</span></div>
+              <div class="rend-valor" style="color:#10b981">{{ rendimiento.promedio.estrategico }}<span class="rend-max">%</span></div>
             </div>
 
           </div>
-          <p class="rend-sesiones"><i class="pi pi-calendar"></i> Basado en <strong>{{ rendimiento.promedio.sesiones }}</strong> sesión{{ rendimiento.promedio.sesiones === 1 ? '' : 'es' }} de entrenamiento</p>
+
+          <p class="rend-sesiones">
+            <i class="pi pi-calendar"></i>
+            Promedio general: <strong>{{ rendimiento.promedio.general }}%</strong>
+            &nbsp;·&nbsp;
+            <strong>{{ rendimiento.promedio.sesiones }}</strong> sesión{{ rendimiento.promedio.sesiones === 1 ? '' : 'es' }} registrada{{ rendimiento.promedio.sesiones === 1 ? '' : 's' }}
+          </p>
+
+          <!-- Gráfico de progresión -->
+          <div class="rend-chart-wrap" *ngIf="chartData && rendimiento.historial?.length > 0">
+            <h3 class="rend-chart-title"><i class="pi pi-chart-line"></i> Progresión en el tiempo</h3>
+            <p-chart type="line" [data]="chartData" [options]="chartOptions" height="300"></p-chart>
+          </div>
+
         </div>
 
       </div>

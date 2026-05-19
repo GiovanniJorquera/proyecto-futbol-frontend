@@ -25,6 +25,8 @@ export class RegistroInvitadoComponent implements OnInit {
   estado: 'cargando' | 'valido' | 'invalido' | 'expirado' | 'usado' | 'enviado' = 'cargando';
   mensajeError = '';
   esTimeout = false;
+  mensajeCarga = 'Validando link...';
+  private intentos = 0;
   formulario!: FormGroup;
   rutInvalido = false;
   enviando = false;
@@ -81,14 +83,22 @@ export class RegistroInvitadoComponent implements OnInit {
     this.estado = 'cargando';
     this.mensajeError = '';
     this.esTimeout = false;
+    this.intentos = 0;
+    this.mensajeCarga = 'Validando link...';
     this.validarToken();
   }
 
   private validarToken() {
-    this.api.validarInvitacion(this.token).pipe(timeout(20000)).subscribe({
+    this.intentos++;
+    this.api.validarInvitacion(this.token).pipe(timeout(40000)).subscribe({
       next: () => { this.estado = 'valido'; },
       error: (err) => {
         if (err?.name === 'TimeoutError') {
+          if (this.intentos < 2) {
+            this.mensajeCarga = 'El servidor está iniciando, reintentando...';
+            setTimeout(() => this.validarToken(), 3000);
+            return;
+          }
           this.estado = 'invalido'; this.esTimeout = true;
           this.mensajeError = 'El servidor tardó en responder. Intenta nuevamente.';
           return;

@@ -465,13 +465,38 @@
 .rend-sesiones {
   font-size: .85rem;
   color: var(--text-sub);
-  margin: 0;
+  margin: .75rem 0 0;
   display: flex;
   align-items: center;
   gap: .4rem;
+  flex-wrap: wrap;
 }
 .rend-sesiones .pi { color: var(--accent); }
 .rend-sesiones strong { color: var(--text); }
+
+.rend-chart-wrap {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--bdr);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.rend-chart-title {
+  margin: 0 0 1.25rem;
+  font-size: .9rem;
+  font-weight: 800;
+  color: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--bdr);
+}
+.rend-chart-title .pi { color: var(--accent); }
 
 /* ALERTAS */
 .alerta-ok, .alerta-error {
