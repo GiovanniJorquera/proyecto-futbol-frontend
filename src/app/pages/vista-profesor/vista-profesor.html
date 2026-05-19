@@ -285,11 +285,11 @@
                   <span class="rend-cat-titulo"><i class="pi pi-bolt"></i> Físico</span>
                   <span class="rend-cat-prom">{{ promedioCat(rendForm.fisico) }}%</span>
                 </div>
-                <div class="rend-subitem"><label>Velocidad</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.velocidad"/><span>{{ rendForm.fisico.velocidad }}%</span></div>
-                <div class="rend-subitem"><label>Agilidad</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.agilidad"/><span>{{ rendForm.fisico.agilidad }}%</span></div>
-                <div class="rend-subitem"><label>Resistencia</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.resistencia"/><span>{{ rendForm.fisico.resistencia }}%</span></div>
-                <div class="rend-subitem"><label>Fuerza</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.fuerza"/><span>{{ rendForm.fisico.fuerza }}%</span></div>
-                <div class="rend-subitem"><label>Coordinación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.fisico.coordinacion"/><span>{{ rendForm.fisico.coordinacion }}%</span></div>
+                <div class="rend-subitem"><label>Velocidad</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.fisico.velocidad"/><span>{{ rendForm.fisico.velocidad }}%</span></div>
+                <div class="rend-subitem"><label>Agilidad</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.fisico.agilidad"/><span>{{ rendForm.fisico.agilidad }}%</span></div>
+                <div class="rend-subitem"><label>Resistencia</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.fisico.resistencia"/><span>{{ rendForm.fisico.resistencia }}%</span></div>
+                <div class="rend-subitem"><label>Fuerza</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.fisico.fuerza"/><span>{{ rendForm.fisico.fuerza }}%</span></div>
+                <div class="rend-subitem"><label>Coordinación</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.fisico.coordinacion"/><span>{{ rendForm.fisico.coordinacion }}%</span></div>
               </div>
 
               <!-- TÉCNICO -->
@@ -298,11 +298,11 @@
                   <span class="rend-cat-titulo"><i class="pi pi-star"></i> Técnico</span>
                   <span class="rend-cat-prom">{{ promedioCat(rendForm.tecnico) }}%</span>
                 </div>
-                <div class="rend-subitem"><label>Control y dominio</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.controlDominio"/><span>{{ rendForm.tecnico.controlDominio }}%</span></div>
-                <div class="rend-subitem"><label>Precisión en la ejecución</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.precisionEjecucion"/><span>{{ rendForm.tecnico.precisionEjecucion }}%</span></div>
-                <div class="rend-subitem"><label>Fluidez del movimiento</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.fluidezMovimiento"/><span>{{ rendForm.tecnico.fluidezMovimiento }}%</span></div>
-                <div class="rend-subitem"><label>Uso de perfiles</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.usoPerfiles"/><span>{{ rendForm.tecnico.usoPerfiles }}%</span></div>
-                <div class="rend-subitem"><label>Postura corporal</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.tecnico.posturaCorporal"/><span>{{ rendForm.tecnico.posturaCorporal }}%</span></div>
+                <div class="rend-subitem"><label>Control y dominio</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.tecnico.controlDominio"/><span>{{ rendForm.tecnico.controlDominio }}%</span></div>
+                <div class="rend-subitem"><label>Precisión en la ejecución</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.tecnico.precisionEjecucion"/><span>{{ rendForm.tecnico.precisionEjecucion }}%</span></div>
+                <div class="rend-subitem"><label>Fluidez del movimiento</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.tecnico.fluidezMovimiento"/><span>{{ rendForm.tecnico.fluidezMovimiento }}%</span></div>
+                <div class="rend-subitem"><label>Uso de perfiles</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.tecnico.usoPerfiles"/><span>{{ rendForm.tecnico.usoPerfiles }}%</span></div>
+                <div class="rend-subitem"><label>Postura corporal</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.tecnico.posturaCorporal"/><span>{{ rendForm.tecnico.posturaCorporal }}%</span></div>
               </div>
 
               <!-- ACTITUDINAL -->
@@ -311,11 +311,11 @@
                   <span class="rend-cat-titulo"><i class="pi pi-heart"></i> Actitudinal</span>
                   <span class="rend-cat-prom">{{ promedioCat(rendForm.actitudinal) }}%</span>
                 </div>
-                <div class="rend-subitem"><label>Nivel de motivación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.motivacion"/><span>{{ rendForm.actitudinal.motivacion }}%</span></div>
-                <div class="rend-subitem"><label>Reacción ante el resultado</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.reaccionResultado"/><span>{{ rendForm.actitudinal.reaccionResultado }}%</span></div>
-                <div class="rend-subitem"><label>Apoyo al compañero</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.apoyoCompanero"/><span>{{ rendForm.actitudinal.apoyoCompanero }}%</span></div>
-                <div class="rend-subitem"><label>Deseos de superación</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.deseosSuperacion"/><span>{{ rendForm.actitudinal.deseosSuperacion }}%</span></div>
-                <div class="rend-subitem"><label>Resiliencia ante una jugada</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.actitudinal.resiliencia"/><span>{{ rendForm.actitudinal.resiliencia }}%</span></div>
+                <div class="rend-subitem"><label>Nivel de motivación</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.actitudinal.motivacion"/><span>{{ rendForm.actitudinal.motivacion }}%</span></div>
+                <div class="rend-subitem"><label>Reacción ante el resultado</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.actitudinal.reaccionResultado"/><span>{{ rendForm.actitudinal.reaccionResultado }}%</span></div>
+                <div class="rend-subitem"><label>Apoyo al compañero</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.actitudinal.apoyoCompanero"/><span>{{ rendForm.actitudinal.apoyoCompanero }}%</span></div>
+                <div class="rend-subitem"><label>Deseos de superación</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.actitudinal.deseosSuperacion"/><span>{{ rendForm.actitudinal.deseosSuperacion }}%</span></div>
+                <div class="rend-subitem"><label>Resiliencia ante una jugada</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.actitudinal.resiliencia"/><span>{{ rendForm.actitudinal.resiliencia }}%</span></div>
               </div>
 
               <!-- ESTRATÉGICO -->
@@ -324,11 +324,11 @@
                   <span class="rend-cat-titulo"><i class="pi pi-compass"></i> Estratégico</span>
                   <span class="rend-cat-prom">{{ promedioCat(rendForm.estrategico) }}%</span>
                 </div>
-                <div class="rend-subitem"><label>Toma de decisiones</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.tomaDecisiones"/><span>{{ rendForm.estrategico.tomaDecisiones }}%</span></div>
-                <div class="rend-subitem"><label>Lectura de juego</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.lecturaJuego"/><span>{{ rendForm.estrategico.lecturaJuego }}%</span></div>
-                <div class="rend-subitem"><label>Ocupación del espacio</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.ocupacionEspacio"/><span>{{ rendForm.estrategico.ocupacionEspacio }}%</span></div>
-                <div class="rend-subitem"><label>Transiciones</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.transiciones"/><span>{{ rendForm.estrategico.transiciones }}%</span></div>
-                <div class="rend-subitem"><label>Cumplimiento del plan táctico</label><input type="range" min="0" max="100" [(ngModel)]="rendForm.estrategico.cumplimientoPlan"/><span>{{ rendForm.estrategico.cumplimientoPlan }}%</span></div>
+                <div class="rend-subitem"><label>Toma de decisiones</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.estrategico.tomaDecisiones"/><span>{{ rendForm.estrategico.tomaDecisiones }}%</span></div>
+                <div class="rend-subitem"><label>Lectura de juego</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.estrategico.lecturaJuego"/><span>{{ rendForm.estrategico.lecturaJuego }}%</span></div>
+                <div class="rend-subitem"><label>Ocupación del espacio</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.estrategico.ocupacionEspacio"/><span>{{ rendForm.estrategico.ocupacionEspacio }}%</span></div>
+                <div class="rend-subitem"><label>Transiciones</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.estrategico.transiciones"/><span>{{ rendForm.estrategico.transiciones }}%</span></div>
+                <div class="rend-subitem"><label>Cumplimiento del plan táctico</label><input type="range" min="0" max="100" step="10" [(ngModel)]="rendForm.estrategico.cumplimientoPlan"/><span>{{ rendForm.estrategico.cumplimientoPlan }}%</span></div>
               </div>
 
             </div>

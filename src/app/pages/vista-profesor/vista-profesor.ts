@@ -185,7 +185,7 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   promedioCat(cat: any): number {
-    const vals = Object.values(cat).filter(v => typeof v === 'number') as number[];
+    const vals = Object.values(cat).map(v => Number(v)).filter(v => !isNaN(v));
     return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
   }
 
@@ -213,14 +213,16 @@ export class VistaProfesorComponent implements OnInit {
     this.guardandoRendInd = true;
     this.errorRendInd = '';
     this.rendIndGuardado = false;
+    const n = (v: any) => Number(v);
+    const f = this.rendForm;
     const data = {
       jugadorId:  this.jugadorSeleccionadoRend._id,
       profesorId: this.profesor?._id,
-      fisico:      this.rendForm.fisico,
-      tecnico:     this.rendForm.tecnico,
-      actitudinal: this.rendForm.actitudinal,
-      estrategico: this.rendForm.estrategico,
-      comentario:  this.rendForm.comentario
+      fisico:      { velocidad: n(f.fisico.velocidad), agilidad: n(f.fisico.agilidad), resistencia: n(f.fisico.resistencia), fuerza: n(f.fisico.fuerza), coordinacion: n(f.fisico.coordinacion) },
+      tecnico:     { controlDominio: n(f.tecnico.controlDominio), precisionEjecucion: n(f.tecnico.precisionEjecucion), fluidezMovimiento: n(f.tecnico.fluidezMovimiento), usoPerfiles: n(f.tecnico.usoPerfiles), posturaCorporal: n(f.tecnico.posturaCorporal) },
+      actitudinal: { motivacion: n(f.actitudinal.motivacion), reaccionResultado: n(f.actitudinal.reaccionResultado), apoyoCompanero: n(f.actitudinal.apoyoCompanero), deseosSuperacion: n(f.actitudinal.deseosSuperacion), resiliencia: n(f.actitudinal.resiliencia) },
+      estrategico: { tomaDecisiones: n(f.estrategico.tomaDecisiones), lecturaJuego: n(f.estrategico.lecturaJuego), ocupacionEspacio: n(f.estrategico.ocupacionEspacio), transiciones: n(f.estrategico.transiciones), cumplimientoPlan: n(f.estrategico.cumplimientoPlan) },
+      comentario:  f.comentario
     };
     this.rendimientoService.crearRendimiento(data).subscribe({
       next: () => {
