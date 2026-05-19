@@ -11,8 +11,4 @@ export const zoneInterceptor: HttpInterceptorFn = (req, next) => {
       complete: () => zone.run(() => observer.complete()),
     });
   });
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 22a3e76 (Entrega 2)

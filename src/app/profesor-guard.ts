@@ -8,8 +8,4 @@ export const profesorGuard: CanActivateFn = () => {
 
   if (auth.isLoggedIn() && auth.getRol() === 'profesor') return true;
   return router.createUrlTree(['/login']);
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 22a3e76 (Entrega 2)

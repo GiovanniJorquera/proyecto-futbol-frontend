@@ -41,14 +41,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-<<<<<<< HEAD
-=======
     path: 'rendimiento',
     loadComponent: () =>
       import('./pages/rendimiento/rendimiento').then(m => m.RendimientoComponent)
   },
   {
->>>>>>> 22a3e76 (Entrega 2)
     path: 'vista-cliente',
     loadComponent: () => import('./pages/vista-cliente/vista-cliente').then(m => m.VistaClienteComponent),
     canActivate: [clienteGuard]

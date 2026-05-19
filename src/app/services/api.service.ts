@@ -194,8 +194,4 @@ export class ApiService {
   getRendimientoJugador(jugadorId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${jugadorId}`, this.authHeaders);
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 22a3e76 (Entrega 2)
