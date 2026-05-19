@@ -51,6 +51,10 @@ export const routes: Routes = [
     canActivate: [profesorGuard]
   },
   {
+    path: 'registrar/:token',
+    loadComponent: () => import('./pages/registro-invitado/registro-invitado').then(m => m.RegistroInvitadoComponent)
+  },
+  {
     path: '',
     redirectTo: 'inicio',
     pathMatch: 'full'

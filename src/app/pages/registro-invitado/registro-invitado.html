@@ -1,0 +1,144 @@
+<p-toast></p-toast>
+
+<!-- ESTADOS: cargando / inválido / usado / expirado / enviado -->
+<div class="estado-wrap" *ngIf="estado !== 'valido'">
+  <div class="estado-card" [class.estado-error]="estado !== 'cargando' && estado !== 'enviado'" [class.estado-ok]="estado === 'enviado'">
+
+    <ng-container *ngIf="estado === 'cargando'">
+      <i class="pi pi-spin pi-spinner estado-icon"></i>
+      <p>Validando link...</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'enviado'">
+      <i class="pi pi-check-circle estado-icon"></i>
+      <h2>¡Registro completado!</h2>
+      <p>Tu ficha fue enviada correctamente. El administrador la revisará pronto.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'usado'">
+      <i class="pi pi-ban estado-icon"></i>
+      <h2>Link ya utilizado</h2>
+      <p>Este link de registro ya fue usado. Contacta al administrador para obtener uno nuevo.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'expirado'">
+      <i class="pi pi-clock estado-icon"></i>
+      <h2>Link expirado</h2>
+      <p>Este link estuvo disponible por 48 horas y ya venció. Contacta al administrador para obtener uno nuevo.</p>
+    </ng-container>
+
+    <ng-container *ngIf="estado === 'invalido'">
+      <i class="pi pi-times-circle estado-icon"></i>
+      <h2>Link inválido</h2>
+      <p>{{ mensajeError || 'Este link no existe o no es válido.' }}</p>
+    </ng-container>
+
+  </div>
+</div>
+
+<!-- FORMULARIO -->
+<div class="reg-wrap" *ngIf="estado === 'valido'">
+  <div class="reg-header">
+    <img src="assets/logo.png" alt="Logo" class="reg-logo" onerror="this.style.display='none'">
+    <h1 class="reg-titulo">Registro de Jugador</h1>
+    <p class="reg-subtitulo">Completa los datos del apoderado y del jugador</p>
+  </div>
+
+  <form [formGroup]="formulario" (ngSubmit)="enviarFormulario()" class="reg-form">
+
+    <!-- APODERADO -->
+    <div class="reg-seccion">
+      <h2 class="reg-seccion-titulo"><i class="pi pi-user"></i> Datos del Apoderado</h2>
+      <div formGroupName="apoderado" class="reg-grid">
+
+        <div class="reg-field">
+          <label>Nombre <span class="req">*</span></label>
+          <input pInputText formControlName="nombre" placeholder="Nombre" [class.ng-invalid]="campoInvalido('apoderado','nombre')" />
+          <small *ngIf="campoInvalido('apoderado','nombre')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Apellidos <span class="req">*</span></label>
+          <input pInputText formControlName="apellidos" placeholder="Apellidos" [class.ng-invalid]="campoInvalido('apoderado','apellidos')" />
+          <small *ngIf="campoInvalido('apoderado','apellidos')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input pInputText formControlName="correo" type="email" placeholder="correo@ejemplo.cl" [class.ng-invalid]="campoInvalido('apoderado','correo')" />
+          <small *ngIf="campoInvalido('apoderado','correo')" class="reg-error">Correo inválido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Teléfono <span class="req">*</span></label>
+          <input pInputText formControlName="telefono" placeholder="+56 9 1234 5678" [class.ng-invalid]="campoInvalido('apoderado','telefono')" />
+          <small *ngIf="campoInvalido('apoderado','telefono')" class="reg-error">Número inválido (ej: +56 9 1234 5678)</small>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- JUGADOR -->
+    <div class="reg-seccion">
+      <h2 class="reg-seccion-titulo"><i class="pi pi-star"></i> Datos del Jugador</h2>
+      <div formGroupName="pupilo" class="reg-grid">
+
+        <div class="reg-field">
+          <label>Nombre <span class="req">*</span></label>
+          <input pInputText formControlName="nombre" placeholder="Nombre" [class.ng-invalid]="campoInvalido('pupilo','nombre')" />
+          <small *ngIf="campoInvalido('pupilo','nombre')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Apellido paterno <span class="req">*</span></label>
+          <input pInputText formControlName="apellidoPaterno" placeholder="Apellido paterno" [class.ng-invalid]="campoInvalido('pupilo','apellidoPaterno')" />
+          <small *ngIf="campoInvalido('pupilo','apellidoPaterno')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Apellido materno <span class="req">*</span></label>
+          <input pInputText formControlName="apellidoMaterno" placeholder="Apellido materno" [class.ng-invalid]="campoInvalido('pupilo','apellidoMaterno')" />
+          <small *ngIf="campoInvalido('pupilo','apellidoMaterno')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>RUT <span class="req">*</span></label>
+          <input pInputText formControlName="rut" placeholder="12345678-9" [class.ng-invalid]="campoInvalido('pupilo','rut')" />
+          <small *ngIf="campoInvalido('pupilo','rut')" class="reg-error">RUT inválido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Fecha de nacimiento <span class="req">*</span></label>
+          <input pInputText type="date" formControlName="fechaNacimiento" [class.ng-invalid]="campoInvalido('pupilo','fechaNacimiento')" />
+          <small *ngIf="campoInvalido('pupilo','fechaNacimiento')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Género <span class="req">*</span></label>
+          <p-select formControlName="genero" [options]="generos" optionLabel="name" placeholder="Selecciona" appendTo="body"
+            [class.ng-invalid]="campoInvalido('pupilo','genero')"></p-select>
+          <small *ngIf="campoInvalido('pupilo','genero')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field reg-field-full">
+          <label>Dirección <span class="req">*</span></label>
+          <input pInputText formControlName="direccion" placeholder="Calle y número" [class.ng-invalid]="campoInvalido('pupilo','direccion')" />
+          <small *ngIf="campoInvalido('pupilo','direccion')" class="reg-error">Campo requerido</small>
+        </div>
+
+        <div class="reg-field">
+          <label>Comuna <span class="req">*</span></label>
+          <p-select formControlName="comuna" [options]="comunas" optionLabel="name" placeholder="Selecciona" appendTo="body"
+            [class.ng-invalid]="campoInvalido('pupilo','comuna')"></p-select>
+          <small *ngIf="campoInvalido('pupilo','comuna')" class="reg-error">Campo requerido</small>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="reg-actions">
+      <p-button type="submit" label="Enviar registro" icon="pi pi-send" [loading]="enviando" severity="success" size="large"></p-button>
+    </div>
+
+  </form>
+</div>

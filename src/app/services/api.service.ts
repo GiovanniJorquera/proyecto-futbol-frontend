@@ -136,6 +136,14 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/ficha-temporada`, data);
   }
 
+  generarInvitacion(): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.apiUrl}/admin/generar-invitacion`, {}, this.authHeaders);
+  }
+
+  validarInvitacion(token: string): Observable<{ valido: boolean }> {
+    return this.http.get<{ valido: boolean }>(`${this.apiUrl}/invitacion/${token}`);
+  }
+
   getMiFicha(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/cliente/mi-ficha`, this.authHeaders);
   }

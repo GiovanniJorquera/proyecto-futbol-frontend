@@ -552,7 +552,7 @@ export class AdminComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const b64 = await this.comprimirImagen(file, 1200, 0.72);
+    const b64 = await this.comprimirImagen(file, 1920, 0.92);
     this.siteConfig.imagenesCarrusel = [...this.siteConfig.imagenesCarrusel, b64];
     input.value = '';
   }
@@ -565,7 +565,7 @@ export class AdminComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const b64 = await this.comprimirImagen(file, 1000, 0.70);
+    const b64 = await this.comprimirImagen(file, 1600, 0.90);
     this.siteConfig.imagenesGaleria = [...this.siteConfig.imagenesGaleria, { url: b64, descripcion: '' }];
     input.value = '';
   }
@@ -578,30 +578,17 @@ export class AdminComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const b64 = await this.comprimirImagen(file, 1000, 0.75);
+    const b64 = await this.comprimirImagen(file, 1200, 0.90);
     this.siteConfig.imagenPopup = b64;
     input.value = '';
   }
 
-  seleccionarImagenDestacada(event: Event): void {
+  async seleccionarImagenDestacada(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 1200;
-        let w = img.width, h = img.height;
-        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-        this.siteConfig.imagenDestacada = canvas.toDataURL('image/jpeg', 0.75);
-      };
-      img.src = e.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    this.siteConfig.imagenDestacada = await this.comprimirImagen(file, 1920, 0.92);
+    input.value = '';
   }
 
   private putConfig(payload: object): void {
@@ -826,6 +813,20 @@ export class AdminComponent implements OnInit {
   get totalConCuenta() { return this.fichas.filter((f: any) => f.tieneCuenta).length; }
   get totalBeca()      { return this.fichas.filter((f: any) => f.beca).length; }
   limpiarFiltrosFichas() { this.filtrosFichas = { texto: '', categoria: null, conCuenta: null }; }
+
+  generarLinkRegistro() {
+    this.http.post<{ token: string }>(`${this.apiUrl}/admin/generar-invitacion`, {}, this.authHeaders()).subscribe({
+      next: ({ token }) => {
+        const url = `${window.location.origin}/registrar/${token}`;
+        navigator.clipboard.writeText(url).then(() => {
+          this.toast('success', '¡Link copiado!', 'Válido por 48 horas. Envíalo al apoderado.');
+        }).catch(() => {
+          this.toast('info', 'Link generado', url);
+        });
+      },
+      error: () => this.toast('error', 'Error', 'No se pudo generar el link.')
+    });
+  }
 
   toggleBeca(ficha: any) {
     const nuevaBeca = !ficha.beca;

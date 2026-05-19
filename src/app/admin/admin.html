@@ -685,7 +685,10 @@
 <div [hidden]="activeTab !== 'fichas'" class="tab-content">
   <ng-container *ngIf="tabFichasLoaded">
   <p-card>
-    <div class="sec-header"><h3>Ficha-Temporada</h3></div>
+    <div class="sec-header">
+      <h3>Ficha-Temporada</h3>
+      <p-button label="Generar link de registro" icon="pi pi-link" severity="success" size="small" (onClick)="generarLinkRegistro()"></p-button>
+    </div>
     <div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.25rem; padding:0.75rem 1rem; background:rgba(57,211,83,0.06); border:1px solid rgba(57,211,83,0.15); border-radius:10px;">
       <span style="font-size:0.9rem;"><strong>{{ fichas.length }}</strong> fichas</span>
       <span style="font-size:0.9rem;"><strong>{{ totalConCuenta }}</strong> con acceso portal</span>

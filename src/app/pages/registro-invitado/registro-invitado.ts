@@ -1,0 +1,137 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { MessageService } from 'primeng/api';
+import { ApiService } from '../../services/api.service';
+
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+
+@Component({
+  selector: 'app-registro-invitado',
+  standalone: true,
+  providers: [MessageService],
+  imports: [CommonModule, ReactiveFormsModule, CardModule, InputTextModule, SelectModule, ButtonModule, ToastModule],
+  templateUrl: './registro-invitado.html',
+  styleUrl: './registro-invitado.css'
+})
+export class RegistroInvitadoComponent implements OnInit {
+  token = '';
+  estado: 'cargando' | 'valido' | 'invalido' | 'expirado' | 'usado' | 'enviado' = 'cargando';
+  mensajeError = '';
+  formulario!: FormGroup;
+  rutInvalido = false;
+  enviando = false;
+
+  generos = [{ name: 'Masculino' }, { name: 'Femenino' }];
+  comunas = [
+    { name: 'Viña del Mar' }, { name: 'Valparaíso' }, { name: 'Quilpué' },
+    { name: 'Villa Alemana' }, { name: 'Concón' }, { name: 'Quintero' }
+  ];
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder,
+    private api: ApiService,
+    private messageService: MessageService
+  ) {}
+
+  ngOnInit() {
+    this.token = this.route.snapshot.paramMap.get('token') ?? '';
+    this.formulario = this.fb.group({
+      apoderado: this.fb.group({
+        nombre: ['', Validators.required],
+        apellidos: ['', Validators.required],
+        correo: ['', [Validators.required, Validators.email]],
+        telefono: ['', [Validators.required, Validators.pattern(/^\+?56?\s?9\s?\d{4}\s?\d{4}$/)]]
+      }),
+      pupilo: this.fb.group({
+        nombre: ['', Validators.required],
+        apellidoPaterno: ['', Validators.required],
+        apellidoMaterno: ['', Validators.required],
+        rut: ['', [Validators.required, this.validarRut.bind(this)]],
+        fechaNacimiento: ['', Validators.required],
+        genero: [null, Validators.required],
+        direccion: ['', Validators.required],
+        comuna: [null, Validators.required]
+      })
+    });
+
+    this.formulario.get('pupilo.rut')?.valueChanges.subscribe(v => {
+      this.rutInvalido = !this.validarRutFormato(v);
+    });
+
+    if (!this.token) {
+      this.estado = 'invalido';
+      this.mensajeError = 'Link inválido.';
+      return;
+    }
+
+    this.api.validarInvitacion(this.token).subscribe({
+      next: () => { this.estado = 'valido'; },
+      error: (err) => {
+        const msg: string = err?.error?.mensaje ?? '';
+        if (msg.includes('utilizado')) { this.estado = 'usado'; }
+        else if (msg.includes('expirado')) { this.estado = 'expirado'; }
+        else { this.estado = 'invalido'; }
+        this.mensajeError = msg || 'Link no válido.';
+      }
+    });
+  }
+
+  validarRut(control: AbstractControl): ValidationErrors | null {
+    return this.validarRutFormato(control.value) ? null : { rutInvalido: true };
+  }
+
+  validarRutFormato(rut: string): boolean {
+    if (!rut) return false;
+    rut = rut.replace(/\./g, '').replace(/-/g, '');
+    if (rut.length < 8 || rut.length > 9) return false;
+    const cuerpo = rut.slice(0, -1);
+    const dv = rut.slice(-1).toUpperCase();
+    let suma = 0, mult = 2;
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo[i]) * mult;
+      mult = mult === 7 ? 2 : mult + 1;
+    }
+    const resto = suma % 11;
+    const dvCalc = resto === 0 ? '0' : resto === 1 ? 'K' : (11 - resto).toString();
+    return dv === dvCalc;
+  }
+
+  campoInvalido(grupo: string, campo: string): boolean {
+    const c = this.formulario.get(`${grupo}.${campo}`);
+    return !!(c?.invalid && c?.touched);
+  }
+
+  enviarFormulario() {
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      this.messageService.add({ severity: 'warn', summary: 'Formulario incompleto', detail: 'Completa todos los campos requeridos.', life: 4000 });
+      return;
+    }
+    this.enviando = true;
+    const payload = { ...this.formulario.value, invitacionToken: this.token };
+    this.api.crearFichaTemporada(payload).subscribe({
+      next: () => {
+        this.enviando = false;
+        this.estado = 'enviado';
+      },
+      error: (err) => {
+        this.enviando = false;
+        const msg: string = err?.error?.mensaje ?? '';
+        if (msg.includes('utilizado') || msg.includes('expirado')) {
+          this.estado = 'usado';
+          this.mensajeError = msg;
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'Error al enviar', detail: 'Intenta nuevamente.', life: 5000 });
+        }
+      }
+    });
+  }
+}
