@@ -55,9 +55,15 @@
         <div class="grid">
 
           <div class="campo">
-            <label>Nombre completo <span class="req">*</span></label>
-            <input pInputText formControlName="nombre"
+            <label>Nombre(s) <span class="req">*</span></label>
+            <input pInputText formControlName="nombre" placeholder="Ej: Juan Andrés"
               [ngClass]="{'input-error': campoInvalido('nombre')}" />
+          </div>
+
+          <div class="campo">
+            <label>Apellido(s) <span class="req">*</span></label>
+            <input pInputText formControlName="apellido" placeholder="Ej: García López"
+              [ngClass]="{'input-error': campoInvalido('apellido')}" />
             <small *ngIf="campoInvalido('nombre')" class="error">El nombre es obligatorio</small>
           </div>
 

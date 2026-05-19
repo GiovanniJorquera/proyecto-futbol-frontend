@@ -854,7 +854,7 @@ export class AdminComponent implements OnInit {
     return this.fichas.filter((f: any) => {
       const t = this.filtrosJugadores.texto.trim().toLowerCase();
       if (t) {
-        const n = (f.nombre || '').toLowerCase();
+        const n = `${f.nombre || ''} ${f.apellido || ''}`.toLowerCase();
         const c = (f.cedula || '').toLowerCase();
         if (!n.includes(t) && !c.includes(t)) return false;
       }

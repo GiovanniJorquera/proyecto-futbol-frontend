@@ -73,6 +73,7 @@ export class FichaTemporadaComponent implements OnInit {
 
     this.formulario = this.fb.group({
       nombre:          ['', Validators.required],
+      apellido:        ['', Validators.required],
       cedula:          ['', Validators.required],
       fechaNacimiento: ['', Validators.required],
       posicion:        [null],

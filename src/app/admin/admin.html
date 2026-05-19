@@ -728,7 +728,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-f>
         <tr>
-          <td>{{ f.nombre }}</td>
+          <td>{{ f.nombre }} {{ f.apellido || '' }}</td>
           <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
           <td>{{ f.cedula || '—' }}</td>
           <td>{{ f.apoderado?.nombre || '—' }}</td>
@@ -805,7 +805,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-f>
         <tr>
-          <td>{{ f.nombre }}</td>
+          <td>{{ f.nombre }} {{ f.apellido || '' }}</td>
           <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
           <td>{{ f.posicion || '—' }}</td>
           <td>{{ f.fechaNacimiento ? calcularEdad(f.fechaNacimiento) + ' años' : '—' }}</td>
@@ -1104,7 +1104,7 @@
   <div *ngIf="fichaSeleccionada" style="display:flex; flex-direction:column; gap:1.25rem;">
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 1.5rem;">
-      <p><strong>Nombre:</strong> {{ fichaSeleccionada.nombre }}</p>
+      <p><strong>Nombre:</strong> {{ fichaSeleccionada.nombre }} {{ fichaSeleccionada.apellido || '' }}</p>
       <p><strong>Categoría:</strong> {{ fichaSeleccionada.categoria }}</p>
       <p><strong>RUT:</strong> {{ fichaSeleccionada.cedula }}</p>
       <p><strong>Edad:</strong> {{ calcularEdad(fichaSeleccionada.fechaNacimiento) }} años</p>
