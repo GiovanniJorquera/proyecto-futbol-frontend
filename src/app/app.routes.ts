@@ -13,12 +13,6 @@ export const routes: Routes = [
     loadComponent: () => import('./formulario/formulario').then(m => m.FormularioComponent)
   },
   {
-    path: 'ficha-temporada',
-    loadComponent: () =>
-      import('./ficha-temporada/ficha-temporada')
-        .then(m => m.FichaTemporadaComponent)
-  },
-  {
     path: 'login',
     loadComponent: () => import('./login/login').then(m => m.LoginComponent)
   },
