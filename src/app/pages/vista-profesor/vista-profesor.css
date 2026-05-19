@@ -496,6 +496,108 @@
   .btn-dia-num { font-size: 2.2rem; }
 }
 
+/* LEYENDA ASISTENCIA */
+.asis-leyenda {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: .6rem 1rem;
+  background: var(--surface-alt);
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  font-size: .84rem;
+}
+
+.ley-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-weight: 600;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 6px;
+  font-size: .85rem;
+  font-weight: 800;
+  font-family: inherit;
+  border: 2px solid;
+}
+
+.ley-p { color: var(--ok); }
+.ley-p kbd { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.ley-a { color: var(--err); }
+.ley-a kbd { background: var(--err-bg); border-color: var(--err); color: var(--err); }
+.ley-j { color: var(--warn); }
+.ley-j kbd { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+
+.ley-hint {
+  margin-left: auto;
+  font-size: .78rem;
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.ley-hint .pi { color: var(--accent); font-size: .78rem; }
+
+/* NÚMERO DE LISTA */
+.asis-numero {
+  font-size: .82rem;
+  color: var(--lbl-clr);
+  font-weight: 600;
+  min-width: 1.6rem;
+  flex-shrink: 0;
+}
+
+/* INPUT LETRA */
+.asis-letra {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  border: 2px solid var(--bdr);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text-sub);
+  cursor: pointer;
+  outline: none;
+  caret-color: transparent;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.asis-letra:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(30,122,48,.18);
+}
+:host.dark .asis-letra:focus {
+  box-shadow: 0 0 0 3px rgba(57,211,83,.18);
+}
+
+.asis-letra.letra-p {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.asis-letra.letra-a {
+  background: var(--err-bg);
+  color: var(--err);
+  border-color: var(--err);
+}
+.asis-letra.letra-j {
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-color: var(--warn);
+}
+
 /* RESUMEN BAR */
 .resumen-bar {
   display: flex;
@@ -531,13 +633,11 @@
 .asistencia-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: .85rem 1.1rem;
+  gap: .75rem;
+  padding: .6rem 1rem;
   background: var(--surface);
   border: 1px solid var(--bdr);
-  border-radius: 12px;
-  flex-wrap: wrap;
+  border-radius: 10px;
 }
 
 .asis-jugador {
@@ -863,8 +963,8 @@
   .profesor-meta { justify-content: center; }
   .bienvenida { display: none; }
   .jugadores-grid { grid-template-columns: 1fr; }
-  .asistencia-row { flex-direction: column; align-items: flex-start; }
-  .asis-btns { width: 100%; justify-content: flex-start; }
+  .ley-hint { display: none; }
+  .asistencia-row { padding: .55rem .75rem; }
   .guardar-row { justify-content: stretch; }
   .btn-guardar { width: 100%; justify-content: center; }
   .rend-form-grid { grid-template-columns: 1fr; }

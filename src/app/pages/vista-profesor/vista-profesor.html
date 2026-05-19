@@ -154,38 +154,35 @@
             </span>
           </div>
 
+          <!-- Leyenda -->
+          <div class="asis-leyenda">
+            <span class="ley-item ley-p"><kbd>P</kbd> Presente</span>
+            <span class="ley-item ley-a"><kbd>A</kbd> Ausente</span>
+            <span class="ley-item ley-j"><kbd>J</kbd> Justificado</span>
+            <span class="ley-hint"><i class="pi pi-info-circle"></i> Escribe la letra y avanza automáticamente</span>
+          </div>
+
           <div class="asistencia-lista">
-            <div class="asistencia-row" *ngFor="let r of registros">
+            <div class="asistencia-row" *ngFor="let r of registros; let i = index">
+              <span class="asis-numero">{{ i + 1 }}.</span>
               <div class="asis-jugador">
                 <span class="asis-nombre">{{ r.nombre }} {{ r.apellido }}</span>
                 <span class="tag division">{{ r.categoria }}</span>
               </div>
-              <div class="asis-btns">
-                <button
-                  class="btn-estado"
-                  [class.asistio]="r.estado === 'asistio'"
-                  (click)="setEstado(r, 'asistio')"
-                  title="Asistió"
-                >
-                  <i class="pi pi-check"></i> Asistió
-                </button>
-                <button
-                  class="btn-estado"
-                  [class.ausente]="r.estado === 'ausente'"
-                  (click)="setEstado(r, 'ausente')"
-                  title="Ausente"
-                >
-                  <i class="pi pi-times"></i> Ausente
-                </button>
-                <button
-                  class="btn-estado"
-                  [class.justificado]="r.estado === 'justificado'"
-                  (click)="setEstado(r, 'justificado')"
-                  title="Justificado"
-                >
-                  <i class="pi pi-info-circle"></i> Justificado
-                </button>
-              </div>
+              <input
+                type="text"
+                class="asis-letra"
+                [class.letra-p]="r.estado === 'asistio'"
+                [class.letra-a]="r.estado === 'ausente'"
+                [class.letra-j]="r.estado === 'justificado'"
+                [value]="getLetra(r.estado)"
+                (keydown)="onLetraKeydown($event, r, i)"
+                [id]="'asis-' + i"
+                maxlength="1"
+                readonly
+                autocomplete="off"
+                spellcheck="false"
+              />
             </div>
           </div>
 

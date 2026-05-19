@@ -149,6 +149,26 @@ export class VistaProfesorComponent implements OnInit {
     registro.estado = estado;
   }
 
+  getLetra(estado: string): string {
+    if (estado === 'ausente')     return 'A';
+    if (estado === 'justificado') return 'J';
+    return 'P';
+  }
+
+  onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
+    const key = event.key.toUpperCase();
+    if (key === 'P') { event.preventDefault(); this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
+    else if (key === 'A') { event.preventDefault(); this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
+    else if (key === 'J') { event.preventDefault(); this.setEstado(registro, 'justificado'); this.moverFoco(index + 1); }
+    else if (key === 'ENTER' || key === 'ARROWDOWN') { event.preventDefault(); this.moverFoco(index + 1); }
+    else if (key === 'ARROWUP') { event.preventDefault(); this.moverFoco(index - 1); }
+  }
+
+  moverFoco(index: number) {
+    const el = document.getElementById(`asis-${index}`);
+    if (el) el.focus();
+  }
+
   guardarAsistencia() {
     if (!this.fechaSeleccionada || this.registros.length === 0) return;
     this.guardando = true;
