@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { timeout } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 
 import { CardModule } from 'primeng/card';
@@ -23,6 +24,7 @@ export class RegistroInvitadoComponent implements OnInit {
   token = '';
   estado: 'cargando' | 'valido' | 'invalido' | 'expirado' | 'usado' | 'enviado' = 'cargando';
   mensajeError = '';
+  esTimeout = false;
   formulario!: FormGroup;
   rutInvalido = false;
   enviando = false;
@@ -72,9 +74,26 @@ export class RegistroInvitadoComponent implements OnInit {
       return;
     }
 
-    this.api.validarInvitacion(this.token).subscribe({
+    this.validarToken();
+  }
+
+  reintentar() {
+    this.estado = 'cargando';
+    this.mensajeError = '';
+    this.esTimeout = false;
+    this.validarToken();
+  }
+
+  private validarToken() {
+    this.api.validarInvitacion(this.token).pipe(timeout(20000)).subscribe({
       next: () => { this.estado = 'valido'; },
       error: (err) => {
+        if (err?.name === 'TimeoutError') {
+          this.estado = 'invalido'; this.esTimeout = true;
+          this.mensajeError = 'El servidor tardó en responder. Intenta nuevamente.';
+          return;
+        }
+        this.esTimeout = false;
         const msg: string = err?.error?.mensaje ?? '';
         if (msg.includes('utilizado')) { this.estado = 'usado'; }
         else if (msg.includes('expirado')) { this.estado = 'expirado'; }

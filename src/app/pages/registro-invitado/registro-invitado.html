@@ -31,6 +31,9 @@
       <i class="pi pi-times-circle estado-icon"></i>
       <h2>Link inválido</h2>
       <p>{{ mensajeError || 'Este link no existe o no es válido.' }}</p>
+      <div *ngIf="esTimeout" style="margin-top:12px">
+        <p-button label="Reintentar" icon="pi pi-refresh" severity="secondary" (onClick)="reintentar()"></p-button>
+      </div>
     </ng-container>
 
   </div>
