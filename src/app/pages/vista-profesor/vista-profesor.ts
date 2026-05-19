@@ -292,9 +292,10 @@ export class VistaProfesorComponent implements OnInit {
         this.rendForm = this.rendFormVacio();
         this.cargarHistorialRend();
       },
-      error: () => {
+      error: (err: any) => {
         this.guardandoRendInd = false;
-        this.errorRendInd = 'Error al guardar. Intente nuevamente.';
+        const msg = err?.error?.mensaje || err?.message || '';
+        this.errorRendInd = `Error al guardar (${err?.status || '?'}): ${msg || 'Intente nuevamente.'}`;
       }
     });
   }
