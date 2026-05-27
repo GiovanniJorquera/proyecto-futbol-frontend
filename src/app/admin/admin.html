@@ -626,6 +626,30 @@
       </p-table>
     </p-card>
 
+    <!-- Gestión de Sedes -->
+    <p-card>
+      <div class="sec-header">
+        <h3>Sedes</h3>
+      </div>
+      <p style="color:rgba(233,247,234,0.5); font-size:0.85rem; margin:0 0 1rem;">
+        Las sedes disponibles se usan al registrar y filtrar jugadores.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <div *ngFor="let sede of siteConfig.sedes; let i = index"
+          style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem 0.75rem; background:rgba(57,211,83,0.06); border:1px solid rgba(57,211,83,0.15); border-radius:8px;">
+          <span style="flex:1;">{{ sede }}</span>
+          <p-button icon="pi pi-trash" size="small" severity="danger" (onClick)="eliminarSede(i)" pTooltip="Eliminar sede"></p-button>
+        </div>
+        <div *ngIf="siteConfig.sedes.length === 0" style="color:rgba(233,247,234,0.35); font-style:italic;">
+          No hay sedes registradas.
+        </div>
+        <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+          <input pInputText [(ngModel)]="nuevaSede" placeholder="Nueva sede (ej: Valparaíso)" style="flex:1;" (keyup.enter)="agregarSede()" />
+          <p-button label="Agregar" icon="pi pi-plus" (onClick)="agregarSede()" [disabled]="!nuevaSede.trim()"></p-button>
+        </div>
+      </div>
+    </p-card>
+
     <!-- Gestión de Popup -->
     <p-card>
       <div class="sec-header">
@@ -1187,7 +1211,7 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Sede</label>
-          <input pInputText [(ngModel)]="fichaEditandoForm.sede" style="width:100%;" placeholder="Ej: Sede Norte" />
+          <p-select [options]="sedeJugadorOpciones" [(ngModel)]="fichaEditandoForm.sede" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" appendTo="body" style="width:100%;"></p-select>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Posición</label>

@@ -179,7 +179,9 @@ export class AdminComponent implements OnInit {
     imagenPopup: '',
     tituloPopup: '',
     cuerpoPopup: '',
+    sedes: [] as string[],
   };
+  nuevaSede = '';
   guardandoConfig = false;
   noticiasAdmin: any[] = [];
   noticiaForm: { titulo: string; descripcion: string; contenido: string; fecha: string; imagenUrl: string; categoria: string } = { titulo: '', descripcion: '', contenido: '', fecha: '', imagenUrl: '', categoria: '' };
@@ -524,6 +526,7 @@ export class AdminComponent implements OnInit {
         this.siteConfig.imagenPopup = c.imagenPopup || '';
         this.siteConfig.tituloPopup = c.tituloPopup || '';
         this.siteConfig.cuerpoPopup = c.cuerpoPopup || '';
+        this.siteConfig.sedes = c.sedes?.length ? c.sedes : ['Viña del Mar', 'Olmué'];
       },
       error: () => {},
     });
@@ -632,6 +635,19 @@ export class AdminComponent implements OnInit {
       tituloPopup:  this.siteConfig.tituloPopup,
       cuerpoPopup:  this.siteConfig.cuerpoPopup,
     });
+  }
+
+  agregarSede(): void {
+    const s = this.nuevaSede.trim();
+    if (!s || this.siteConfig.sedes.includes(s)) { this.nuevaSede = ''; return; }
+    this.siteConfig.sedes = [...this.siteConfig.sedes, s];
+    this.nuevaSede = '';
+    this.putConfig({ sedes: this.siteConfig.sedes });
+  }
+
+  eliminarSede(i: number): void {
+    this.siteConfig.sedes = this.siteConfig.sedes.filter((_, idx) => idx !== i);
+    this.putConfig({ sedes: this.siteConfig.sedes });
   }
 
   guardarConfig(): void {
@@ -873,8 +889,7 @@ export class AdminComponent implements OnInit {
   }
 
   get sedeJugadorOpciones() {
-    const sedes = [...new Set(this.fichas.map((f: any) => f.sede).filter(Boolean))].sort();
-    return [{ label: 'Todas', value: null }, ...sedes.map(s => ({ label: s as string, value: s as string }))];
+    return [{ label: 'Todas', value: null }, ...this.siteConfig.sedes.map(s => ({ label: s, value: s }))];
   }
 
   limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null, sede: null }; }
