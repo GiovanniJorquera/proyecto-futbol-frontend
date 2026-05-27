@@ -131,8 +131,19 @@
   }
 
 
+.reg-actions {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+
 @media (max-width: 600px) {
   .reg-grid { grid-template-columns: 1fr; }
   .reg-field-full { grid-column: 1; }
   .reg-seccion { padding: 20px 16px; }
+  .reg-wrap { padding: 20px 12px 48px; }
+  .reg-titulo { font-size: 1.4rem; }
+  .reg-actions { padding: 4px 0 12px; }
+  .reg-actions p-button,
+  .reg-actions .p-button { width: 100%; }
 }

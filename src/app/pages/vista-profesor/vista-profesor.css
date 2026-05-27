@@ -534,6 +534,11 @@
 @media (max-width: 480px) {
   .btn-dia { padding: 1rem 2rem; }
   .btn-dia-num { font-size: 2.2rem; }
+  .rend-subitem label { flex: 0 0 90px; font-size: .75rem; }
+  .rend-subitem span { flex: 0 0 2.4rem; font-size: .8rem; }
+  .rend-cat-bloque { padding: .85rem .85rem; }
+  .profesor-banner { padding: 1rem; }
+  .tab-content { padding: 1rem .75rem; }
 }
 
 /* LEYENDA ASISTENCIA */
@@ -991,10 +996,83 @@ kbd {
   color: var(--lbl-clr);
 }
 
+/* RENDIMIENTO CATEGORÍAS */
+.rend-categorias {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rend-cat-bloque {
+  background: var(--surface-alt);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.rend-cat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .85rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.rend-cat-titulo {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--heading);
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.rend-cat-titulo .pi { color: var(--accent); }
+
+.rend-cat-prom {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.rend-subitem {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-bottom: .55rem;
+}
+
+.rend-subitem label {
+  flex: 0 0 150px;
+  font-size: .8rem;
+  color: var(--text-sub);
+}
+
+.rend-subitem input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.rend-subitem span {
+  flex: 0 0 3rem;
+  text-align: right;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: .85rem;
+}
+
 /* RESPONSIVE */
+@media (max-width: 900px) {
+  .rend-categorias { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 768px) {
   .rend-layout { grid-template-columns: 1fr; }
   .rend-lista-panel { position: static; max-height: none; }
+  .page-header h1 { font-size: .95rem; }
+  .tab-content { padding: 1.25rem 1rem; }
 }
 
 @media (max-width: 640px) {
@@ -1008,4 +1086,9 @@ kbd {
   .guardar-row { justify-content: stretch; }
   .btn-guardar { width: 100%; justify-content: center; }
   .rend-form-grid { grid-template-columns: 1fr; }
+  .tabs-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 0 .75rem; }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .tab-btn { font-size: .82rem; padding: .75rem .85rem; }
+  .rend-resumen-bar { flex-wrap: wrap; gap: .75rem; }
+  .rend-subitem label { flex: 0 0 110px; }
 }
