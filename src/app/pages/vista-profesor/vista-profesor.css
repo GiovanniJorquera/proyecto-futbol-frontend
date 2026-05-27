@@ -425,6 +425,46 @@
 .btn-cargar:hover:not(:disabled) { background: var(--accent); color: #fff; }
 .btn-cargar:disabled { opacity: .5; cursor: not-allowed; }
 
+/* FILTRO POR DIVISIÓN */
+.filtro-div {
+  cursor: pointer;
+  background: none;
+  border: 1.5px solid transparent;
+  font: inherit;
+  padding: .2rem .65rem;
+  border-radius: 20px;
+  transition: border-color .18s, background .18s, color .18s;
+}
+.filtro-div:hover {
+  border-color: var(--accent);
+  background: var(--accent-a);
+}
+.filtro-div.div-activa {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.filtro-todos {
+  cursor: pointer;
+  background: none;
+  border: 1.5px solid var(--bdr);
+  border-radius: 20px;
+  padding: .18rem .55rem;
+  font-size: .78rem;
+  color: var(--text-sub);
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  transition: all .18s;
+  font: inherit;
+}
+.filtro-todos:hover {
+  background: var(--err-bg);
+  color: var(--err);
+  border-color: var(--err);
+}
+
 /* DÍAS DE ENTRENAMIENTO */
 .semana-label {
   margin: 0 0 1rem;

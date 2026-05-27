@@ -32,6 +32,7 @@ export class VistaProfesorComponent implements OnInit {
   error = '';
 
   tabActiva: 'jugadores' | 'asistencia' | 'rendimiento' = 'jugadores';
+  divisionFiltro: string | null = null;
 
   // Asistencia
   fechaSeleccionada = '';
@@ -126,7 +127,7 @@ export class VistaProfesorComponent implements OnInit {
     this.asistenciaGuardada = false;
     this.errorAsistencia = '';
 
-    this.registros = this.fichas.map(f => ({
+    this.registros = this.fichasFiltradas.map(f => ({
       jugadorId: f._id,
       nombre: f.nombre,
       apellido: f.apellido || '',
@@ -294,10 +295,25 @@ export class VistaProfesorComponent implements OnInit {
       },
       error: (err: any) => {
         this.guardandoRendInd = false;
-        const msg = err?.error?.mensaje || err?.message || '';
-        this.errorRendInd = `Error al guardar (${err?.status || '?'}): ${msg || 'Intente nuevamente.'}`;
+        const msg = err?.error?.detalle || err?.error?.mensaje || err?.message || '';
+        this.errorRendInd = `Error (${err?.status}): ${msg}`;
       }
     });
+  }
+
+  get fichasFiltradas(): any[] {
+    if (!this.divisionFiltro) return this.fichas;
+    return this.fichas.filter(f => f.categoria === this.divisionFiltro);
+  }
+
+  toggleFiltroDiv(d: string) {
+    this.divisionFiltro = this.divisionFiltro === d ? null : d;
+    if (this.fechaSeleccionada) this.cargarAsistenciaFecha();
+    if (this.jugadorSeleccionadoRend && this.divisionFiltro && this.jugadorSeleccionadoRend.categoria !== this.divisionFiltro) {
+      this.jugadorSeleccionadoRend = null;
+      this.rendHistorial = [];
+      this.rendResumen = {};
+    }
   }
 
   get divisiones(): string {

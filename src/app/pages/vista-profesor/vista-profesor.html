@@ -37,13 +37,21 @@
         <h2 class="profesor-nombre">{{ profesor?.nombre }} {{ profesor?.apellido }}</h2>
         <div class="profesor-meta">
           <span class="tag" *ngIf="profesor?.especialidad">{{ profesor.especialidad }}</span>
-          <span class="tag division" *ngFor="let d of profesor?.divisiones">{{ d }}</span>
+          <button type="button" class="tag division filtro-div"
+                  *ngFor="let d of profesor?.divisiones"
+                  [class.div-activa]="divisionFiltro === d"
+                  (click)="toggleFiltroDiv(d)">
+            {{ d }}
+          </button>
+          <button type="button" class="filtro-todos" *ngIf="divisionFiltro" (click)="toggleFiltroDiv(divisionFiltro)">
+            <i class="pi pi-times"></i> Todos
+          </button>
         </div>
       </div>
       <div class="profesor-stats">
         <div class="stat">
-          <span class="stat-num">{{ fichas.length }}</span>
-          <span class="stat-lbl">Jugadores</span>
+          <span class="stat-num">{{ fichasFiltradas.length }}</span>
+          <span class="stat-lbl">{{ divisionFiltro ? divisionFiltro : 'Jugadores' }}</span>
         </div>
         <div class="stat">
           <span class="stat-num">{{ profesor?.divisiones?.length || 0 }}</span>
@@ -69,13 +77,13 @@
     <div class="tab-content" *ngIf="tabActiva === 'jugadores'">
       <div class="section-inner">
 
-        <div class="empty-msg" *ngIf="fichas.length === 0">
+        <div class="empty-msg" *ngIf="fichasFiltradas.length === 0">
           <i class="pi pi-inbox"></i>
-          <p>No hay jugadores en tus sub-divisiones aún.</p>
+          <p>No hay jugadores en {{ divisionFiltro ? divisionFiltro : 'tus sub-divisiones' }}.</p>
         </div>
 
-        <div class="jugadores-grid" *ngIf="fichas.length > 0">
-          <div class="jugador-card" *ngFor="let f of fichas">
+        <div class="jugadores-grid" *ngIf="fichasFiltradas.length > 0">
+          <div class="jugador-card" *ngFor="let f of fichasFiltradas">
             <div class="jugador-card-header">
               <div class="jc-avatar"><i class="pi pi-user"></i></div>
               <div>
@@ -223,13 +231,13 @@
         <div class="rend-lista-panel">
           <h3 class="asistencia-titulo"><i class="pi pi-users"></i> Selecciona un jugador</h3>
 
-          <div class="empty-msg" *ngIf="fichas.length === 0">
+          <div class="empty-msg" *ngIf="fichasFiltradas.length === 0">
             <i class="pi pi-inbox"></i>
-            <p>No hay jugadores en tus sub-divisiones.</p>
+            <p>No hay jugadores en {{ divisionFiltro ? divisionFiltro : 'tus sub-divisiones' }}.</p>
           </div>
 
           <div class="rend-jugador-item"
-               *ngFor="let f of fichas"
+               *ngFor="let f of fichasFiltradas"
                [class.rend-jugador-activo]="jugadorSeleccionadoRend?._id === f._id"
                (click)="seleccionarJugadorRend(f)">
             <div class="jc-avatar jc-avatar-sm"><i class="pi pi-user"></i></div>
