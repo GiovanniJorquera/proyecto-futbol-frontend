@@ -752,7 +752,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-f>
         <tr>
-          <td>{{ f.nombre }} {{ f.apellido || '' }}</td>
+          <td>{{ f.nombre }} {{ f.apellidoPaterno || '' }} {{ f.apellidoMaterno || '' }}</td>
           <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
           <td>{{ f.cedula || '—' }}</td>
           <td>{{ f.apoderado?.nombre || '—' }}</td>
@@ -834,7 +834,7 @@
       </ng-template>
       <ng-template pTemplate="body" let-f>
         <tr>
-          <td>{{ f.nombre }} {{ f.apellido || '' }}</td>
+          <td>{{ f.nombre }} {{ f.apellidoPaterno || '' }} {{ f.apellidoMaterno || '' }}</td>
           <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
           <td>{{ f.sede || '—' }}</td>
           <td>{{ f.posicion || '—' }}</td>
@@ -1134,7 +1134,7 @@
   <div *ngIf="fichaSeleccionada" style="display:flex; flex-direction:column; gap:1.25rem;">
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 1.5rem;">
-      <p><strong>Nombre:</strong> {{ fichaSeleccionada.nombre }} {{ fichaSeleccionada.apellido || '' }}</p>
+      <p><strong>Nombre:</strong> {{ fichaSeleccionada.nombre }} {{ fichaSeleccionada.apellidoPaterno || '' }} {{ fichaSeleccionada.apellidoMaterno || '' }}</p>
       <p><strong>Categoría:</strong> {{ fichaSeleccionada.categoria }}</p>
       <p><strong>RUT:</strong> {{ fichaSeleccionada.cedula }}</p>
       <p><strong>Edad:</strong> {{ calcularEdad(fichaSeleccionada.fechaNacimiento) }} años</p>
@@ -1185,9 +1185,17 @@
     <div>
       <h4 style="margin:0 0 0.75rem; color:#39d353;">Datos del Jugador</h4>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
-        <div style="display:flex;flex-direction:column;gap:0.2rem;grid-column:1/-1;">
-          <label style="font-weight:600;">Nombre completo *</label>
-          <input pInputText [(ngModel)]="fichaEditandoForm.nombre" style="width:100%;" />
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Nombre *</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.nombre" style="width:100%;" placeholder="Nombre(s)" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Apellido paterno</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.apellidoPaterno" style="width:100%;" placeholder="Apellido paterno" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Apellido materno</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.apellidoMaterno" style="width:100%;" placeholder="Apellido materno" />
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Fecha de nacimiento</label>

@@ -701,6 +701,8 @@ export class AdminComponent implements OnInit {
     this.fichaSeleccionada = ficha;
     this.fichaEditandoForm = {
       nombre: ficha.nombre || '',
+      apellidoPaterno: ficha.apellidoPaterno || '',
+      apellidoMaterno: ficha.apellidoMaterno || '',
       fechaNacimiento: ficha.fechaNacimiento ? ficha.fechaNacimiento.split('T')[0] : '',
       cedula: ficha.cedula || '',
       direccion: ficha.direccion || '',
@@ -817,7 +819,7 @@ export class AdminComponent implements OnInit {
     return this.fichas.filter((f: any) => {
       const t = this.filtrosFichas.texto.trim().toLowerCase();
       if (t) {
-        const n = (f.nombre || '').toLowerCase();
+        const n = `${f.nombre || ''} ${f.apellidoPaterno || ''} ${f.apellidoMaterno || ''} ${f.apellido || ''}`.toLowerCase();
         const c = (f.cedula || '').toLowerCase();
         const a = (f.apoderado?.nombre || '').toLowerCase();
         if (!n.includes(t) && !c.includes(t) && !a.includes(t)) return false;
@@ -871,7 +873,7 @@ export class AdminComponent implements OnInit {
     return this.fichas.filter((f: any) => {
       const t = this.filtrosJugadores.texto.trim().toLowerCase();
       if (t) {
-        const n = `${f.nombre || ''} ${f.apellido || ''}`.toLowerCase();
+        const n = `${f.nombre || ''} ${f.apellidoPaterno || ''} ${f.apellidoMaterno || ''} ${f.apellido || ''}`.toLowerCase();
         const c = (f.cedula || '').toLowerCase();
         const s = (f.sede || '').toLowerCase();
         if (!n.includes(t) && !c.includes(t) && !s.includes(t)) return false;

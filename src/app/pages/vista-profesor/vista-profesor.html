@@ -87,7 +87,7 @@
             <div class="jugador-card-header">
               <div class="jc-avatar"><i class="pi pi-user"></i></div>
               <div>
-                <p class="jc-nombre">{{ f.nombre }} {{ f.apellido || '' }}</p>
+                <p class="jc-nombre">{{ f.nombre }} {{ f.apellidoPaterno || '' }} {{ f.apellidoMaterno || '' }}</p>
                 <div class="jc-tags">
                   <span class="tag division">{{ f.categoria }}</span>
                   <span class="tag" *ngIf="f.posicion">{{ f.posicion }}</span>
@@ -174,7 +174,7 @@
             <div class="asistencia-row" *ngFor="let r of registros; let i = index">
               <span class="asis-numero">{{ i + 1 }}.</span>
               <div class="asis-jugador">
-                <span class="asis-nombre">{{ r.nombre }} {{ r.apellido }}</span>
+                <span class="asis-nombre">{{ r.nombre }} {{ r.apellidoPaterno }} {{ r.apellidoMaterno }}</span>
                 <span class="tag division">{{ r.categoria }}</span>
               </div>
               <input
@@ -242,7 +242,7 @@
                (click)="seleccionarJugadorRend(f)">
             <div class="jc-avatar jc-avatar-sm"><i class="pi pi-user"></i></div>
             <div>
-              <p class="jc-nombre">{{ f.nombre }} {{ f.apellido || '' }}</p>
+              <p class="jc-nombre">{{ f.nombre }} {{ f.apellidoPaterno || '' }} {{ f.apellidoMaterno || '' }}</p>
               <span class="tag division">{{ f.categoria }}</span>
             </div>
           </div>
@@ -260,7 +260,7 @@
 
             <h3 class="asistencia-titulo">
               <i class="pi pi-chart-bar"></i>
-              Evaluación — {{ jugadorSeleccionadoRend.nombre }} {{ jugadorSeleccionadoRend.apellido || '' }}
+              Evaluación — {{ jugadorSeleccionadoRend.nombre }} {{ jugadorSeleccionadoRend.apellidoPaterno || '' }} {{ jugadorSeleccionadoRend.apellidoMaterno || '' }}
             </h3>
 
             <!-- Resumen global -->

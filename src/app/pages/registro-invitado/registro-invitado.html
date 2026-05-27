@@ -142,6 +142,13 @@
           <small *ngIf="campoInvalido('pupilo','comuna')" class="reg-error">Campo requerido</small>
         </div>
 
+        <div class="reg-field">
+          <label>Sede <span class="req">*</span></label>
+          <p-select formControlName="sede" [options]="sedesOpciones" placeholder="Selecciona sede" appendTo="body"
+            [class.ng-invalid]="campoInvalido('pupilo','sede')"></p-select>
+          <small *ngIf="campoInvalido('pupilo','sede')" class="reg-error">Campo requerido</small>
+        </div>
+
       </div>
     </div>
 

@@ -9,7 +9,8 @@ import { RendimientoService } from '../../services/rendimiento.service';
 interface RegistroAsistencia {
   jugadorId: string;
   nombre: string;
-  apellido: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
   categoria: string;
   estado: 'asistio' | 'ausente' | 'justificado';
   marcado: boolean;
@@ -130,7 +131,8 @@ export class VistaProfesorComponent implements OnInit {
     this.registros = this.fichasFiltradas.map(f => ({
       jugadorId: f._id,
       nombre: f.nombre,
-      apellido: f.apellido || '',
+      apellidoPaterno: f.apellidoPaterno || '',
+      apellidoMaterno: f.apellidoMaterno || '',
       categoria: f.categoria,
       estado: 'asistio' as const,
       marcado: false

@@ -33,6 +33,7 @@ export class RegistroInvitadoComponent implements OnInit {
   categoriaSugerida = '';
   ramaFemenina = false;
 
+  sedesOpciones: string[] = ['Viña del Mar', 'Olmué'];
   generos = [{ name: 'Masculino' }, { name: 'Femenino' }];
   comunas = [
     { name: 'Viña del Mar' }, { name: 'Valparaíso' }, { name: 'Quilpué' },
@@ -64,12 +65,18 @@ export class RegistroInvitadoComponent implements OnInit {
         fechaNacimiento: ['', Validators.required],
         genero:          [null, Validators.required],
         direccion:       ['', [Validators.required, Validators.maxLength(150)]],
-        comuna:          [null, Validators.required]
+        comuna:          [null, Validators.required],
+        sede:            ['', Validators.required]
       })
     });
 
     this.formulario.get('pupilo.rut')?.valueChanges.subscribe(v => {
       this.rutInvalido = !this.validarRutFormato(v);
+    });
+
+    this.api.getConfig().subscribe({
+      next: (c) => { if (c.sedes?.length) this.sedesOpciones = c.sedes; },
+      error: () => {}
     });
 
     if (!this.token) {
