@@ -101,7 +101,7 @@ export class AdminComponent implements OnInit {
   fichaEditandoForm: any = {};
 
   /* Filtros jugadores (tab separado) */
-  filtrosJugadores = { texto: '', categoria: null as string | null, posicion: null as string | null };
+  filtrosJugadores = { texto: '', categoria: null as string | null, posicion: null as string | null, sede: null as string | null };
 
   /* Rendimiento */
   modalRendimientoVisible = false;
@@ -689,6 +689,7 @@ export class AdminComponent implements OnInit {
       cedula: ficha.cedula || '',
       direccion: ficha.direccion || '',
       ciudad: ficha.ciudad || '',
+      sede: ficha.sede || '',
       establecimiento: ficha.establecimiento || '',
       curso: ficha.curso || '',
       clubAmateur: ficha.clubAmateur || '',
@@ -856,10 +857,12 @@ export class AdminComponent implements OnInit {
       if (t) {
         const n = `${f.nombre || ''} ${f.apellido || ''}`.toLowerCase();
         const c = (f.cedula || '').toLowerCase();
-        if (!n.includes(t) && !c.includes(t)) return false;
+        const s = (f.sede || '').toLowerCase();
+        if (!n.includes(t) && !c.includes(t) && !s.includes(t)) return false;
       }
       if (this.filtrosJugadores.categoria && f.categoria !== this.filtrosJugadores.categoria) return false;
       if (this.filtrosJugadores.posicion && f.posicion !== this.filtrosJugadores.posicion) return false;
+      if (this.filtrosJugadores.sede && f.sede !== this.filtrosJugadores.sede) return false;
       return true;
     });
   }
@@ -869,7 +872,12 @@ export class AdminComponent implements OnInit {
     return [{ label: 'Todas', value: null }, ...pos.map(p => ({ label: p as string, value: p as string }))];
   }
 
-  limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null }; }
+  get sedeJugadorOpciones() {
+    const sedes = [...new Set(this.fichas.map((f: any) => f.sede).filter(Boolean))].sort();
+    return [{ label: 'Todas', value: null }, ...sedes.map(s => ({ label: s as string, value: s as string }))];
+  }
+
+  limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null, sede: null }; }
 
   verRendimiento(ficha: any) {
     this.fichaSeleccionada = ficha;

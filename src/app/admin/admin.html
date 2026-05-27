@@ -786,6 +786,10 @@
         <label>Posición</label>
         <p-select [options]="posicionJugadorOpciones" [(ngModel)]="filtrosJugadores.posicion" optionLabel="label" optionValue="value" placeholder="Todas" appendTo="body"></p-select>
       </div>
+      <div class="filter-field medium">
+        <label>Sede</label>
+        <p-select [options]="sedeJugadorOpciones" [(ngModel)]="filtrosJugadores.sede" optionLabel="label" optionValue="value" placeholder="Todas" appendTo="body"></p-select>
+      </div>
       <p-button label="Limpiar" icon="pi pi-filter-slash" severity="secondary" (onClick)="limpiarFiltrosJugadores()"></p-button>
     </div>
     <p class="result-count">Mostrando {{ jugadoresFiltrados.length }} de {{ fichas.length }} jugadores</p>
@@ -795,6 +799,7 @@
         <tr>
           <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"/></th>
           <th pSortableColumn="categoria">Sub-División <p-sortIcon field="categoria"/></th>
+          <th pSortableColumn="sede">Sede <p-sortIcon field="sede"/></th>
           <th>Posición</th>
           <th>Edad</th>
           <th>Pie hábil</th>
@@ -807,6 +812,7 @@
         <tr>
           <td>{{ f.nombre }} {{ f.apellido || '' }}</td>
           <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
+          <td>{{ f.sede || '—' }}</td>
           <td>{{ f.posicion || '—' }}</td>
           <td>{{ f.fechaNacimiento ? calcularEdad(f.fechaNacimiento) + ' años' : '—' }}</td>
           <td>{{ f.pieHabil || '—' }}</td>
@@ -827,7 +833,7 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
-        <tr><td colspan="8" style="text-align:center; padding:2rem;">No hay jugadores registrados.</td></tr>
+        <tr><td colspan="9" style="text-align:center; padding:2rem;">No hay jugadores registrados.</td></tr>
       </ng-template>
     </p-table>
   </p-card>
@@ -1178,6 +1184,10 @@
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Ciudad</label>
           <input pInputText [(ngModel)]="fichaEditandoForm.ciudad" style="width:100%;" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Sede</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.sede" style="width:100%;" placeholder="Ej: Sede Norte" />
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Posición</label>
