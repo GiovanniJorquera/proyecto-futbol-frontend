@@ -193,6 +193,30 @@ export class AdminComponent implements OnInit {
     { label: 'Entrenamiento', value: 'Entrenamiento' },
   ];
 
+  /* ── MIGRACIÓN CSV ───────────────────────────────── */
+  migracionEnCurso  = false;
+  migracionResultado = '';
+
+  ejecutarMigracionCSV() {
+    if (this.migracionEnCurso) return;
+    this.migracionEnCurso = true;
+    this.migracionResultado = '';
+    this.http.post<any>(`${this.apiUrl}/admin/migracion-fichas-csv`, {}, this.authHeaders()).subscribe({
+      next: (r) => {
+        this.migracionEnCurso = false;
+        this.migracionResultado = r.mensaje + (r.errores ? ` (${r.errores} errores)` : '');
+        this.cargarFichas();
+        this.tabLibroLoaded = false;
+        this.libroJugadores = [];
+        this.libroFechas    = [];
+      },
+      error: (err) => {
+        this.migracionEnCurso = false;
+        this.migracionResultado = 'Error: ' + (err?.error?.detalle || err?.error?.mensaje || 'desconocido');
+      }
+    });
+  }
+
   /* ── LIBRO DE ASISTENCIA ─────────────────────────── */
   libroMes      = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`; })();
   libroCat      : string | null = null;
