@@ -1,6 +1,8 @@
 <!-- ========= HEADER ========= -->
 <header class="page-header">
   <h1>{{ siteConfig.tituloHeader }}</h1>
+
+  <!-- Nav escritorio -->
   <nav class="header-nav">
     <button type="button" class="theme-toggle" (click)="toggleTema()" [title]="temaOscuro ? 'Modo claro' : 'Modo oscuro'">
       <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
@@ -8,6 +10,21 @@
     <button pButton type="button" label="Postular" icon="pi pi-user-plus" size="small" (click)="navegarFormulario()"></button>
     <button pButton type="button" label="Iniciar Sesión" icon="pi pi-sign-in" size="small" severity="secondary" (click)="navegarLogin()"></button>
   </nav>
+
+  <!-- Botón burger (solo móvil) -->
+  <button type="button" class="burger-btn" (click)="menuAbierto = !menuAbierto" [attr.aria-expanded]="menuAbierto">
+    <i class="pi" [class.pi-bars]="!menuAbierto" [class.pi-times]="menuAbierto"></i>
+  </button>
+
+  <!-- Menú desplegable móvil -->
+  <div class="header-dropdown" [hidden]="!menuAbierto">
+    <button type="button" class="theme-toggle" (click)="toggleTema()">
+      <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
+      {{ temaOscuro ? 'Modo claro' : 'Modo oscuro' }}
+    </button>
+    <button pButton type="button" label="Postular" icon="pi pi-user-plus" (click)="navegarFormulario(); menuAbierto=false"></button>
+    <button pButton type="button" label="Iniciar Sesión" icon="pi pi-sign-in" severity="secondary" (click)="navegarLogin(); menuAbierto=false"></button>
+  </div>
 </header>
 
 <!-- ========= HERO ========= -->

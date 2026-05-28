@@ -25,6 +25,7 @@ interface RegistroAsistencia {
 })
 export class VistaProfesorComponent implements OnInit {
   @HostBinding('class.dark') temaOscuro = false;
+  menuAbierto = false;
 
   profesor: any = null;
   usuario: any = null;

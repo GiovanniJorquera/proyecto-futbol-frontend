@@ -94,7 +94,7 @@
 .page-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   padding: 0.75rem 1.25rem;
   background: var(--header-bg);
   backdrop-filter: blur(10px);
@@ -105,6 +105,40 @@
   gap: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: background 0.25s, border-color 0.25s;
+}
+
+.burger-btn {
+  display: none;
+  background: var(--accent-a);
+  border: 1px solid var(--bdr);
+  border-radius: 50%;
+  width: 2.3rem;
+  height: 2.3rem;
+  cursor: pointer;
+  color: var(--accent);
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.18s, color 0.18s;
+}
+.burger-btn:hover { background: var(--accent); color: #fff; }
+
+.header-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--header-bdr);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.14);
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  z-index: 99;
 }
 
 .page-header h1 {
@@ -836,6 +870,15 @@
     padding: 1rem 1.25rem;
   }
   .floating-popup-button { right: 1rem; bottom: 1rem; }
+}
+
+@media (max-width: 640px) {
+  .header-nav { display: none; }
+  .burger-btn { display: flex; }
+  .page-header h1 { font-size: 0.95rem; }
+  .header-dropdown:not([hidden]) { display: flex; }
+  .header-dropdown .theme-toggle { width: auto; border-radius: 8px; padding: 0.5rem 1rem; gap: 0.5rem; font-size: 0.9rem; justify-content: flex-start; }
+  .header-dropdown .p-button { width: 100%; justify-content: center; }
 }
 
 @media (min-width: 769px) {

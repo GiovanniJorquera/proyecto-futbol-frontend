@@ -16,6 +16,7 @@ import { ChartModule } from 'primeng/chart';
 })
 export class VistaClienteComponent implements OnInit {
   @HostBinding('class.dark') temaOscuro = false;
+  menuAbierto = false;
 
   ficha: any = null;
   cargando = true;

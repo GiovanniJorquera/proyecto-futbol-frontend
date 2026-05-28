@@ -3,6 +3,8 @@
     <h1>Santiago Wanderers</h1>
     <span class="rol-badge">Profesor</span>
   </div>
+
+  <!-- Nav escritorio -->
   <nav class="header-nav">
     <span class="bienvenida" *ngIf="usuario">{{ usuario.nombre }}</span>
     <button type="button" class="theme-toggle" (click)="toggleTema()" [title]="temaOscuro ? 'Modo claro' : 'Modo oscuro'">
@@ -12,6 +14,23 @@
       <i class="pi pi-sign-out"></i> Cerrar sesión
     </button>
   </nav>
+
+  <!-- Botón burger (solo móvil) -->
+  <button type="button" class="burger-btn" (click)="menuAbierto = !menuAbierto" [attr.aria-expanded]="menuAbierto">
+    <i class="pi" [class.pi-bars]="!menuAbierto" [class.pi-times]="menuAbierto"></i>
+  </button>
+
+  <!-- Menú desplegable móvil -->
+  <div class="header-dropdown" [hidden]="!menuAbierto">
+    <span class="dropdown-saludo" *ngIf="usuario">{{ usuario.nombre }}</span>
+    <button type="button" class="theme-toggle dropdown-theme" (click)="toggleTema()">
+      <i [class]="temaOscuro ? 'pi pi-sun' : 'pi pi-moon'"></i>
+      {{ temaOscuro ? 'Modo claro' : 'Modo oscuro' }}
+    </button>
+    <button type="button" class="btn-cerrar dropdown-full" (click)="cerrarSesion()">
+      <i class="pi pi-sign-out"></i> Cerrar sesión
+    </button>
+  </div>
 </header>
 
 <div class="profesor-body">

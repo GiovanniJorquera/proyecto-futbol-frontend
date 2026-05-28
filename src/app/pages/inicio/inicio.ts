@@ -16,6 +16,7 @@ import { GalleriaModule } from 'primeng/galleria';
 })
 export class Inicio implements OnInit, AfterViewInit, OnDestroy {
   @HostBinding('class.dark') temaOscuro = false;
+  menuAbierto = false;
 
   mostrarPostulaciones = false;
   mostrarImagenPopup = false;
