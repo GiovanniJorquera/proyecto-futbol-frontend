@@ -191,7 +191,7 @@ export class VistaProfesorComponent implements OnInit {
     const payload = this.registros.map(r => ({ jugadorId: r.jugadorId, estado: r.estado }));
 
     this.api.guardarAsistenciasLote(this.fechaSeleccionada, payload).subscribe({
-      next: () => { this.guardando = false; this.asistenciaGuardada = true; },
+      next: () => { this.guardando = false; this.asistenciaGuardada = true; this.cargarLibroProfesor(); },
       error: () => { this.guardando = false; this.errorAsistencia = 'Error al guardar. Intente nuevamente.'; }
     });
   }
@@ -207,7 +207,7 @@ export class VistaProfesorComponent implements OnInit {
 
   abrirLibro() {
     this.modoAsistencia = 'libro';
-    if (this.libroJugadores.length === 0) this.cargarLibroProfesor();
+    this.cargarLibroProfesor();
   }
 
   estadoLetraProf(estado: string): string {

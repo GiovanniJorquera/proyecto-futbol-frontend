@@ -833,7 +833,7 @@ export class AdminComponent implements OnInit {
       if (tab === 'jugadores') this.tabJugadoresLoaded = true;
       if (this.fichas.length === 0 && !this.cargandoFichas) this.cargarFichas();
     }
-    if (tab === 'asistencia' && !this.tabLibroLoaded) {
+    if (tab === 'asistencia') {
       this.tabLibroLoaded = true;
       this.cargarLibroAdmin();
     }
