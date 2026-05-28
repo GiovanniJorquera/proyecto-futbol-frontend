@@ -135,7 +135,7 @@ export class AdminComponent implements OnInit {
 
   /* ── PROFESORES ───────────────────────────────── */
   profesores: any[] = [];
-  profesorForm = { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '' };
+  profesorForm = { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '', sede: '' };
   profesorEditando: any = null;
   modalProfesorVisible = false;
   credencialesProfesor: { email: string; passwordTemporal: string } | null = null;
@@ -324,8 +324,8 @@ export class AdminComponent implements OnInit {
   abrirModalProfesor(p?: any) {
     this.profesorEditando = p || null;
     this.profesorForm = p
-      ? { nombre: p.nombre, apellido: p.apellido || '', rut: p.rut || '', especialidad: p.especialidad || '', experiencia: p.experiencia || '', divisionesTexto: (p.divisiones || []).join(', '), telefono: p.telefono || '' }
-      : { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '' };
+      ? { nombre: p.nombre, apellido: p.apellido || '', rut: p.rut || '', especialidad: p.especialidad || '', experiencia: p.experiencia || '', divisionesTexto: (p.divisiones || []).join(', '), telefono: p.telefono || '', sede: p.sede || '' }
+      : { nombre: '', apellido: '', rut: '', especialidad: '', experiencia: '', divisionesTexto: '', telefono: '', sede: '' };
     this.modalProfesorVisible = true;
   }
 
@@ -350,6 +350,7 @@ export class AdminComponent implements OnInit {
         especialidad: this.profesorForm.especialidad,
         experiencia: this.profesorForm.experiencia,
         telefono: this.profesorForm.telefono,
+        sede: this.profesorForm.sede,
         divisiones
       };
       this.http.post<any>(`${this.apiUrl}/profesores/crear-acceso`, data, this.authHeaders()).subscribe({

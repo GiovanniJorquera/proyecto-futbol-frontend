@@ -185,10 +185,13 @@ export class VistaProfesorComponent implements OnInit {
 
   guardarAsistencia() {
     if (!this.fechaSeleccionada || this.registros.length === 0) return;
+    if (!this.registros.some(r => r.marcado)) return;
     this.guardando = true;
     this.errorAsistencia = '';
 
-    const payload = this.registros.map(r => ({ jugadorId: r.jugadorId, estado: r.estado }));
+    const payload = this.registros
+      .filter(r => r.marcado)
+      .map(r => ({ jugadorId: r.jugadorId, estado: r.estado }));
 
     this.api.guardarAsistenciasLote(this.fechaSeleccionada, payload).subscribe({
       next: () => { this.guardando = false; this.asistenciaGuardada = true; this.cargarLibroProfesor(); },

@@ -1085,6 +1085,10 @@
         <label style="font-weight:600;">Experiencia</label>
         <input pInputText [(ngModel)]="profesorForm.experiencia" style="width:100%;" placeholder="Ej: 5 años" />
       </div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <label style="font-weight:600;">Sede *</label>
+        <p-select [(ngModel)]="profesorForm.sede" [options]="[{label:'Viña del Mar', value:'VIÑA'},{label:'Olmué', value:'OLMUÉ'}]" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" style="width:100%;"></p-select>
+      </div>
       <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
         <label style="font-weight:600;">Divisiones <small style="font-weight:400;">(separadas por coma, ej: Sub-12, Sub-14)</small></label>
         <input pInputText [(ngModel)]="profesorForm.divisionesTexto" style="width:100%;" placeholder="Sub-12, Sub-14" />
