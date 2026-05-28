@@ -175,6 +175,16 @@ export class ApiService {
     return this.http.post(`${this.apiUrl}/profesor/asistencias/lote`, { fecha, registros }, this.authHeaders);
   }
 
+  getLibroAdmin(mes: string, categoria?: string | null): Observable<any> {
+    let url = `${this.apiUrl}/admin/asistencias/libro?mes=${mes}`;
+    if (categoria) url += `&categoria=${encodeURIComponent(categoria)}`;
+    return this.http.get<any>(url, this.authHeaders);
+  }
+
+  getLibroProfesor(mes: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/profesor/asistencias/libro?mes=${mes}`, this.authHeaders);
+  }
+
   marcarPagoMensual(fichaId: string, estado: 'pagado' | 'pendiente'): Observable<any> {
     return this.http.put(`${this.apiUrl}/admin/pago-mensual/${fichaId}`, { estado }, this.authHeaders);
   }

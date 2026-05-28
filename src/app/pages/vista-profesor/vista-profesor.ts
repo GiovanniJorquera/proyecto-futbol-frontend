@@ -38,6 +38,13 @@ export class VistaProfesorComponent implements OnInit {
   // Asistencia
   fechaSeleccionada = '';
   registros: RegistroAsistencia[] = [];
+  modoAsistencia: 'registrar' | 'libro' = 'registrar';
+
+  // Libro del mes (profesor)
+  libroMes       = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`; })();
+  libroFechas   : string[] = [];
+  libroJugadores: any[]   = [];
+  cargandoLibro  = false;
 
   // Rendimiento (batch por fecha — conservado)
   fechaRendimiento = '';
@@ -186,6 +193,31 @@ export class VistaProfesorComponent implements OnInit {
       next: () => { this.guardando = false; this.asistenciaGuardada = true; },
       error: () => { this.guardando = false; this.errorAsistencia = 'Error al guardar. Intente nuevamente.'; }
     });
+  }
+
+  cargarLibroProfesor() {
+    this.cargandoLibro = true;
+    this.api.getLibroProfesor(this.libroMes).subscribe({
+      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
+      error: () => { this.cargandoLibro = false; }
+    });
+  }
+
+  abrirLibro() {
+    this.modoAsistencia = 'libro';
+    if (this.libroJugadores.length === 0) this.cargarLibroProfesor();
+  }
+
+  estadoLetraProf(estado: string): string {
+    if (estado === 'asistio')     return 'P';
+    if (estado === 'ausente')     return 'A';
+    if (estado === 'justificado') return 'J';
+    return '—';
+  }
+
+  formatFechaLibroProf(iso: string): string {
+    const [, m, d] = iso.split('-');
+    return `${d}/${m}`;
   }
 
   toggleTema() {

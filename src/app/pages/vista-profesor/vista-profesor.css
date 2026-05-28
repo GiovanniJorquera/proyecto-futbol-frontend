@@ -1091,4 +1091,112 @@ kbd {
   .tab-btn { font-size: .82rem; padding: .75rem .85rem; }
   .rend-resumen-bar { flex-wrap: wrap; gap: .75rem; }
   .rend-subitem label { flex: 0 0 110px; }
+  .asis-modo-bar { gap: .5rem; }
+  .btn-modo { font-size: .82rem; padding: .45rem .85rem; }
 }
+
+/* MODO TOGGLE ASISTENCIA */
+.asis-modo-bar {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.btn-modo {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .55rem 1.15rem;
+  border: 1.5px solid var(--bdr);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-sub);
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  font-family: inherit;
+}
+.btn-modo:hover { border-color: var(--accent); color: var(--accent); }
+.btn-modo-activo {
+  border-color: var(--accent);
+  background: var(--accent-a);
+  color: var(--accent);
+}
+
+/* LIBRO PROFESOR */
+.libro-prf-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.libro-prf-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid var(--bdr);
+  margin-bottom: .75rem;
+}
+
+.libro-prf-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .83rem;
+  white-space: nowrap;
+  min-width: 500px;
+}
+
+.libro-prf-tabla thead tr { background: var(--accent-a); }
+
+.lprf-th-num    { width: 2rem; padding: .5rem .35rem; text-align: center; color: var(--lbl-clr); font-weight: 600; }
+.lprf-th-nombre { padding: .5rem .75rem; text-align: left; color: var(--text-sub); font-weight: 600; min-width: 160px; }
+.lprf-th-fecha  { padding: .5rem .4rem; text-align: center; color: var(--accent); font-weight: 700; font-size: .78rem; min-width: 2.4rem; }
+.lprf-th-pct    { padding: .5rem .6rem; text-align: center; color: var(--text-sub); font-weight: 700; }
+.lprf-th-res    { padding: .5rem .75rem; text-align: center; color: var(--lbl-clr); font-weight: 600; }
+
+.libro-prf-tabla tbody tr { border-bottom: 1px solid var(--bdr); transition: background .15s; }
+.libro-prf-tabla tbody tr:hover { background: var(--accent-a); }
+
+.lprf-row-critico { background: rgba(183,28,28,.06) !important; }
+:host.dark .lprf-row-critico { background: rgba(255,107,107,.06) !important; }
+
+.lprf-td-num    { padding: .45rem .35rem; text-align: center; color: var(--lbl-clr); font-size: .78rem; }
+.lprf-td-nombre { padding: .45rem .75rem; color: var(--heading); font-weight: 600; }
+
+.lprf-td-estado {
+  padding: .45rem .4rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .9rem;
+  border-left: 1px solid var(--bdr);
+}
+.lprf-estado-p   { color: var(--ok); background: var(--ok-bg); }
+.lprf-estado-a   { color: var(--err); background: var(--err-bg); }
+.lprf-estado-j   { color: var(--warn); background: var(--warn-bg); }
+.lprf-estado-sin { color: var(--lbl-clr); }
+
+.lprf-td-pct {
+  padding: .45rem .6rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .92rem;
+  border-left: 2px solid var(--bdr);
+}
+
+.lprf-td-res {
+  padding: .45rem .75rem;
+  text-align: center;
+  display: flex;
+  gap: .4rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.lprf-p { color: var(--ok);   font-weight: 700; font-size: .8rem; }
+.lprf-j { color: var(--warn); font-weight: 700; font-size: .8rem; }
+.lprf-a { color: var(--err);  font-weight: 700; font-size: .8rem; }

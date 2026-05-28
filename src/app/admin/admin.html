@@ -17,6 +17,7 @@
     <button class="tab-btn" [class.active]="activeTab === 'partidos'"      (click)="setActiveTab('partidos')">Partidos</button>
     <button class="tab-btn" [class.active]="activeTab === 'pagos'"         (click)="setActiveTab('pagos')">Pagos Pendientes</button>
     <button class="tab-btn" [class.active]="activeTab === 'pagos-aprobados'" (click)="setActiveTab('pagos-aprobados')">Pagos Aprobados</button>
+    <button class="tab-btn" [class.active]="activeTab === 'asistencia'"    (click)="setActiveTab('asistencia')">Libro Asistencia</button>
     <button class="tab-btn" [class.active]="activeTab === 'inicio'"        (click)="setActiveTab('inicio')">Editar Inicio</button>
   </div>
 
@@ -462,6 +463,105 @@
         </ng-template>
 
       </p-table>
+    </p-card>
+  </div>
+
+  <!-- LIBRO DE ASISTENCIA -->
+  <div [hidden]="activeTab !== 'asistencia'" class="tab-content">
+    <p-card>
+      <div class="sec-header">
+        <h3><i class="pi pi-book" style="color:var(--p-primary-color)"></i> Libro de Asistencia Mensual</h3>
+      </div>
+
+      <!-- Controles -->
+      <div class="filter-bar" style="margin-bottom:1.25rem">
+        <div class="filter-field narrow">
+          <label>Mes</label>
+          <input type="month" [(ngModel)]="libroMes" (change)="cargarLibroAdmin()" class="libro-mes-input" />
+        </div>
+        <div class="filter-field medium">
+          <label>Categoría</label>
+          <p-select
+            [options]="categoriaJugadorOpciones"
+            [(ngModel)]="libroCat"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todas las categorías"
+            appendTo="body"
+            (onChange)="cargarLibroAdmin()">
+          </p-select>
+        </div>
+      </div>
+
+      <!-- Cargando -->
+      <div *ngIf="cargandoLibro" style="text-align:center;padding:2rem;color:#888">
+        <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+        <p>Cargando libro...</p>
+      </div>
+
+      <!-- Sin datos -->
+      <div *ngIf="!cargandoLibro && tabLibroLoaded && libroJugadores.length === 0" style="text-align:center;padding:2rem;color:#888">
+        <i class="pi pi-calendar-times" style="font-size:2rem"></i>
+        <p>No hay asistencias registradas para este período.</p>
+      </div>
+
+      <!-- Tabla libro -->
+      <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-scroll-wrap">
+        <table class="libro-tabla">
+          <thead>
+            <tr>
+              <th class="libro-th-num">#</th>
+              <th class="libro-th-nombre">Jugador</th>
+              <th class="libro-th-cat">Cat.</th>
+              <th *ngFor="let f of libroFechas" class="libro-th-fecha">{{ formatFechaLibro(f) }}</th>
+              <th class="libro-th-pct">%</th>
+              <th class="libro-th-resumen">Asistencias</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let j of libroJugadores; let i = index"
+                [class.libro-row-critico]="j.porcentaje !== null && j.porcentaje < 70">
+              <td class="libro-td-num">{{ i + 1 }}</td>
+              <td class="libro-td-nombre">{{ j.apellidoPaterno }} {{ j.apellidoMaterno }}, {{ j.nombre }}</td>
+              <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
+              <td *ngFor="let f of libroFechas"
+                  class="libro-td-estado"
+                  [class.libro-estado-asistio]="j.registros[f] === 'asistio'"
+                  [class.libro-estado-ausente]="j.registros[f] === 'ausente'"
+                  [class.libro-estado-justificado]="j.registros[f] === 'justificado'"
+                  [class.libro-estado-sin]="!j.registros[f]">
+                {{ estadoLetra(j.registros[f]) }}
+              </td>
+              <td class="libro-td-pct"
+                  [class.pct-ok]="j.porcentaje !== null && j.porcentaje >= 85"
+                  [class.pct-warn]="j.porcentaje !== null && j.porcentaje >= 70 && j.porcentaje < 85"
+                  [class.pct-err]="j.porcentaje !== null && j.porcentaje < 70">
+                {{ j.porcentaje !== null ? j.porcentaje + '%' : '—' }}
+              </td>
+              <td class="libro-td-resumen">
+                <span class="libro-p">{{ j.asistio }}P</span>
+                <span class="libro-j">{{ j.justificado }}J</span>
+                <span class="libro-a">{{ j.ausente }}A</span>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="libro-tfoot">
+              <td colspan="3" class="libro-tf-label">Presentes ese día</td>
+              <td *ngFor="let f of libroFechas" class="libro-tf-total">{{ contarPresentes(f) }}</td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Leyenda -->
+      <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-leyenda">
+        <span class="lib-ley lib-ley-p">P = Presente</span>
+        <span class="lib-ley lib-ley-j">J = Justificado (cuenta como presente)</span>
+        <span class="lib-ley lib-ley-a">A = Ausente</span>
+        <span class="lib-ley lib-ley-critico">Rojo = menos del 70%</span>
+      </div>
     </p-card>
   </div>
 

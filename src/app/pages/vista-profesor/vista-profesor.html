@@ -122,6 +122,18 @@
     <div class="tab-content" *ngIf="tabActiva === 'asistencia'">
       <div class="section-inner">
 
+        <!-- Toggle modo -->
+        <div class="asis-modo-bar">
+          <button class="btn-modo" [class.btn-modo-activo]="modoAsistencia === 'registrar'" (click)="modoAsistencia = 'registrar'">
+            <i class="pi pi-pencil"></i> Registrar asistencia
+          </button>
+          <button class="btn-modo" [class.btn-modo-activo]="modoAsistencia === 'libro'" (click)="abrirLibro()">
+            <i class="pi pi-book"></i> Libro del mes
+          </button>
+        </div>
+
+        <!-- MODO: REGISTRAR -->
+        <div *ngIf="modoAsistencia === 'registrar'">
         <div class="asistencia-header">
           <h3 class="asistencia-titulo"><i class="pi pi-calendar"></i> Día de entrenamiento</h3>
           <p class="semana-label">{{ semanaLabel }}</p>
@@ -219,6 +231,72 @@
           <i class="pi pi-users"></i>
           <p>No hay jugadores registrados en tus sub-divisiones.</p>
         </div>
+
+        </div><!-- /modo registrar -->
+
+        <!-- MODO: LIBRO DEL MES -->
+        <div *ngIf="modoAsistencia === 'libro'">
+          <div class="libro-prf-header">
+            <h3 class="asistencia-titulo"><i class="pi pi-book"></i> Libro de Asistencia</h3>
+            <input type="month" [(ngModel)]="libroMes" (change)="cargarLibroProfesor()" class="fecha-input" />
+          </div>
+
+          <div class="empty-msg" *ngIf="cargandoLibro">
+            <i class="pi pi-spin pi-spinner"></i>
+          </div>
+
+          <div class="empty-msg" *ngIf="!cargandoLibro && libroJugadores.length === 0">
+            <i class="pi pi-calendar-times"></i>
+            <p>Sin asistencias registradas este mes.</p>
+          </div>
+
+          <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-prf-scroll">
+            <table class="libro-prf-tabla">
+              <thead>
+                <tr>
+                  <th class="lprf-th-num">#</th>
+                  <th class="lprf-th-nombre">Jugador</th>
+                  <th *ngFor="let f of libroFechas" class="lprf-th-fecha">{{ formatFechaLibroProf(f) }}</th>
+                  <th class="lprf-th-pct">%</th>
+                  <th class="lprf-th-res">Resumen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let j of libroJugadores; let i = index"
+                    [class.lprf-row-critico]="j.porcentaje !== null && j.porcentaje < 70">
+                  <td class="lprf-td-num">{{ i + 1 }}</td>
+                  <td class="lprf-td-nombre">{{ j.apellidoPaterno }} {{ j.apellidoMaterno }}, {{ j.nombre }}</td>
+                  <td *ngFor="let f of libroFechas"
+                      class="lprf-td-estado"
+                      [class.lprf-estado-p]="j.registros[f] === 'asistio'"
+                      [class.lprf-estado-a]="j.registros[f] === 'ausente'"
+                      [class.lprf-estado-j]="j.registros[f] === 'justificado'"
+                      [class.lprf-estado-sin]="!j.registros[f]">
+                    {{ estadoLetraProf(j.registros[f]) }}
+                  </td>
+                  <td class="lprf-td-pct"
+                      [class.pct-ok]="j.porcentaje !== null && j.porcentaje >= 85"
+                      [class.pct-warn]="j.porcentaje !== null && j.porcentaje >= 70 && j.porcentaje < 85"
+                      [class.pct-err]="j.porcentaje !== null && j.porcentaje < 70">
+                    {{ j.porcentaje !== null ? j.porcentaje + '%' : '—' }}
+                  </td>
+                  <td class="lprf-td-res">
+                    <span class="lprf-p">{{ j.asistio }}P</span>
+                    <span class="lprf-j">{{ j.justificado }}J</span>
+                    <span class="lprf-a">{{ j.ausente }}A</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="asis-leyenda" style="margin-top:.75rem">
+            <span class="ley-item ley-p"><kbd>P</kbd> Presente</span>
+            <span class="ley-item ley-a"><kbd>A</kbd> Ausente</span>
+            <span class="ley-item ley-j"><kbd>J</kbd> Justificado</span>
+            <span class="ley-hint"><i class="pi pi-info-circle"></i> J y P cuentan para el % de asistencia</span>
+          </div>
+        </div><!-- /modo libro -->
 
       </div>
     </div>

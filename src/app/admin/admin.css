@@ -516,3 +516,133 @@
   :host ::ng-deep .p-dialog { border-radius: 14px 14px 0 0 !important; }
   :host ::ng-deep .p-dialog.p-dialog-maximized { border-radius: 0 !important; }
 }
+
+/* ── LIBRO DE ASISTENCIA ─────────────────────────── */
+.libro-mes-input {
+  padding: .48rem .75rem;
+  border: 1px solid rgba(57,211,83,.25);
+  border-radius: 8px;
+  background: rgba(14,20,14,.9);
+  color: #f4f7f3;
+  font-size: .9rem;
+  font-family: inherit;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+.libro-mes-input:focus { border-color: #39d353; }
+
+.libro-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+  border: 1px solid rgba(57,211,83,.18);
+  margin-bottom: 1rem;
+}
+
+.libro-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  white-space: nowrap;
+  min-width: 600px;
+}
+
+.libro-tabla thead tr {
+  background: rgba(57,211,83,.1);
+}
+
+.libro-th-num    { width: 2.2rem; padding: .55rem .4rem; text-align: center; color: rgba(244,247,243,.5); font-weight: 600; }
+.libro-th-nombre { padding: .55rem .75rem; text-align: left; color: rgba(244,247,243,.7); font-weight: 600; min-width: 180px; }
+.libro-th-cat    { padding: .55rem .5rem; text-align: center; color: rgba(244,247,243,.7); font-weight: 600; }
+.libro-th-fecha  { padding: .55rem .4rem; text-align: center; color: #39d353; font-weight: 700; font-size: .78rem; min-width: 2.6rem; }
+.libro-th-pct    { padding: .55rem .6rem; text-align: center; color: rgba(244,247,243,.7); font-weight: 700; }
+.libro-th-resumen{ padding: .55rem .75rem; text-align: center; color: rgba(244,247,243,.5); font-weight: 600; }
+
+.libro-tabla tbody tr {
+  border-bottom: 1px solid rgba(57,211,83,.08);
+  transition: background .15s;
+}
+.libro-tabla tbody tr:hover { background: rgba(57,211,83,.05); }
+
+.libro-row-critico { background: rgba(255,80,80,.06) !important; }
+.libro-row-critico:hover { background: rgba(255,80,80,.1) !important; }
+
+.libro-td-num     { padding: .5rem .4rem; text-align: center; color: rgba(244,247,243,.4); font-size: .78rem; }
+.libro-td-nombre  { padding: .5rem .75rem; color: #f4f7f3; font-weight: 600; }
+.libro-td-cat     { padding: .5rem .5rem; text-align: center; }
+
+.libro-cat-badge {
+  background: rgba(57,211,83,.15);
+  border: 1px solid rgba(57,211,83,.25);
+  border-radius: 999px;
+  padding: .1rem .5rem;
+  font-size: .72rem;
+  font-weight: 700;
+  color: #39d353;
+}
+
+.libro-td-estado {
+  padding: .5rem .4rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .88rem;
+  border-left: 1px solid rgba(57,211,83,.06);
+}
+.libro-estado-asistio    { color: #39d353; background: rgba(57,211,83,.08); }
+.libro-estado-ausente    { color: #ff6b6b; background: rgba(255,107,107,.08); }
+.libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
+.libro-estado-sin        { color: rgba(244,247,243,.2); }
+
+.libro-td-pct {
+  padding: .5rem .6rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .92rem;
+  border-left: 2px solid rgba(57,211,83,.15);
+}
+.pct-ok   { color: #39d353; }
+.pct-warn { color: #fbbf24; }
+.pct-err  { color: #ff6b6b; }
+
+.libro-td-resumen {
+  padding: .5rem .75rem;
+  text-align: center;
+  display: flex;
+  gap: .4rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.libro-p  { color: #39d353; font-weight: 700; font-size: .8rem; }
+.libro-j  { color: #fbbf24; font-weight: 700; font-size: .8rem; }
+.libro-a  { color: #ff6b6b; font-weight: 700; font-size: .8rem; }
+
+.libro-tfoot td {
+  padding: .45rem .4rem;
+  background: rgba(57,211,83,.05);
+  border-top: 2px solid rgba(57,211,83,.2);
+  font-weight: 700;
+  text-align: center;
+  font-size: .78rem;
+  color: rgba(244,247,243,.6);
+}
+.libro-tf-label { text-align: left; padding-left: .75rem; }
+.libro-tf-total { color: #39d353; }
+
+.libro-leyenda {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: .6rem .75rem;
+  background: rgba(57,211,83,.04);
+  border: 1px solid rgba(57,211,83,.12);
+  border-radius: 8px;
+  font-size: .78rem;
+}
+
+.lib-ley         { font-weight: 600; }
+.lib-ley-p       { color: #39d353; }
+.lib-ley-j       { color: #fbbf24; }
+.lib-ley-a       { color: #ff6b6b; }
+.lib-ley-critico { color: rgba(244,247,243,.5); }

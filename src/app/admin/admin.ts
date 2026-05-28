@@ -193,6 +193,14 @@ export class AdminComponent implements OnInit {
     { label: 'Entrenamiento', value: 'Entrenamiento' },
   ];
 
+  /* ── LIBRO DE ASISTENCIA ─────────────────────────── */
+  libroMes      = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`; })();
+  libroCat      : string | null = null;
+  libroFechas   : string[] = [];
+  libroJugadores: any[]   = [];
+  cargandoLibro  = false;
+  tabLibroLoaded = false;
+
   /* ── CONFIRMACIÓN PERSONALIZADA ──────────────────── */
   confirmarVisible = false;
   confirmarHeader  = '';
@@ -800,6 +808,10 @@ export class AdminComponent implements OnInit {
       if (tab === 'jugadores') this.tabJugadoresLoaded = true;
       if (this.fichas.length === 0 && !this.cargandoFichas) this.cargarFichas();
     }
+    if (tab === 'asistencia' && !this.tabLibroLoaded) {
+      this.tabLibroLoaded = true;
+      this.cargarLibroAdmin();
+    }
     this.modalSolicitudVisible = false;
     this.modalProfesorVisible = false;
     this.modalCredencialesProfesorVisible = false;
@@ -917,6 +929,34 @@ export class AdminComponent implements OnInit {
   get categoriaJugadorOpciones() {
     const cats = ['Sub-6','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Libre'];
     return [{ label: 'Todas', value: null }, ...cats.map(c => ({ label: c, value: c }))];
+  }
+
+  /* Libro de asistencia */
+  cargarLibroAdmin() {
+    this.cargandoLibro = true;
+    let url = `${this.apiUrl}/admin/asistencias/libro?mes=${this.libroMes}`;
+    if (this.libroCat) url += `&categoria=${encodeURIComponent(this.libroCat)}`;
+    this.http.get<any>(url, this.authHeaders()).subscribe({
+      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
+      error: () => { this.cargandoLibro = false; }
+    });
+  }
+
+  formatFechaLibro(iso: string): string {
+    const [, m, d] = iso.split('-');
+    return `${d}/${m}`;
+  }
+
+  estadoLetra(estado: string): string {
+    if (estado === 'asistio')     return 'P';
+    if (estado === 'ausente')     return 'A';
+    if (estado === 'justificado') return 'J';
+    return '—';
+  }
+
+  contarPresentes(fecha: string): string {
+    const p = this.libroJugadores.filter(j => j.registros[fecha] === 'asistio').length;
+    return `${p}/${this.libroJugadores.length}`;
   }
 
   /* Profesores */
