@@ -245,12 +245,24 @@
             <i class="pi pi-spin pi-spinner"></i>
           </div>
 
-          <div class="empty-msg" *ngIf="!cargandoLibro && libroJugadores.length === 0">
-            <i class="pi pi-calendar-times"></i>
-            <p>Sin asistencias registradas este mes.</p>
+          <!-- Error -->
+          <div class="alerta-error" *ngIf="libroError">
+            <i class="pi pi-exclamation-triangle"></i> {{ libroError }}
           </div>
 
-          <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-prf-scroll">
+          <!-- Sin jugadores -->
+          <div class="empty-msg" *ngIf="!cargandoLibro && !libroError && libroJugadores.length === 0">
+            <i class="pi pi-inbox"></i>
+            <p>No hay jugadores en tus divisiones.</p>
+          </div>
+
+          <!-- Jugadores pero sin asistencias este mes -->
+          <div class="empty-msg" *ngIf="!cargandoLibro && !libroError && libroJugadores.length > 0 && libroFechas.length === 0">
+            <i class="pi pi-calendar-times"></i>
+            <p>Sin asistencias registradas este mes. Prueba otro mes.</p>
+          </div>
+
+          <div *ngIf="!cargandoLibro && !libroError && libroJugadores.length > 0 && libroFechas.length > 0" class="libro-prf-scroll">
             <table class="libro-prf-tabla">
               <thead>
                 <tr>
@@ -265,7 +277,7 @@
                 <tr *ngFor="let j of libroJugadores; let i = index"
                     [class.lprf-row-critico]="j.porcentaje !== null && j.porcentaje < 70">
                   <td class="lprf-td-num">{{ i + 1 }}</td>
-                  <td class="lprf-td-nombre">{{ j.apellidoPaterno }} {{ j.apellidoMaterno }}, {{ j.nombre }}</td>
+                  <td class="lprf-td-nombre">{{ nombreLibroProf(j) }}</td>
                   <td *ngFor="let f of libroFechas"
                       class="lprf-td-estado"
                       [class.lprf-estado-p]="j.registros[f] === 'asistio'"
@@ -290,7 +302,7 @@
             </table>
           </div>
 
-          <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="asis-leyenda" style="margin-top:.75rem">
+          <div *ngIf="!cargandoLibro && libroJugadores.length > 0 && libroFechas.length > 0" class="asis-leyenda" style="margin-top:.75rem">
             <span class="ley-item ley-p"><kbd>P</kbd> Presente</span>
             <span class="ley-item ley-a"><kbd>A</kbd> Ausente</span>
             <span class="ley-item ley-j"><kbd>J</kbd> Justificado</span>

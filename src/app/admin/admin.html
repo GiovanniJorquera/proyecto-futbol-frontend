@@ -499,14 +499,26 @@
         <p>Cargando libro...</p>
       </div>
 
-      <!-- Sin datos -->
-      <div *ngIf="!cargandoLibro && tabLibroLoaded && libroJugadores.length === 0" style="text-align:center;padding:2rem;color:#888">
+      <!-- Error -->
+      <div *ngIf="libroError" style="padding:.75rem 1rem;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.3);border-radius:8px;color:#ff6b6b;margin-bottom:1rem">
+        <i class="pi pi-exclamation-triangle"></i> {{ libroError }}
+      </div>
+
+      <!-- Sin jugadores -->
+      <div *ngIf="!cargandoLibro && !libroError && tabLibroLoaded && libroJugadores.length === 0" style="text-align:center;padding:2rem;color:#888">
+        <i class="pi pi-inbox" style="font-size:2rem"></i>
+        <p>No hay jugadores registrados{{ libroCat ? ' en ' + libroCat : '' }}.</p>
+      </div>
+
+      <!-- Jugadores pero sin fechas en este mes -->
+      <div *ngIf="!cargandoLibro && !libroError && libroJugadores.length > 0 && libroFechas.length === 0" style="text-align:center;padding:2rem;color:#888">
         <i class="pi pi-calendar-times" style="font-size:2rem"></i>
-        <p>No hay asistencias registradas para este período.</p>
+        <p>No hay asistencias registradas para este mes.</p>
+        <p style="font-size:.85rem;margin-top:.5rem">Prueba seleccionando otro mes en el selector de arriba.</p>
       </div>
 
       <!-- Tabla libro -->
-      <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-scroll-wrap">
+      <div *ngIf="!cargandoLibro && libroJugadores.length > 0 && libroFechas.length > 0" class="libro-scroll-wrap">
         <table class="libro-tabla">
           <thead>
             <tr>
@@ -522,7 +534,7 @@
             <tr *ngFor="let j of libroJugadores; let i = index"
                 [class.libro-row-critico]="j.porcentaje !== null && j.porcentaje < 70">
               <td class="libro-td-num">{{ i + 1 }}</td>
-              <td class="libro-td-nombre">{{ j.apellidoPaterno }} {{ j.apellidoMaterno }}, {{ j.nombre }}</td>
+              <td class="libro-td-nombre">{{ nombreLibro(j) }}</td>
               <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
               <td *ngFor="let f of libroFechas"
                   class="libro-td-estado"
@@ -556,7 +568,7 @@
       </div>
 
       <!-- Leyenda -->
-      <div *ngIf="!cargandoLibro && libroJugadores.length > 0" class="libro-leyenda">
+      <div *ngIf="!cargandoLibro && libroJugadores.length > 0 && libroFechas.length > 0" class="libro-leyenda">
         <span class="lib-ley lib-ley-p">P = Presente</span>
         <span class="lib-ley lib-ley-j">J = Justificado (cuenta como presente)</span>
         <span class="lib-ley lib-ley-a">A = Ausente</span>

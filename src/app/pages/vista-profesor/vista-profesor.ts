@@ -45,6 +45,7 @@ export class VistaProfesorComponent implements OnInit {
   libroFechas   : string[] = [];
   libroJugadores: any[]   = [];
   cargandoLibro  = false;
+  libroError     = '';
 
   // Rendimiento (batch por fecha — conservado)
   fechaRendimiento = '';
@@ -197,9 +198,10 @@ export class VistaProfesorComponent implements OnInit {
 
   cargarLibroProfesor() {
     this.cargandoLibro = true;
+    this.libroError = '';
     this.api.getLibroProfesor(this.libroMes).subscribe({
       next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
-      error: () => { this.cargandoLibro = false; }
+      error: (err: any) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro.'; }
     });
   }
 
@@ -218,6 +220,11 @@ export class VistaProfesorComponent implements OnInit {
   formatFechaLibroProf(iso: string): string {
     const [, m, d] = iso.split('-');
     return `${d}/${m}`;
+  }
+
+  nombreLibroProf(j: any): string {
+    const ap = j.apellido || `${j.apellidoPaterno} ${j.apellidoMaterno}`.trim();
+    return ap ? `${ap}, ${j.nombre}` : j.nombre;
   }
 
   toggleTema() {

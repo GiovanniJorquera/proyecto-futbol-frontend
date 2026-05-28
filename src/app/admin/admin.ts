@@ -200,6 +200,7 @@ export class AdminComponent implements OnInit {
   libroJugadores: any[]   = [];
   cargandoLibro  = false;
   tabLibroLoaded = false;
+  libroError     = '';
 
   /* ── CONFIRMACIÓN PERSONALIZADA ──────────────────── */
   confirmarVisible = false;
@@ -934,11 +935,12 @@ export class AdminComponent implements OnInit {
   /* Libro de asistencia */
   cargarLibroAdmin() {
     this.cargandoLibro = true;
+    this.libroError = '';
     let url = `${this.apiUrl}/admin/asistencias/libro?mes=${this.libroMes}`;
     if (this.libroCat) url += `&categoria=${encodeURIComponent(this.libroCat)}`;
     this.http.get<any>(url, this.authHeaders()).subscribe({
       next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
-      error: () => { this.cargandoLibro = false; }
+      error: (err) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro de asistencia.'; }
     });
   }
 
@@ -957,6 +959,11 @@ export class AdminComponent implements OnInit {
   contarPresentes(fecha: string): string {
     const p = this.libroJugadores.filter(j => j.registros[fecha] === 'asistio').length;
     return `${p}/${this.libroJugadores.length}`;
+  }
+
+  nombreLibro(j: any): string {
+    const ap = j.apellido || `${j.apellidoPaterno} ${j.apellidoMaterno}`.trim();
+    return ap ? `${ap}, ${j.nombre}` : j.nombre;
   }
 
   /* Profesores */
