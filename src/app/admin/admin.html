@@ -18,6 +18,7 @@
     <button class="tab-btn" [class.active]="activeTab === 'pagos'"         (click)="setActiveTab('pagos')">Pagos Pendientes</button>
     <button class="tab-btn" [class.active]="activeTab === 'pagos-aprobados'" (click)="setActiveTab('pagos-aprobados')">Pagos Aprobados</button>
     <button class="tab-btn" [class.active]="activeTab === 'asistencia'"    (click)="setActiveTab('asistencia')">Libro Asistencia</button>
+    <button class="tab-btn" [class.active]="activeTab === 'arqueros'"      (click)="setActiveTab('arqueros')">Arqueros</button>
     <button class="tab-btn" [class.active]="activeTab === 'inicio'"        (click)="setActiveTab('inicio')">Editar Inicio</button>
   </div>
 
@@ -268,7 +269,7 @@
             <td>{{ division.nombre }}</td>
             <td>{{ division.categoria || '—' }}</td>
             <td>{{ division.profesorPrincipal || '—' }}</td>
-            <td>{{ division.estudiantes || 0 }}</td>
+            <td>{{ contarJugadoresDivision(division) }}</td>
             <td>
               <div style="display:flex; gap:0.5rem;">
                 <p-button icon="pi pi-pencil" size="small" severity="secondary" (onClick)="abrirModalDivision(division)" pTooltip="Editar"></p-button>
@@ -505,6 +506,18 @@
             (onChange)="cargarLibroAdmin()">
           </p-select>
         </div>
+        <div class="filter-field medium">
+          <label>Sede</label>
+          <p-select
+            [options]="sedeJugadorOpciones"
+            [(ngModel)]="libroSede"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Todas las sedes"
+            appendTo="body"
+            (onChange)="cargarLibroAdmin()">
+          </p-select>
+        </div>
       </div>
 
       <!-- Cargando -->
@@ -551,11 +564,13 @@
               <td class="libro-td-nombre">{{ nombreLibro(j) }}</td>
               <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
               <td *ngFor="let f of libroFechas"
-                  class="libro-td-estado"
+                  class="libro-td-estado libro-td-editable"
                   [class.libro-estado-asistio]="j.registros[f] === 'asistio'"
                   [class.libro-estado-ausente]="j.registros[f] === 'ausente'"
                   [class.libro-estado-justificado]="j.registros[f] === 'justificado'"
-                  [class.libro-estado-sin]="!j.registros[f]">
+                  [class.libro-estado-sin]="!j.registros[f]"
+                  (click)="editarCeldaLibro(j, f)"
+                  title="Clic para cambiar estado (P → A → J → P)">
                 {{ estadoLetra(j.registros[f]) }}
               </td>
               <td class="libro-td-pct"
@@ -990,6 +1005,61 @@
   </ng-container>
 </div>
 
+<!-- CONTENIDO ARQUEROS -->
+<div [hidden]="activeTab !== 'arqueros'" class="tab-content">
+  <p-card>
+    <div class="sec-header">
+      <h3><i class="pi pi-shield" style="color:var(--p-primary-color)"></i> Panel de Arqueros</h3>
+    </div>
+    <p style="color:rgba(233,247,234,0.55); font-size:0.88rem; margin:0 0 1rem;">
+      Jugadores con posición <strong>Arquero</strong> — reciben clases especiales.
+    </p>
+
+    <div *ngIf="cargandoFichas" style="text-align:center;padding:2rem;">
+      <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+      <p>Cargando arqueros...</p>
+    </div>
+
+    <div *ngIf="!cargandoFichas && arqueros.length === 0" style="text-align:center;padding:2rem;opacity:0.5;">
+      <i class="pi pi-shield" style="font-size:2rem"></i>
+      <p>No hay jugadores con posición Arquero registrados.</p>
+    </div>
+
+    <div *ngIf="!cargandoFichas && arqueros.length > 0">
+      <div style="margin-bottom:1rem; padding:0.6rem 1rem; background:rgba(57,211,83,0.06); border:1px solid rgba(57,211,83,0.15); border-radius:8px; font-size:0.9rem;">
+        <strong>{{ arqueros.length }}</strong> arquero{{ arqueros.length === 1 ? '' : 's' }} registrado{{ arqueros.length === 1 ? '' : 's' }}
+      </div>
+      <p-table [value]="arqueros" [paginator]="true" [rows]="15" sortField="nombre" [sortOrder]="1">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="nombre">Nombre <p-sortIcon field="nombre"/></th>
+            <th pSortableColumn="categoria">Sub-División <p-sortIcon field="categoria"/></th>
+            <th pSortableColumn="sede">Sede <p-sortIcon field="sede"/></th>
+            <th>Edad</th>
+            <th>Pie hábil</th>
+            <th>Talla</th>
+            <th>Apoderado</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-f>
+          <tr>
+            <td><strong>{{ f.nombre }} {{ f.apellidoPaterno || '' }} {{ f.apellidoMaterno || '' }}</strong></td>
+            <td><p-tag [value]="f.categoria || '—'" severity="info"></p-tag></td>
+            <td>{{ f.sede || '—' }}</td>
+            <td>{{ f.fechaNacimiento ? calcularEdad(f.fechaNacimiento) + ' años' : '—' }}</td>
+            <td>{{ f.pieHabil || '—' }}</td>
+            <td>{{ f.talla || '—' }}</td>
+            <td>{{ f.apoderado?.nombre || '—' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="7" style="text-align:center;padding:2rem;">Sin arqueros.</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
 <!-- FIN DEL CONTENIDO -->
 </div>
 
@@ -1089,9 +1159,25 @@
         <label style="font-weight:600;">Sede *</label>
         <p-select [(ngModel)]="profesorForm.sede" [options]="[{label:'Viña del Mar', value:'VIÑA'},{label:'Olmué', value:'OLMUÉ'}]" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" style="width:100%;"></p-select>
       </div>
-      <div style="display:flex; flex-direction:column; gap:0.25rem; grid-column:1/-1;">
-        <label style="font-weight:600;">Divisiones <small style="font-weight:400;">(separadas por coma, ej: Sub-12, Sub-14)</small></label>
-        <input pInputText [(ngModel)]="profesorForm.divisionesTexto" style="width:100%;" placeholder="Sub-12, Sub-14" />
+      <div style="display:flex; flex-direction:column; gap:0.5rem; grid-column:1/-1;">
+        <label style="font-weight:600;">Sub-Divisiones <small style="font-weight:400;">(haz clic para agregar/quitar)</small></label>
+        <!-- Chips seleccionables con las divisiones disponibles -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem; padding:0.5rem; border:1px solid rgba(57,211,83,0.22); border-radius:8px; min-height:2.5rem; background:rgba(57,211,83,0.03);">
+          <span *ngFor="let d of divisionesDisponibles"
+            (click)="toggleDivisionProfesor(d)"
+            [style.background]="isDivisionSeleccionada(d) ? 'rgba(57,211,83,0.25)' : 'rgba(57,211,83,0.06)'"
+            [style.border]="isDivisionSeleccionada(d) ? '1px solid rgba(57,211,83,0.6)' : '1px solid rgba(57,211,83,0.15)'"
+            style="padding:0.3rem 0.75rem; border-radius:999px; cursor:pointer; font-size:0.83rem; user-select:none; transition:all .15s;">
+            <i class="pi pi-check" *ngIf="isDivisionSeleccionada(d)" style="font-size:0.7rem; margin-right:0.3rem;"></i>
+            {{ d }}
+          </span>
+          <span *ngIf="divisionesDisponibles.length === 0" style="opacity:0.4; font-size:0.82rem; padding:0.3rem;">
+            No hay divisiones creadas aún. Crea divisiones en la pestaña Divisiones.
+          </span>
+        </div>
+        <!-- Input manual como fallback -->
+        <input pInputText [(ngModel)]="profesorForm.divisionesTexto" style="width:100%; font-size:0.82rem;" placeholder="O escribe manualmente: Sub-12, Sub-14" />
+        <small style="opacity:0.5;">Las selecciones de arriba actualizan este campo automáticamente.</small>
       </div>
     </div>
     <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.5rem;">
@@ -1503,11 +1589,11 @@
 
 <!-- MODAL RENDIMIENTO JUGADOR -->
 <p-dialog
-  header="Rendimiento — {{ fichaSeleccionada?.nombre }}"
+  header="Rendimiento — {{ fichaSeleccionada?.nombre }} {{ fichaSeleccionada?.apellidoPaterno || '' }}"
   [(visible)]="modalRendimientoVisible"
   [modal]="true"
   appendTo="body"
-  [style]="{ width: 'min(95vw, 580px)' }"
+  [style]="{ width: 'min(95vw, 720px)' }"
   [draggable]="false"
   [resizable]="false">
   <div *ngIf="modalRendimientoVisible" style="display:flex; flex-direction:column; gap:1.25rem;">
@@ -1515,20 +1601,53 @@
     <ng-container *ngIf="!cargandoRendimiento">
       <div *ngIf="!rendimientoJugador.length" style="text-align:center; opacity:0.5; padding:1.5rem 0;">Sin sesiones registradas aún.</div>
       <ng-container *ngIf="rendimientoJugador.length">
-        <div *ngIf="promedioRendimiento" style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; padding:1rem; background:rgba(57,211,83,0.06); border:1px solid rgba(57,211,83,0.15); border-radius:10px;">
-          <div style="font-size:0.85rem;"><strong style="color:#39d353;">Físico:</strong> {{ promedioRendimiento.fisico }} / 5</div>
-          <div style="font-size:0.85rem;"><strong style="color:#39d353;">Técnico:</strong> {{ promedioRendimiento.tecnico }} / 5</div>
-          <div style="font-size:0.85rem;"><strong style="color:#39d353;">Psicológico:</strong> {{ promedioRendimiento.psicologico }} / 5</div>
-          <div style="font-size:0.85rem;"><strong style="color:#39d353;">Estratégico:</strong> {{ promedioRendimiento.estrategico }} / 5</div>
-          <div style="grid-column:1/-1; font-size:0.8rem; opacity:0.55;">{{ rendimientoJugador.length }} sesiones registradas</div>
+
+        <!-- Promedios -->
+        <div *ngIf="promedioRendimiento" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; padding:1rem; background:rgba(57,211,83,0.06); border:1px solid rgba(57,211,83,0.15); border-radius:10px;">
+          <div style="font-size:0.85rem;"><strong style="color:#3b82f6;">Físico:</strong> {{ promedioRendimiento.fisico }}%</div>
+          <div style="font-size:0.85rem;"><strong style="color:#f59e0b;">Técnico:</strong> {{ promedioRendimiento.tecnico }}%</div>
+          <div style="font-size:0.85rem;"><strong style="color:#8b5cf6;">Actitudinal:</strong> {{ promedioRendimiento.actitudinal }}%</div>
+          <div style="font-size:0.85rem;"><strong style="color:#10b981;">Estratégico:</strong> {{ promedioRendimiento.estrategico }}%</div>
+          <div style="font-size:0.85rem;"><strong style="color:#39d353;">General:</strong> {{ promedioRendimiento.general }}%</div>
+          <div style="font-size:0.8rem; opacity:0.55;">{{ rendimientoJugador.length }} sesiones</div>
         </div>
-        <div style="max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem;">
-          <div *ngFor="let r of rendimientoJugador" style="display:grid; grid-template-columns:auto 1fr 1fr 1fr 1fr; gap:0.5rem; align-items:center; padding:0.5rem 0.75rem; background:rgba(255,255,255,0.03); border-radius:6px; font-size:0.84rem;">
-            <span style="opacity:0.55;">{{ r.fecha | date:'dd/MM/yy' }}</span>
-            <span>F: <strong>{{ r.fisico }}</strong></span>
-            <span>T: <strong>{{ r.tecnico }}</strong></span>
-            <span>P: <strong>{{ r.psicologico }}</strong></span>
-            <span>E: <strong>{{ r.estrategico }}</strong></span>
+
+        <!-- Controles de zoom -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+          <span style="font-size:0.82rem; opacity:0.6;">Zoom:</span>
+          <button *ngFor="let a of rendAniosDisponibles"
+            (click)="setRendZoomAnio(rendZoomAnio === a ? null : a)"
+            [style.background]="rendZoomAnio === a ? 'rgba(57,211,83,0.25)' : 'rgba(57,211,83,0.07)'"
+            [style.border]="rendZoomAnio === a ? '1px solid rgba(57,211,83,0.5)' : '1px solid rgba(57,211,83,0.2)'"
+            style="padding:0.2rem 0.6rem; border-radius:999px; cursor:pointer; font-size:0.8rem; color:rgba(233,247,234,0.85);">
+            {{ a }}
+          </button>
+          <ng-container *ngIf="rendZoomAnio !== null">
+            <span style="opacity:0.4;">›</span>
+            <button *ngFor="let m of rendMesesDisponibles"
+              (click)="setRendZoomMes(rendZoomMes === m.value ? null : m.value)"
+              [style.background]="rendZoomMes === m.value ? 'rgba(57,211,83,0.25)' : 'rgba(57,211,83,0.07)'"
+              [style.border]="rendZoomMes === m.value ? '1px solid rgba(57,211,83,0.5)' : '1px solid rgba(57,211,83,0.2)'"
+              style="padding:0.2rem 0.6rem; border-radius:999px; cursor:pointer; font-size:0.8rem; color:rgba(233,247,234,0.85);">
+              {{ m.label }}
+            </button>
+          </ng-container>
+        </div>
+
+        <!-- Gráfico de líneas -->
+        <div *ngIf="rendChartData" style="background:rgba(0,0,0,0.15); border-radius:10px; padding:1rem;">
+          <p-chart type="line" [data]="rendChartData" [options]="rendChartOptions" height="250"></p-chart>
+        </div>
+
+        <!-- Historial tabla -->
+        <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:0.4rem;">
+          <div *ngFor="let r of rendimientoJugadorFiltrado" style="display:grid; grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr; gap:0.5rem; align-items:center; padding:0.4rem 0.75rem; background:rgba(255,255,255,0.03); border-radius:6px; font-size:0.82rem;">
+            <span style="opacity:0.55; min-width:60px;">{{ r.fecha | date:'dd/MM/yy' }}</span>
+            <span style="color:#3b82f6;">F: <strong>{{ r.fisico?.promedio || 0 }}%</strong></span>
+            <span style="color:#f59e0b;">T: <strong>{{ r.tecnico?.promedio || 0 }}%</strong></span>
+            <span style="color:#8b5cf6;">A: <strong>{{ r.actitudinal?.promedio || 0 }}%</strong></span>
+            <span style="color:#10b981;">E: <strong>{{ r.estrategico?.promedio || 0 }}%</strong></span>
+            <span style="color:#39d353;" *ngIf="r.promedioGeneral">G: <strong>{{ r.promedioGeneral }}%</strong></span>
           </div>
         </div>
       </ng-container>

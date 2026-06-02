@@ -168,6 +168,22 @@
             </p-select>
           </div>
 
+          <div class="campo">
+            <label>Sede <span class="error">*</span></label>
+            <p-select
+              [options]="sedesOpciones"
+              formControlName="sede"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleccione sede"
+              appendTo="body"
+              [ngClass]="{'ng-invalid ng-dirty': campoInvalido('pupilo','sede')}">
+            </p-select>
+            <small *ngIf="campoInvalido('pupilo','sede')" class="error">
+              La sede es obligatoria
+            </small>
+          </div>
+
         </div>
       </div>
       <button

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
@@ -27,10 +27,14 @@ import { ToastModule } from 'primeng/toast';
   templateUrl: './formulario.html',
   styleUrls: ['./formulario.css']
 })
-export class FormularioComponent {
+export class FormularioComponent implements OnInit {
 
   formulario!: FormGroup;
   rutInvalido = false;
+  sedesOpciones: { label: string; value: string }[] = [
+    { label: 'Viña del Mar', value: 'Viña del Mar' },
+    { label: 'Olmué', value: 'Olmué' }
+  ];
 
   generos = [
     { name: 'Masculino' },
@@ -69,12 +73,24 @@ export class FormularioComponent {
         fechaNacimiento: ['', Validators.required],
         genero:          [null, Validators.required],
         direccion:       ['', [Validators.required, Validators.maxLength(150)]],
-        comuna:          [null, Validators.required]
+        comuna:          [null, Validators.required],
+        sede:            ['', Validators.required]
       })
     });
 
     this.formulario.get('pupilo.rut')?.valueChanges.subscribe(value => {
       this.rutInvalido = !this.validarRutFormato(value);
+    });
+  }
+
+  ngOnInit(): void {
+    this.apiService.getConfig().subscribe({
+      next: (c) => {
+        if (c.sedes?.length) {
+          this.sedesOpciones = c.sedes.map((s: string) => ({ label: s, value: s }));
+        }
+      },
+      error: () => {}
     });
   }
 

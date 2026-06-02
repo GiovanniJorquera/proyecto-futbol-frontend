@@ -33,7 +33,10 @@ export class RegistroInvitadoComponent implements OnInit {
   categoriaSugerida = '';
   ramaFemenina = false;
 
-  sedesOpciones: string[] = ['Viña del Mar', 'Olmué'];
+  sedesOpciones: { label: string; value: string }[] = [
+    { label: 'Viña del Mar', value: 'Viña del Mar' },
+    { label: 'Olmué', value: 'Olmué' }
+  ];
   generos = [{ name: 'Masculino' }, { name: 'Femenino' }];
   comunas = [
     { name: 'Viña del Mar' }, { name: 'Valparaíso' }, { name: 'Quilpué' },
@@ -75,7 +78,11 @@ export class RegistroInvitadoComponent implements OnInit {
     });
 
     this.api.getConfig().subscribe({
-      next: (c) => { if (c.sedes?.length) this.sedesOpciones = c.sedes; },
+      next: (c) => {
+        if (c.sedes?.length) {
+          this.sedesOpciones = c.sedes.map((s: string) => ({ label: s, value: s }));
+        }
+      },
       error: () => {}
     });
 

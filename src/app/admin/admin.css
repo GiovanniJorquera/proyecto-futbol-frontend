@@ -641,6 +641,18 @@
 .libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
 .libro-estado-sin        { color: rgba(244,247,243,.2); }
 
+.libro-td-editable {
+  cursor: pointer;
+  transition: opacity .12s;
+  user-select: none;
+}
+.libro-td-editable:hover {
+  opacity: 0.75;
+  outline: 2px solid rgba(57,211,83,0.45);
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+
 .libro-td-pct {
   padding: .5rem .6rem;
   text-align: center;

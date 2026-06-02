@@ -225,9 +225,10 @@
             </div>
           </div>
 
-          <!-- Éxito -->
-          <div class="alerta-ok" *ngIf="asistenciaGuardada">
-            <i class="pi pi-check-circle"></i> Asistencia guardada correctamente.
+          <!-- Ya guardada (cargada desde BD) -->
+          <div class="alerta-ok" *ngIf="asistenciaGuardada && !guardando">
+            <i class="pi pi-check-circle"></i>
+            Asistencia ya registrada para este día. Los jugadores sin marca fueron contados como Ausentes.
           </div>
 
           <!-- Error -->
@@ -235,11 +236,11 @@
             <i class="pi pi-exclamation-triangle"></i> {{ errorAsistencia }}
           </div>
 
-          <div class="guardar-row">
+          <div class="guardar-row" *ngIf="!asistenciaGuardada">
             <button class="btn-guardar" (click)="guardarAsistencia()" [disabled]="guardando">
               <i class="pi pi-save" *ngIf="!guardando"></i>
               <i class="pi pi-spin pi-spinner" *ngIf="guardando"></i>
-              {{ guardando ? 'Guardando...' : 'Guardar asistencia' }}
+              {{ guardando ? 'Guardando...' : 'Guardar asistencia (sin marca = Ausente)' }}
             </button>
           </div>
 
@@ -257,7 +258,13 @@
         <div *ngIf="modoAsistencia === 'libro'">
           <div class="libro-prf-header">
             <h3 class="asistencia-titulo"><i class="pi pi-book"></i> Libro de Asistencia</h3>
-            <input type="month" [(ngModel)]="libroMes" (change)="cargarLibroProfesor()" class="fecha-input" />
+            <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+              <input type="month" [(ngModel)]="libroMes" (change)="cargarLibroProfesor()" class="fecha-input" />
+              <select [(ngModel)]="libroFiltroDivision" class="fecha-input" style="padding:0.4rem 0.6rem;">
+                <option [ngValue]="null">Todas las divisiones</option>
+                <option *ngFor="let d of profesor?.divisiones" [value]="d">{{ d }}</option>
+              </select>
+            </div>
           </div>
 
           <div class="empty-msg" *ngIf="cargandoLibro">
@@ -293,7 +300,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let j of libroJugadores; let i = index"
+                <tr *ngFor="let j of libroJugadoresFiltrados; let i = index"
                     [class.lprf-row-critico]="j.porcentaje !== null && j.porcentaje < 70">
                   <td class="lprf-td-num">{{ i + 1 }}</td>
                   <td class="lprf-td-nombre">{{ nombreLibroProf(j) }}</td>
@@ -466,14 +473,41 @@
               </button>
             </div>
 
-            <!-- Historial -->
+            <!-- Historial con gráfico -->
             <div class="rend-historial">
               <h4 class="rend-hist-titulo"><i class="pi pi-history"></i> Historial</h4>
               <div class="empty-msg" *ngIf="cargandoRendHist"><i class="pi pi-spin pi-spinner"></i></div>
               <div class="empty-msg" *ngIf="!cargandoRendHist && rendHistorial.length === 0">
                 <i class="pi pi-inbox"></i><p>Sin evaluaciones previas.</p>
               </div>
-              <div class="rend-hist-card" *ngFor="let r of rendHistorial">
+
+              <!-- Controles de zoom -->
+              <div *ngIf="rendHistorial.length > 0" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; margin-bottom:0.75rem;">
+                <span style="font-size:0.78rem; opacity:0.6;">Zoom por año:</span>
+                <button *ngFor="let a of rendAniosDisponibles"
+                  (click)="setRendZoomAnio(rendZoomAnio === a ? null : a)"
+                  [class.btn-modo-activo]="rendZoomAnio === a"
+                  class="btn-modo" style="font-size:0.78rem; padding:0.2rem 0.6rem;">
+                  {{ a }}
+                </button>
+                <ng-container *ngIf="rendZoomAnio !== null">
+                  <span style="opacity:0.4;">›</span>
+                  <button *ngFor="let m of rendMesesDisponibles"
+                    (click)="setRendZoomMes(rendZoomMes === m.value ? null : m.value)"
+                    [class.btn-modo-activo]="rendZoomMes === m.value"
+                    class="btn-modo" style="font-size:0.78rem; padding:0.2rem 0.6rem;">
+                    {{ m.label }}
+                  </button>
+                </ng-container>
+              </div>
+
+              <!-- Gráfico de líneas -->
+              <div *ngIf="rendChartData" class="rend-chart-wrap" style="margin-bottom:1rem;">
+                <p-chart type="line" [data]="rendChartData" [options]="rendChartOptions" height="240"></p-chart>
+              </div>
+
+              <!-- Lista historial filtrado -->
+              <div class="rend-hist-card" *ngFor="let r of rendHistorialFiltrado">
                 <span class="rend-hist-fecha">{{ r.fecha | date:'dd/MM/yyyy' }}</span>
                 <div class="rend-hist-scores">
                   <span><strong>Fís:</strong> {{ r.fisico?.promedio || 0 }}%</span>

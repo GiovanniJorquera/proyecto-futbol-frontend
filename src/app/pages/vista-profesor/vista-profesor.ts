@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { RendimientoService } from '../../services/rendimiento.service';
+import { ChartModule } from 'primeng/chart';
 
 interface RegistroAsistencia {
   jugadorId: string;
@@ -19,7 +20,7 @@ interface RegistroAsistencia {
 @Component({
   selector: 'app-vista-profesor',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChartModule],
   templateUrl: './vista-profesor.html',
   styleUrl: './vista-profesor.css'
 })
@@ -47,6 +48,7 @@ export class VistaProfesorComponent implements OnInit {
   libroJugadores: any[]   = [];
   cargandoLibro  = false;
   libroError     = '';
+  libroFiltroDivision: string | null = null;
 
   // Rendimiento (batch por fecha — conservado)
   fechaRendimiento = '';
@@ -68,6 +70,10 @@ export class VistaProfesorComponent implements OnInit {
   rendIndGuardado = false;
   errorRendInd = '';
   cargandoRendHist = false;
+  rendChartData: any = null;
+  rendChartOptions: any = null;
+  rendZoomAnio: number | null = null;
+  rendZoomMes: number | null = null;
 
   constructor(
     private api: ApiService,
@@ -153,6 +159,10 @@ export class VistaProfesorComponent implements OnInit {
           const r = this.registros.find(r => r.jugadorId.toString() === a.jugadorId.toString());
           if (r) { r.estado = a.estado; r.marcado = true; }
         });
+        // Si ya hay registros guardados para esta fecha, bloquear re-guardado
+        if (asistencias.length > 0) {
+          this.asistenciaGuardada = true;
+        }
         this.cargandoAsistencia = false;
       },
       error: () => { this.cargandoAsistencia = false; }
@@ -186,16 +196,24 @@ export class VistaProfesorComponent implements OnInit {
 
   guardarAsistencia() {
     if (!this.fechaSeleccionada || this.registros.length === 0) return;
-    if (!this.registros.some(r => r.marcado)) return;
+    if (this.asistenciaGuardada) return;
     this.guardando = true;
     this.errorAsistencia = '';
 
-    const payload = this.registros
-      .filter(r => r.marcado)
-      .map(r => ({ jugadorId: r.jugadorId, estado: r.estado }));
+    // Los no marcados quedan como 'ausente'
+    const payload = this.registros.map(r => ({
+      jugadorId: r.jugadorId,
+      estado: r.marcado ? r.estado : 'ausente'
+    }));
 
     this.api.guardarAsistenciasLote(this.fechaSeleccionada, payload).subscribe({
-      next: () => { this.guardando = false; this.asistenciaGuardada = true; this.cargarLibroProfesor(); },
+      next: () => {
+        this.guardando = false;
+        this.asistenciaGuardada = true;
+        // Marcar todos como guardados para bloquear re-edición
+        this.registros.forEach(r => { r.marcado = true; });
+        this.cargarLibroProfesor();
+      },
       error: () => { this.guardando = false; this.errorAsistencia = 'Error al guardar. Intente nuevamente.'; }
     });
   }
@@ -307,14 +325,76 @@ export class VistaProfesorComponent implements OnInit {
   cargarHistorialRend() {
     if (!this.jugadorSeleccionadoRend) return;
     this.cargandoRendHist = true;
+    this.rendChartData = null;
+    this.rendZoomAnio = null;
+    this.rendZoomMes = null;
     this.rendimientoService.obtenerRendimientos(this.jugadorSeleccionadoRend._id).subscribe({
-      next: (data) => { this.rendHistorial = data; this.cargandoRendHist = false; },
+      next: (data) => {
+        this.rendHistorial = [...data].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+        this.cargandoRendHist = false;
+        this.buildRendChart();
+      },
       error: () => { this.cargandoRendHist = false; }
     });
     this.rendimientoService.obtenerResumen(this.jugadorSeleccionadoRend._id).subscribe({
       next: (data) => { this.rendResumen = data; }
     });
   }
+
+  buildRendChart() {
+    const data = this.rendHistorialFiltrado;
+    if (!data.length) { this.rendChartData = null; return; }
+    const isDark = this.temaOscuro;
+    const textColor = isDark ? 'rgba(244,247,243,.7)' : 'rgba(20,50,20,.6)';
+    const gridColor = isDark ? 'rgba(57,211,83,.1)' : 'rgba(30,122,48,.1)';
+    const labels = data.map((r: any) => {
+      const d = new Date(r.fecha);
+      return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+    });
+    this.rendChartData = {
+      labels,
+      datasets: [
+        { label: 'Físico',      data: data.map((r: any) => r.fisico?.promedio      ?? 0), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Técnico',     data: data.map((r: any) => r.tecnico?.promedio     ?? 0), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.1)', tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Actitudinal', data: data.map((r: any) => r.actitudinal?.promedio ?? 0), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Estratégico', data: data.map((r: any) => r.estrategico?.promedio ?? 0), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+      ]
+    };
+    this.rendChartOptions = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { labels: { color: textColor, font: { size: 12 } } },
+        tooltip: { callbacks: { label: (ctx: any) => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+      },
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: textColor, callback: (v: any) => `${v}%` }, grid: { color: gridColor } },
+        x: { ticks: { color: textColor }, grid: { color: gridColor } }
+      }
+    };
+  }
+
+  get rendHistorialFiltrado(): any[] {
+    let data = this.rendHistorial;
+    if (this.rendZoomAnio !== null) data = data.filter((r: any) => new Date(r.fecha).getFullYear() === this.rendZoomAnio);
+    if (this.rendZoomMes  !== null) data = data.filter((r: any) => new Date(r.fecha).getMonth()    === this.rendZoomMes);
+    return data;
+  }
+
+  get rendAniosDisponibles(): number[] {
+    return [...new Set(this.rendHistorial.map((r: any) => new Date(r.fecha).getFullYear()))].sort() as number[];
+  }
+
+  get rendMesesDisponibles(): { label: string; value: number }[] {
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const base = this.rendZoomAnio !== null
+      ? this.rendHistorial.filter((r: any) => new Date(r.fecha).getFullYear() === this.rendZoomAnio)
+      : this.rendHistorial;
+    const nums = [...new Set(base.map((r: any) => new Date(r.fecha).getMonth()))].sort((a: any, b: any) => a - b) as number[];
+    return nums.map(m => ({ label: meses[m], value: m }));
+  }
+
+  setRendZoomAnio(anio: number | null) { this.rendZoomAnio = anio; this.rendZoomMes = null; this.buildRendChart(); }
+  setRendZoomMes(mes: number | null)   { this.rendZoomMes  = mes;  this.buildRendChart(); }
 
   guardarRendimientoIndividual() {
     this.guardandoRendInd = true;
@@ -349,6 +429,11 @@ export class VistaProfesorComponent implements OnInit {
   get fichasFiltradas(): any[] {
     if (!this.divisionFiltro) return this.fichas;
     return this.fichas.filter(f => f.categoria === this.divisionFiltro);
+  }
+
+  get libroJugadoresFiltrados(): any[] {
+    if (!this.libroFiltroDivision) return this.libroJugadores;
+    return this.libroJugadores.filter(j => j.categoria === this.libroFiltroDivision);
   }
 
   toggleFiltroDiv(d: string) {

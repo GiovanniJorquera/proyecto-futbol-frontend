@@ -19,6 +19,7 @@ export class VistaClienteComponent implements OnInit {
   menuAbierto = false;
 
   ficha: any = null;
+  fichas: any[] = [];
   cargando = true;
   error = '';
   usuario: any = null;
@@ -59,12 +60,6 @@ export class VistaClienteComponent implements OnInit {
       },
       error: () => { this.pagosMensualesError = true; this.pagosMensuales = { error: true }; }
     });
-    this.api.getMiRendimiento().subscribe({
-      next: (data) => {
-        this.rendimiento = data;
-        this.buildChart(data);
-      }
-    });
   }
 
   buildChart(data: any) {
@@ -80,10 +75,7 @@ export class VistaClienteComponent implements OnInit {
     this.chartData = {
       labels,
       datasets: [
-        { label: 'Físico',      data: hist.map((h: any) => h.fisico),      borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
-        { label: 'Técnico',     data: hist.map((h: any) => h.tecnico),     borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.1)', tension: 0.4, fill: false, pointRadius: 4 },
-        { label: 'Actitudinal', data: hist.map((h: any) => h.actitudinal), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
-        { label: 'Estratégico', data: hist.map((h: any) => h.estrategico), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Rendimiento General', data: hist.map((h: any) => h.general ?? Math.round(((h.fisico||0)+(h.tecnico||0)+(h.actitudinal||0)+(h.estrategico||0))/4)), borderColor: '#39d353', backgroundColor: 'rgba(57,211,83,.15)', tension: 0.4, fill: true, pointRadius: 5, borderWidth: 2 },
       ]
     };
 
@@ -109,9 +101,39 @@ export class VistaClienteComponent implements OnInit {
   }
 
   cargarFicha() {
-    this.api.getMiFicha().subscribe({
-      next: (data) => { this.ficha = data; this.cargando = false; },
-      error: () => { this.error = 'No se encontró información asociada a tu cuenta.'; this.cargando = false; }
+    this.api.getMisFichasCliente().subscribe({
+      next: (data) => {
+        this.fichas = data;
+        if (data.length === 0) {
+          this.error = 'No se encontró información asociada a tu cuenta.';
+        } else {
+          this.ficha = data[0];
+          this.cargarRendimientoFicha(this.ficha._id);
+        }
+        this.cargando = false;
+      },
+      error: () => {
+        this.api.getMiFicha().subscribe({
+          next: (data) => { this.ficha = data; this.fichas = [data]; this.cargarRendimientoFicha(data._id); this.cargando = false; },
+          error: () => { this.error = 'No se encontró información asociada a tu cuenta.'; this.cargando = false; }
+        });
+      }
+    });
+  }
+
+  cambiarFicha(ficha: any) {
+    this.ficha = ficha;
+    this.rendimiento = null;
+    this.chartData = null;
+    this.cargarRendimientoFicha(ficha._id);
+  }
+
+  cargarRendimientoFicha(fichaId: string) {
+    this.api.getMiRendimiento(fichaId).subscribe({
+      next: (data) => {
+        this.rendimiento = data;
+        this.buildChart(data);
+      }
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, NgIf, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
+import { ChartModule } from 'primeng/chart';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { catchError, of, timeout } from 'rxjs';
@@ -19,11 +20,12 @@ import { environment } from '../../environments/environment';
 import { EstadoPago, Pago } from '../models/pago';
 import { PagosService } from '../services/pagos.service';
 import { AuthService } from '../services/auth.service';
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ToggleButtonModule, TextareaModule, ToastModule],
+  imports: [NgFor, NgIf, DatePipe, CurrencyPipe, FormsModule, TableModule, ButtonModule, CardModule, DialogModule, TagModule, InputTextModule, SelectModule, ToggleButtonModule, TextareaModule, ToastModule, ChartModule],
   providers: [MessageService],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
@@ -107,6 +109,10 @@ export class AdminComponent implements OnInit {
   modalRendimientoVisible = false;
   rendimientoJugador: any[] = [];
   cargandoRendimiento = false;
+  rendChartData: any = null;
+  rendChartOptions: any = null;
+  rendZoomAnio: number | null = null;
+  rendZoomMes: number | null = null;
 
   posicionOpciones = [
     { label: '— Sin posición —', value: '' },
@@ -220,6 +226,7 @@ export class AdminComponent implements OnInit {
   /* ── LIBRO DE ASISTENCIA ─────────────────────────── */
   libroMes      = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}`; })();
   libroCat      : string | null = null;
+  libroSede     : string | null = null;
   libroFechas   : string[] = [];
   libroJugadores: any[]   = [];
   cargandoLibro  = false;
@@ -241,12 +248,17 @@ export class AdminComponent implements OnInit {
     if (cb) cb();
   }
 
+  /* Edición de celda en libro */
+  libroEditandoCelda: { jugadorId: string; fecha: string } | null = null;
+
   constructor(
     private http: HttpClient,
     private router: Router,
     private pagosService: PagosService,
     private authService: AuthService,
     private messageService: MessageService,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   private readonly apiUrl = environment.apiUrl;
@@ -829,7 +841,7 @@ export class AdminComponent implements OnInit {
   setActiveTab(tab: string) {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
-    if (tab === 'fichas' || tab === 'jugadores') {
+    if (tab === 'fichas' || tab === 'jugadores' || tab === 'divisiones' || tab === 'arqueros') {
       if (tab === 'fichas') this.tabFichasLoaded = true;
       if (tab === 'jugadores') this.tabJugadoresLoaded = true;
       if (this.fichas.length === 0 && !this.cargandoFichas) this.cargarFichas();
@@ -938,17 +950,99 @@ export class AdminComponent implements OnInit {
     this.fichaSeleccionada = ficha;
     this.cargandoRendimiento = true;
     this.modalRendimientoVisible = true;
+    this.rendChartData = null;
+    this.rendZoomAnio = null;
+    this.rendZoomMes = null;
     this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${ficha._id}`, this.authHeaders()).subscribe({
-      next: (data) => { this.rendimientoJugador = data; this.cargandoRendimiento = false; },
+      next: (data) => {
+        this.rendimientoJugador = [...data].reverse();
+        this.cargandoRendimiento = false;
+        this.buildRendChart();
+      },
       error: () => { this.rendimientoJugador = []; this.cargandoRendimiento = false; }
     });
+  }
+
+  buildRendChart() {
+    const data = this.rendimientoJugadorFiltrado;
+    if (!data.length) { this.rendChartData = null; return; }
+    const labels = data.map(r => {
+      const d = new Date(r.fecha);
+      return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+    });
+    this.rendChartData = {
+      labels,
+      datasets: [
+        { label: 'Físico',      data: data.map(r => r.fisico?.promedio      ?? 0), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,.1)', tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Técnico',     data: data.map(r => r.tecnico?.promedio     ?? 0), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.1)', tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Actitudinal', data: data.map(r => r.actitudinal?.promedio ?? 0), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+        { label: 'Estratégico', data: data.map(r => r.estrategico?.promedio ?? 0), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)',  tension: 0.4, fill: false, pointRadius: 4 },
+      ]
+    };
+    this.rendChartOptions = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { labels: { color: 'rgba(233,247,234,.7)', font: { size: 12 } } },
+        tooltip: { callbacks: { label: (ctx: any) => `${ctx.dataset.label}: ${ctx.parsed.y}%` } }
+      },
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: 'rgba(233,247,234,.55)', callback: (v: any) => `${v}%` }, grid: { color: 'rgba(57,211,83,.1)' } },
+        x: { ticks: { color: 'rgba(233,247,234,.55)' }, grid: { color: 'rgba(57,211,83,.08)' } }
+      }
+    };
+  }
+
+  get rendimientoJugadorFiltrado(): any[] {
+    let data = this.rendimientoJugador;
+    if (this.rendZoomAnio !== null) {
+      data = data.filter(r => new Date(r.fecha).getFullYear() === this.rendZoomAnio);
+    }
+    if (this.rendZoomMes !== null) {
+      data = data.filter(r => new Date(r.fecha).getMonth() === this.rendZoomMes);
+    }
+    return data;
+  }
+
+  get rendAniosDisponibles(): number[] {
+    return [...new Set(this.rendimientoJugador.map(r => new Date(r.fecha).getFullYear()))].sort();
+  }
+
+  get rendMesesDisponibles(): { label: string; value: number }[] {
+    const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const data = this.rendZoomAnio !== null
+      ? this.rendimientoJugador.filter(r => new Date(r.fecha).getFullYear() === this.rendZoomAnio)
+      : this.rendimientoJugador;
+    const nums = [...new Set(data.map(r => new Date(r.fecha).getMonth()))].sort((a,b) => a-b);
+    return nums.map(m => ({ label: meses[m], value: m }));
+  }
+
+  setRendZoomAnio(anio: number | null) {
+    this.rendZoomAnio = anio;
+    this.rendZoomMes = null;
+    this.buildRendChart();
+  }
+
+  setRendZoomMes(mes: number | null) {
+    this.rendZoomMes = mes;
+    this.buildRendChart();
   }
 
   get promedioRendimiento() {
     const r = this.rendimientoJugador;
     if (!r.length) return null;
-    const avg = (k: string) => +(r.reduce((s: number, x: any) => s + (x[k] || 0), 0) / r.length).toFixed(1);
-    return { fisico: avg('fisico'), tecnico: avg('tecnico'), psicologico: avg('psicologico'), estrategico: avg('estrategico') };
+    const avg = (k: string) => +(r.reduce((s: number, x: any) => s + (x[k]?.promedio || 0), 0) / r.length).toFixed(1);
+    return {
+      fisico:      avg('fisico'),
+      tecnico:     avg('tecnico'),
+      actitudinal: avg('actitudinal'),
+      estrategico: avg('estrategico'),
+      general:     +((avg('fisico') + avg('tecnico') + avg('actitudinal') + avg('estrategico')) / 4).toFixed(1)
+    };
+  }
+
+  /* Arqueros */
+  get arqueros(): any[] {
+    return this.fichas.filter((f: any) => (f.posicion || '').toLowerCase() === 'arquero');
   }
 
   /* Categorías */
@@ -962,7 +1056,8 @@ export class AdminComponent implements OnInit {
     this.cargandoLibro = true;
     this.libroError = '';
     let url = `${this.apiUrl}/admin/asistencias/libro?mes=${this.libroMes}`;
-    if (this.libroCat) url += `&categoria=${encodeURIComponent(this.libroCat)}`;
+    if (this.libroCat)  url += `&categoria=${encodeURIComponent(this.libroCat)}`;
+    if (this.libroSede) url += `&sede=${encodeURIComponent(this.libroSede)}`;
     this.http.get<any>(url, this.authHeaders()).subscribe({
       next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
       error: (err) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro de asistencia.'; }
@@ -991,6 +1086,51 @@ export class AdminComponent implements OnInit {
     return ap ? `${ap}, ${j.nombre}` : j.nombre;
   }
 
+  /* Lista unificada de divisiones disponibles (de la colección Divisiones + de profesores) */
+  get divisionesDisponibles(): string[] {
+    const fromDivisiones = this.divisiones.map((d: any) => d.nombre).filter(Boolean);
+    const fromProfesores = this.profesores.flatMap((p: any) => p.divisiones || []);
+    const todas = [...new Set([...fromDivisiones, ...fromProfesores])].sort();
+    return todas as string[];
+  }
+
+  isDivisionSeleccionada(d: string): boolean {
+    const lista = this.profesorForm.divisionesTexto.split(',').map(x => x.trim()).filter(Boolean);
+    return lista.includes(d);
+  }
+
+  toggleDivisionProfesor(d: string) {
+    const lista = this.profesorForm.divisionesTexto.split(',').map(x => x.trim()).filter(Boolean);
+    const idx = lista.indexOf(d);
+    if (idx >= 0) lista.splice(idx, 1);
+    else lista.push(d);
+    this.profesorForm.divisionesTexto = lista.join(', ');
+  }
+
+  /* Edición inline en libro de asistencia */
+  editarCeldaLibro(jugador: any, fecha: string) {
+    const estadoActual = jugador.registros[fecha] || '';
+    const ciclo: Record<string, string> = { '': 'asistio', 'asistio': 'ausente', 'ausente': 'justificado', 'justificado': 'asistio' };
+    const nuevoEstado = ciclo[estadoActual] ?? 'asistio';
+    jugador.registros[fecha] = nuevoEstado;
+    this.apiService.editarAsistenciaAdmin(jugador._id, fecha, nuevoEstado).subscribe({
+      next: () => {
+        // Recalcular porcentaje del jugador
+        const totalClases = this.libroFechas.length;
+        const asistio     = this.libroFechas.filter(f => jugador.registros[f] === 'asistio').length;
+        const justificado = this.libroFechas.filter(f => jugador.registros[f] === 'justificado').length;
+        jugador.asistio     = asistio;
+        jugador.justificado = justificado;
+        jugador.ausente     = this.libroFechas.filter(f => jugador.registros[f] === 'ausente').length;
+        jugador.porcentaje  = totalClases > 0 ? Math.round((asistio + justificado) / totalClases * 100) : null;
+      },
+      error: () => {
+        jugador.registros[fecha] = estadoActual;
+        this.toast('error', 'Error', 'No se pudo guardar el cambio.');
+      }
+    });
+  }
+
   /* Profesores */
   get divisionProfesorOpciones() {
     const divs = [...new Set(this.profesores.flatMap((p: any) => p.divisiones || []))];
@@ -1009,6 +1149,15 @@ export class AdminComponent implements OnInit {
     });
   }
   limpiarFiltrosProfesores() { this.filtrosProfesores = { texto: '', division: null }; }
+
+  /* Cuenta cuántas fichas tienen una categoría que coincide con el nombre de la división */
+  contarJugadoresDivision(division: any): number {
+    if (!this.fichas.length) return division.estudiantes || 0;
+    const nombre = (division.nombre || '').toLowerCase().trim();
+    return this.fichas.filter((f: any) =>
+      (f.categoria || '').toLowerCase().trim() === nombre
+    ).length;
+  }
 
   /* Divisiones */
   get divisionesFiltradas() {

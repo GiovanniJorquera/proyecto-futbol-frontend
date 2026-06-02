@@ -193,8 +193,11 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/cliente/mis-pagos-mensuales`, this.authHeaders);
   }
 
-  getMiRendimiento(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/cliente/mi-rendimiento`, this.authHeaders);
+  getMiRendimiento(fichaId?: string): Observable<any> {
+    const url = fichaId
+      ? `${this.apiUrl}/cliente/mi-rendimiento?fichaId=${fichaId}`
+      : `${this.apiUrl}/cliente/mi-rendimiento`;
+    return this.http.get<any>(url, this.authHeaders);
   }
 
   guardarRendimientoProfesor(fecha: string, registros: any[]): Observable<any> {
@@ -207,5 +210,13 @@ export class ApiService {
 
   getRendimientoJugador(jugadorId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${jugadorId}`, this.authHeaders);
+  }
+
+  editarAsistenciaAdmin(jugadorId: string, fecha: string, estado: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/admin/asistencias/editar`, { jugadorId, fecha, estado }, this.authHeaders);
+  }
+
+  getMisFichasCliente(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/cliente/mis-fichas`, this.authHeaders);
   }
 }

@@ -35,8 +35,9 @@ export class LoginComponent {
     this.cargando = true;
     this.errorMessage = '';
     const { user, password } = this.loginForm.value;
+    const userNorm = (user as string).toLowerCase().trim();
 
-    this.authService.login(user, password).subscribe(ok => {
+    this.authService.login(userNorm, password).subscribe(ok => {
       this.cargando = false;
       if (ok) {
         const rol = this.authService.getRol();
