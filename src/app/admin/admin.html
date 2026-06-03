@@ -3,7 +3,7 @@
 <div class="admin-container">
 
   <header class="admin-header">
-    <h1>Panel Administrador — Santiago Wanderers</h1>
+    <h1>Panel Administrador — Escuela Familias del Fútbol</h1>
     <button pButton type="button" label="Inicio" icon="pi pi-home" size="small" severity="secondary" (click)="volverInicio()"></button>
   </header>
 
@@ -552,6 +552,7 @@
               <th class="libro-th-num">#</th>
               <th class="libro-th-nombre">Jugador</th>
               <th class="libro-th-cat">Cat.</th>
+              <th class="libro-th-cat">Sede</th>
               <th *ngFor="let f of libroFechas" class="libro-th-fecha">{{ formatFechaLibro(f) }}</th>
               <th class="libro-th-pct">%</th>
               <th class="libro-th-resumen">Asistencias</th>
@@ -563,15 +564,21 @@
               <td class="libro-td-num">{{ i + 1 }}</td>
               <td class="libro-td-nombre">{{ nombreLibro(j) }}</td>
               <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
-              <td *ngFor="let f of libroFechas"
-                  class="libro-td-estado libro-td-editable"
+              <td class="libro-td-cat" style="font-size:.78rem; opacity:.75;">{{ j.sede || '—' }}</td>
+              <td *ngFor="let f of libroFechas" class="libro-td-estado">
+                <input
+                  type="text"
+                  class="libro-celda-input"
                   [class.libro-estado-asistio]="j.registros[f] === 'asistio'"
                   [class.libro-estado-ausente]="j.registros[f] === 'ausente'"
                   [class.libro-estado-justificado]="j.registros[f] === 'justificado'"
                   [class.libro-estado-sin]="!j.registros[f]"
-                  (click)="editarCeldaLibro(j, f)"
-                  title="Clic para cambiar estado (P → A → J → P)">
-                {{ estadoLetra(j.registros[f]) }}
+                  [value]="estadoLetra(j.registros[f])"
+                  (keydown)="onLibroCeldaKeydown($event, j, f)"
+                  maxlength="1"
+                  readonly
+                  title="Clic para enfocar, luego teclea P (Presente), A (Ausente) o J (Justificado)"
+                />
               </td>
               <td class="libro-td-pct"
                   [class.pct-ok]="j.porcentaje !== null && j.porcentaje >= 85"
@@ -588,7 +595,7 @@
           </tbody>
           <tfoot>
             <tr class="libro-tfoot">
-              <td colspan="3" class="libro-tf-label">Presentes ese día</td>
+              <td colspan="4" class="libro-tf-label">Presentes ese día</td>
               <td *ngFor="let f of libroFechas" class="libro-tf-total">{{ contarPresentes(f) }}</td>
               <td colspan="2"></td>
             </tr>
@@ -602,6 +609,7 @@
         <span class="lib-ley lib-ley-j">J = Justificado (cuenta como presente)</span>
         <span class="lib-ley lib-ley-a">A = Ausente</span>
         <span class="lib-ley lib-ley-critico">Rojo = menos del 70%</span>
+        <span class="lib-ley" style="opacity:.6;font-size:.78rem;">✏️ Clic en celda + tecla P / A / J para editar</span>
       </div>
     </p-card>
   </div>

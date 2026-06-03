@@ -641,17 +641,29 @@
 .libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
 .libro-estado-sin        { color: rgba(244,247,243,.2); }
 
-.libro-td-editable {
+.libro-celda-input {
+  width: 2rem;
+  height: 1.8rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: .88rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
   cursor: pointer;
-  transition: opacity .12s;
-  user-select: none;
+  caret-color: transparent;
+  outline: none;
+  color: inherit;
 }
-.libro-td-editable:hover {
-  opacity: 0.75;
-  outline: 2px solid rgba(57,211,83,0.45);
-  outline-offset: -2px;
-  border-radius: 3px;
+.libro-celda-input:focus {
+  border-color: rgba(57,211,83,0.6);
+  background: rgba(57,211,83,0.07);
+  outline: none;
 }
+.libro-celda-input.libro-estado-asistio    { color: #39d353; background: rgba(57,211,83,.08); }
+.libro-celda-input.libro-estado-ausente    { color: #ff6b6b; background: rgba(255,107,107,.08); }
+.libro-celda-input.libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
+.libro-celda-input.libro-estado-sin        { color: rgba(244,247,243,.2); }
 
 .libro-td-pct {
   padding: .5rem .6rem;

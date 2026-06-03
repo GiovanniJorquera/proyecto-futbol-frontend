@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NgFor, NgIf, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,6 @@ import { environment } from '../../environments/environment';
 import { EstadoPago, Pago } from '../models/pago';
 import { PagosService } from '../services/pagos.service';
 import { AuthService } from '../services/auth.service';
-import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-admin',
@@ -248,17 +247,12 @@ export class AdminComponent implements OnInit {
     if (cb) cb();
   }
 
-  /* Edición de celda en libro */
-  libroEditandoCelda: { jugadorId: string; fecha: string } | null = null;
-
   constructor(
     private http: HttpClient,
     private router: Router,
     private pagosService: PagosService,
     private authService: AuthService,
     private messageService: MessageService,
-    private apiService: ApiService,
-    private cdr: ChangeDetectorRef,
   ) {}
 
   private readonly apiUrl = environment.apiUrl;
@@ -1108,14 +1102,25 @@ export class AdminComponent implements OnInit {
   }
 
   /* Edición inline en libro de asistencia */
-  editarCeldaLibro(jugador: any, fecha: string) {
-    const estadoActual = jugador.registros[fecha] || '';
-    const ciclo: Record<string, string> = { '': 'asistio', 'asistio': 'ausente', 'ausente': 'justificado', 'justificado': 'asistio' };
-    const nuevoEstado = ciclo[estadoActual] ?? 'asistio';
+  /* Edición con teclado: foco en celda y presiona P, A o J */
+  onLibroCeldaKeydown(event: KeyboardEvent, jugador: any, fecha: string) {
+    const key = (event.key || '').toUpperCase();
+    let nuevoEstado: string | null = null;
+    if (key === 'P') nuevoEstado = 'asistio';
+    else if (key === 'A') nuevoEstado = 'ausente';
+    else if (key === 'J') nuevoEstado = 'justificado';
+    else return;
+
+    event.preventDefault();
+    const estadoAnterior = jugador.registros[fecha] || '';
     jugador.registros[fecha] = nuevoEstado;
-    this.apiService.editarAsistenciaAdmin(jugador._id, fecha, nuevoEstado).subscribe({
+
+    this.http.put(
+      `${this.apiUrl}/admin/asistencias/editar`,
+      { jugadorId: jugador._id, fecha, estado: nuevoEstado },
+      this.authHeaders()
+    ).subscribe({
       next: () => {
-        // Recalcular porcentaje del jugador
         const totalClases = this.libroFechas.length;
         const asistio     = this.libroFechas.filter(f => jugador.registros[f] === 'asistio').length;
         const justificado = this.libroFechas.filter(f => jugador.registros[f] === 'justificado').length;
@@ -1125,7 +1130,7 @@ export class AdminComponent implements OnInit {
         jugador.porcentaje  = totalClases > 0 ? Math.round((asistio + justificado) / totalClases * 100) : null;
       },
       error: () => {
-        jugador.registros[fecha] = estadoActual;
+        jugador.registros[fecha] = estadoAnterior;
         this.toast('error', 'Error', 'No se pudo guardar el cambio.');
       }
     });
