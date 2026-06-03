@@ -60,6 +60,11 @@ export class FichaTemporadaComponent implements OnInit {
     { name: 'Ambidiestro' }
   ];
 
+  sedesOpciones: { label: string; value: string }[] = [
+    { label: 'Viña del Mar', value: 'Viña del Mar' },
+    { label: 'Olmué', value: 'Olmué' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -88,6 +93,7 @@ export class FichaTemporadaComponent implements OnInit {
       actitudSocial:   [''],
       direccion:       ['', Validators.required],
       ciudad:          ['', Validators.required],
+      sede:            ['', Validators.required],
 
       apoderado: this.fb.group({
         nombre:  ['', Validators.required],
@@ -95,6 +101,16 @@ export class FichaTemporadaComponent implements OnInit {
         whatsapp:[''],
         vinculo: ['']
       })
+    });
+
+    // Cargar sedes dinámicas desde la configuración del admin
+    this.apiService.getConfig().subscribe({
+      next: (c) => {
+        if (c.sedes?.length) {
+          this.sedesOpciones = c.sedes.map((s: string) => ({ label: s, value: s }));
+        }
+      },
+      error: () => {}
     });
 
     if (!this.token) {

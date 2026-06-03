@@ -145,6 +145,20 @@
             <small *ngIf="campoInvalido('ciudad')" class="error">La ciudad es obligatoria</small>
           </div>
 
+          <div class="campo">
+            <label>Sede <span class="req">*</span></label>
+            <p-select
+              formControlName="sede"
+              [options]="sedesOpciones"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Selecciona tu sede"
+              appendTo="body"
+              [ngClass]="{'ng-invalid ng-dirty': campoInvalido('sede')}">
+            </p-select>
+            <small *ngIf="campoInvalido('sede')" class="error">La sede es obligatoria</small>
+          </div>
+
         </div>
       </div>
 
