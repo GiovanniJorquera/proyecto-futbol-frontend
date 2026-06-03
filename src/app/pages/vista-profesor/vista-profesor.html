@@ -276,10 +276,16 @@
             <i class="pi pi-exclamation-triangle"></i> {{ libroError }}
           </div>
 
-          <!-- Sin jugadores -->
-          <div class="empty-msg" *ngIf="!cargandoLibro && !libroError && libroJugadores.length === 0">
+          <!-- Sin divisiones asignadas -->
+          <div class="empty-msg" *ngIf="!cargandoLibro && !libroError && !(profesor?.divisiones?.length)">
+            <i class="pi pi-exclamation-triangle"></i>
+            <p>No tienes sub-divisiones asignadas. Contacta al administrador.</p>
+          </div>
+
+          <!-- Sin jugadores en sus divisiones -->
+          <div class="empty-msg" *ngIf="!cargandoLibro && !libroError && profesor?.divisiones?.length && libroJugadores.length === 0">
             <i class="pi pi-inbox"></i>
-            <p>No hay jugadores en tus divisiones.</p>
+            <p>No hay jugadores en tus divisiones ({{ profesor?.divisiones?.join(', ') }}).</p>
           </div>
 
           <!-- Jugadores pero sin asistencias este mes -->
