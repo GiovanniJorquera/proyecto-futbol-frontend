@@ -169,7 +169,7 @@ export class VistaProfesorComponent implements OnInit {
     });
   }
 
-  setEstado(registro: RegistroAsistencia, estado: 'asistio' | 'ausente' | 'justificado') {
+  setEstado(registro: RegistroAsistencia, estado: 'asistio' | 'ausente' | 'justificado' | 'licenciado') {
     registro.estado = estado;
   }
 
