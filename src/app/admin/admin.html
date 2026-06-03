@@ -12,13 +12,13 @@
     <button class="tab-btn" [class.active]="activeTab === 'solicitudes'"    (click)="setActiveTab('solicitudes')">Solicitudes</button>
     <button class="tab-btn" [class.active]="activeTab === 'fichas'"        (click)="setActiveTab('fichas')">Ficha-Temporada</button>
     <button class="tab-btn" [class.active]="activeTab === 'jugadores'"     (click)="setActiveTab('jugadores')">Jugadores</button>
+    <button class="tab-btn" [class.active]="activeTab === 'arqueros'"      (click)="setActiveTab('arqueros')">Arqueros</button>
     <button class="tab-btn" [class.active]="activeTab === 'profesores'"    (click)="setActiveTab('profesores')">Profesores</button>
     <button class="tab-btn" [class.active]="activeTab === 'divisiones'"    (click)="setActiveTab('divisiones')">Divisiones</button>
     <button class="tab-btn" [class.active]="activeTab === 'partidos'"      (click)="setActiveTab('partidos')">Partidos</button>
     <button class="tab-btn" [class.active]="activeTab === 'pagos'"         (click)="setActiveTab('pagos')">Pagos Pendientes</button>
     <button class="tab-btn" [class.active]="activeTab === 'pagos-aprobados'" (click)="setActiveTab('pagos-aprobados')">Pagos Aprobados</button>
     <button class="tab-btn" [class.active]="activeTab === 'asistencia'"    (click)="setActiveTab('asistencia')">Libro Asistencia</button>
-    <button class="tab-btn" [class.active]="activeTab === 'arqueros'"      (click)="setActiveTab('arqueros')">Arqueros</button>
     <button class="tab-btn" [class.active]="activeTab === 'inicio'"        (click)="setActiveTab('inicio')">Editar Inicio</button>
   </div>
 
@@ -566,19 +566,18 @@
               <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
               <td class="libro-td-cat" style="font-size:.78rem; opacity:.75;">{{ j.sede || '—' }}</td>
               <td *ngFor="let f of libroFechas" class="libro-td-estado">
-                <input
-                  type="text"
-                  class="libro-celda-input"
+                <span
+                  class="libro-celda-span"
                   [class.libro-estado-asistio]="j.registros[f] === 'asistio'"
                   [class.libro-estado-ausente]="j.registros[f] === 'ausente'"
                   [class.libro-estado-justificado]="j.registros[f] === 'justificado'"
+                  [class.libro-estado-licenciado]="j.registros[f] === 'licenciado'"
                   [class.libro-estado-sin]="!j.registros[f]"
-                  [value]="estadoLetra(j.registros[f])"
+                  tabindex="0"
                   (keydown)="onLibroCeldaKeydown($event, j, f)"
-                  maxlength="1"
-                  readonly
-                  title="Clic para enfocar, luego teclea P (Presente), A (Ausente) o J (Justificado)"
-                />
+                  title="Clic para enfocar, luego teclea: P=Presente  A=Ausente  J=Justificado  L=Licenciado">
+                  {{ estadoLetra(j.registros[f]) }}
+                </span>
               </td>
               <td class="libro-td-pct"
                   [class.pct-ok]="j.porcentaje !== null && j.porcentaje >= 85"
@@ -588,6 +587,7 @@
               </td>
               <td class="libro-td-resumen">
                 <span class="libro-p">{{ j.asistio }}P</span>
+                <span class="libro-l">{{ j.licenciado }}L</span>
                 <span class="libro-j">{{ j.justificado }}J</span>
                 <span class="libro-a">{{ j.ausente }}A</span>
               </td>
@@ -605,11 +605,12 @@
 
       <!-- Leyenda -->
       <div *ngIf="!cargandoLibro && libroJugadores.length > 0 && libroFechas.length > 0" class="libro-leyenda">
-        <span class="lib-ley lib-ley-p">P = Presente</span>
-        <span class="lib-ley lib-ley-j">J = Justificado (cuenta como presente)</span>
-        <span class="lib-ley lib-ley-a">A = Ausente</span>
+        <span class="lib-ley lib-ley-p">P = Presente (100%)</span>
+        <span class="lib-ley lib-ley-l">L = Licenciado (100%)</span>
+        <span class="lib-ley lib-ley-j">J = Justificado (0%)</span>
+        <span class="lib-ley lib-ley-a">A = Ausente (0%)</span>
         <span class="lib-ley lib-ley-critico">Rojo = menos del 70%</span>
-        <span class="lib-ley" style="opacity:.6;font-size:.78rem;">✏️ Clic en celda + tecla P / A / J para editar</span>
+        <span class="lib-ley" style="opacity:.6;font-size:.78rem;">✏️ Clic en celda y teclea P / A / J / L para editar</span>
       </div>
     </p-card>
   </div>

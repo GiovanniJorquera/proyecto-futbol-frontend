@@ -1067,11 +1067,14 @@ export class AdminComponent implements OnInit {
     if (estado === 'asistio')     return 'P';
     if (estado === 'ausente')     return 'A';
     if (estado === 'justificado') return 'J';
+    if (estado === 'licenciado')  return 'L';
     return '—';
   }
 
   contarPresentes(fecha: string): string {
-    const p = this.libroJugadores.filter(j => j.registros[fecha] === 'asistio').length;
+    const p = this.libroJugadores.filter(j =>
+      j.registros[fecha] === 'asistio' || j.registros[fecha] === 'licenciado'
+    ).length;
     return `${p}/${this.libroJugadores.length}`;
   }
 
@@ -1102,13 +1105,14 @@ export class AdminComponent implements OnInit {
   }
 
   /* Edición inline en libro de asistencia */
-  /* Edición con teclado: foco en celda y presiona P, A o J */
+  /* Edición con teclado: foco en celda y presiona P, A, J o L */
   onLibroCeldaKeydown(event: KeyboardEvent, jugador: any, fecha: string) {
     const key = (event.key || '').toUpperCase();
     let nuevoEstado: string | null = null;
     if (key === 'P') nuevoEstado = 'asistio';
     else if (key === 'A') nuevoEstado = 'ausente';
     else if (key === 'J') nuevoEstado = 'justificado';
+    else if (key === 'L') nuevoEstado = 'licenciado';
     else return;
 
     event.preventDefault();

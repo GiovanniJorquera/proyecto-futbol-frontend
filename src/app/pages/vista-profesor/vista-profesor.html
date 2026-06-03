@@ -183,7 +183,7 @@
           <!-- Resumen rápido -->
           <div class="resumen-bar">
             <span class="resumen-item asistio">
-              <i class="pi pi-check-circle"></i> {{ totalAsistio }} asistieron
+              <i class="pi pi-check-circle"></i> {{ totalAsistio }} presentes/lic.
             </span>
             <span class="resumen-item ausente">
               <i class="pi pi-times-circle"></i> {{ totalAusente }} ausentes
@@ -195,9 +195,10 @@
 
           <!-- Leyenda -->
           <div class="asis-leyenda">
-            <span class="ley-item ley-p"><kbd>P</kbd> Presente</span>
-            <span class="ley-item ley-a"><kbd>A</kbd> Ausente</span>
-            <span class="ley-item ley-j"><kbd>J</kbd> Justificado</span>
+            <span class="ley-item ley-p"><kbd>P</kbd> Presente (100%)</span>
+            <span class="ley-item ley-l"><kbd>L</kbd> Licenciado (100%)</span>
+            <span class="ley-item ley-j"><kbd>J</kbd> Justificado (0%)</span>
+            <span class="ley-item ley-a"><kbd>A</kbd> Ausente (0%)</span>
             <span class="ley-hint"><i class="pi pi-info-circle"></i> Escribe la letra y avanza automáticamente</span>
           </div>
 
@@ -214,6 +215,7 @@
                 [class.letra-p]="r.marcado && r.estado === 'asistio'"
                 [class.letra-a]="r.marcado && r.estado === 'ausente'"
                 [class.letra-j]="r.marcado && r.estado === 'justificado'"
+                [class.letra-l]="r.marcado && r.estado === 'licenciado'"
                 [value]="getLetra(r)"
                 (keydown)="onLetraKeydown($event, r, i)"
                 [id]="'asis-' + i"
@@ -315,6 +317,7 @@
                       [class.lprf-estado-p]="j.registros[f] === 'asistio'"
                       [class.lprf-estado-a]="j.registros[f] === 'ausente'"
                       [class.lprf-estado-j]="j.registros[f] === 'justificado'"
+                      [class.lprf-estado-l]="j.registros[f] === 'licenciado'"
                       [class.lprf-estado-sin]="!j.registros[f]">
                     {{ estadoLetraProf(j.registros[f]) }}
                   </td>
@@ -326,6 +329,7 @@
                   </td>
                   <td class="lprf-td-res">
                     <span class="lprf-p">{{ j.asistio }}P</span>
+                    <span class="lprf-l">{{ j.licenciado }}L</span>
                     <span class="lprf-j">{{ j.justificado }}J</span>
                     <span class="lprf-a">{{ j.ausente }}A</span>
                   </td>
@@ -335,10 +339,10 @@
           </div>
 
           <div *ngIf="!cargandoLibro && libroJugadores.length > 0 && libroFechas.length > 0" class="asis-leyenda" style="margin-top:.75rem">
-            <span class="ley-item ley-p"><kbd>P</kbd> Presente</span>
-            <span class="ley-item ley-a"><kbd>A</kbd> Ausente</span>
-            <span class="ley-item ley-j"><kbd>J</kbd> Justificado</span>
-            <span class="ley-hint"><i class="pi pi-info-circle"></i> J y P cuentan para el % de asistencia</span>
+            <span class="ley-item ley-p"><kbd>P</kbd> Presente (100%)</span>
+            <span class="ley-item ley-l"><kbd>L</kbd> Licenciado (100%)</span>
+            <span class="ley-item ley-j"><kbd>J</kbd> Justificado (0%)</span>
+            <span class="ley-item ley-a"><kbd>A</kbd> Ausente (0%)</span>
           </div>
         </div><!-- /modo libro -->
 

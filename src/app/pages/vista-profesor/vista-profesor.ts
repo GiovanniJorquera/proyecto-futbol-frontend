@@ -13,7 +13,7 @@ interface RegistroAsistencia {
   apellidoPaterno: string;
   apellidoMaterno: string;
   categoria: string;
-  estado: 'asistio' | 'ausente' | 'justificado';
+  estado: 'asistio' | 'ausente' | 'justificado' | 'licenciado';
   marcado: boolean;
 }
 
@@ -177,14 +177,16 @@ export class VistaProfesorComponent implements OnInit {
     if (!registro.marcado) return '';
     if (registro.estado === 'ausente')     return 'A';
     if (registro.estado === 'justificado') return 'J';
+    if (registro.estado === 'licenciado')  return 'L';
     return 'P';
   }
 
   onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
     const key = event.key.toUpperCase();
-    if (key === 'P') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
+    if      (key === 'P') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
     else if (key === 'A') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
     else if (key === 'J') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'justificado'); this.moverFoco(index + 1); }
+    else if (key === 'L') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'licenciado');  this.moverFoco(index + 1); }
     else if (key === 'ENTER' || key === 'ARROWDOWN') { event.preventDefault(); this.moverFoco(index + 1); }
     else if (key === 'ARROWUP') { event.preventDefault(); this.moverFoco(index - 1); }
   }
@@ -236,6 +238,7 @@ export class VistaProfesorComponent implements OnInit {
     if (estado === 'asistio')     return 'P';
     if (estado === 'ausente')     return 'A';
     if (estado === 'justificado') return 'J';
+    if (estado === 'licenciado')  return 'L';
     return '—';
   }
 
@@ -451,14 +454,18 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   get totalAsistio(): number {
-    return this.registros.filter(r => r.estado === 'asistio').length;
+    return this.registros.filter(r => r.marcado && (r.estado === 'asistio' || r.estado === 'licenciado')).length;
   }
 
   get totalAusente(): number {
-    return this.registros.filter(r => r.estado === 'ausente').length;
+    return this.registros.filter(r => r.marcado && r.estado === 'ausente').length;
   }
 
   get totalJustificado(): number {
-    return this.registros.filter(r => r.estado === 'justificado').length;
+    return this.registros.filter(r => r.marcado && r.estado === 'justificado').length;
+  }
+
+  get totalLicenciado(): number {
+    return this.registros.filter(r => r.marcado && r.estado === 'licenciado').length;
   }
 }

@@ -581,6 +581,8 @@ kbd {
 .ley-a kbd { background: var(--err-bg); border-color: var(--err); color: var(--err); }
 .ley-j { color: var(--warn); }
 .ley-j kbd { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+.ley-l { color: #38bdf8; }
+.ley-l kbd { background: rgba(56,189,248,.12); border-color: #38bdf8; color: #38bdf8; }
 
 .ley-hint {
   margin-left: auto;
@@ -641,6 +643,11 @@ kbd {
   background: var(--warn-bg);
   color: var(--warn);
   border-color: var(--warn);
+}
+.asis-letra.letra-l {
+  background: rgba(56,189,248,.12);
+  color: #38bdf8;
+  border-color: #38bdf8;
 }
 
 /* RESUMEN BAR */
@@ -1229,6 +1236,7 @@ kbd {
 .lprf-estado-p   { color: var(--ok); background: var(--ok-bg); }
 .lprf-estado-a   { color: var(--err); background: var(--err-bg); }
 .lprf-estado-j   { color: var(--warn); background: var(--warn-bg); }
+.lprf-estado-l   { color: #38bdf8; background: rgba(56,189,248,.10); }
 .lprf-estado-sin { color: var(--lbl-clr); }
 
 .lprf-td-pct {
@@ -1249,5 +1257,6 @@ kbd {
 }
 
 .lprf-p { color: var(--ok);   font-weight: 700; font-size: .8rem; }
+.lprf-l { color: #38bdf8;     font-weight: 700; font-size: .8rem; }
 .lprf-j { color: var(--warn); font-weight: 700; font-size: .8rem; }
 .lprf-a { color: var(--err);  font-weight: 700; font-size: .8rem; }
