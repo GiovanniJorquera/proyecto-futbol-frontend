@@ -328,10 +328,13 @@
                     {{ j.porcentaje !== null ? j.porcentaje + '%' : '—' }}
                   </td>
                   <td class="lprf-td-res">
-                    <span class="lprf-p">{{ j.asistio }}P</span>
-                    <span class="lprf-l">{{ j.licenciado }}L</span>
-                    <span class="lprf-j">{{ j.justificado }}J</span>
-                    <span class="lprf-a">{{ j.ausente }}A</span>
+                    <span class="lprf-p">{{ j.asistio }} P</span>
+                    <span class="lprf-sep">|</span>
+                    <span class="lprf-l">{{ j.licenciado }} L</span>
+                    <span class="lprf-sep">|</span>
+                    <span class="lprf-j">{{ j.justificado }} J</span>
+                    <span class="lprf-sep">|</span>
+                    <span class="lprf-a">{{ j.ausente }} A</span>
                   </td>
                 </tr>
               </tbody>

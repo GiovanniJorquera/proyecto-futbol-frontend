@@ -665,7 +665,8 @@
 .libro-celda-span.libro-estado-licenciado { color: #38bdf8; background: rgba(56,189,248,.10); }
 .libro-celda-span.libro-estado-sin        { color: rgba(244,247,243,.2); }
 
-.libro-l { color: #38bdf8; font-weight: 700; font-size: .78rem; }
+.libro-l   { color: #38bdf8; font-weight: 700; font-size: .78rem; }
+.libro-sep { color: rgba(244,247,243,.25); font-size: .72rem; margin: 0 .15rem; }
 .lib-ley-l { background: rgba(56,189,248,.12); color: #38bdf8; }
 
 .libro-td-pct {

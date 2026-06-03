@@ -1256,7 +1256,8 @@ kbd {
   justify-content: center;
 }
 
-.lprf-p { color: var(--ok);   font-weight: 700; font-size: .8rem; }
-.lprf-l { color: #38bdf8;     font-weight: 700; font-size: .8rem; }
-.lprf-j { color: var(--warn); font-weight: 700; font-size: .8rem; }
-.lprf-a { color: var(--err);  font-weight: 700; font-size: .8rem; }
+.lprf-p   { color: var(--ok);   font-weight: 700; font-size: .8rem; }
+.lprf-l   { color: #38bdf8;     font-weight: 700; font-size: .8rem; }
+.lprf-j   { color: var(--warn); font-weight: 700; font-size: .8rem; }
+.lprf-a   { color: var(--err);  font-weight: 700; font-size: .8rem; }
+.lprf-sep { color: rgba(0,0,0,.25); font-size: .72rem; margin: 0 .15rem; }

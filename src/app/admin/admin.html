@@ -586,10 +586,13 @@
                 {{ j.porcentaje !== null ? j.porcentaje + '%' : '—' }}
               </td>
               <td class="libro-td-resumen">
-                <span class="libro-p">{{ j.asistio }}P</span>
-                <span class="libro-l">{{ j.licenciado }}L</span>
-                <span class="libro-j">{{ j.justificado }}J</span>
-                <span class="libro-a">{{ j.ausente }}A</span>
+                <span class="libro-p">{{ j.asistio }} P</span>
+                <span class="libro-sep">|</span>
+                <span class="libro-l">{{ j.licenciado }} L</span>
+                <span class="libro-sep">|</span>
+                <span class="libro-j">{{ j.justificado }} J</span>
+                <span class="libro-sep">|</span>
+                <span class="libro-a">{{ j.ausente }} A</span>
               </td>
             </tr>
           </tbody>
