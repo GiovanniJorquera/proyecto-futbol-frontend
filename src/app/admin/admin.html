@@ -474,19 +474,6 @@
         <h3><i class="pi pi-book" style="color:var(--p-primary-color)"></i> Libro de Asistencia Mensual</h3>
       </div>
 
-      <!-- MIGRACIÓN CSV -->
-      <div class="migracion-bloque">
-        <div class="migracion-info">
-          <i class="pi pi-exclamation-triangle" style="color:#fbbf24"></i>
-          <span>Si los jugadores no muestran apellido, usa este botón <strong>una sola vez</strong> para corregir los datos importados.</span>
-        </div>
-        <button class="btn-migracion" (click)="ejecutarMigracionCSV()" [disabled]="migracionEnCurso">
-          <i class="pi pi-spin pi-spinner" *ngIf="migracionEnCurso"></i>
-          <i class="pi pi-wrench" *ngIf="!migracionEnCurso"></i>
-          {{ migracionEnCurso ? 'Migrando...' : 'Corregir datos CSV' }}
-        </button>
-        <span *ngIf="migracionResultado" class="migracion-resultado">{{ migracionResultado }}</span>
-      </div>
 
       <!-- Controles -->
       <div class="filter-bar" style="margin-bottom:1.25rem">
