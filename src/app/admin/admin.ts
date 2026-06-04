@@ -1116,7 +1116,11 @@ export class AdminComponent implements OnInit {
     this.libroError = '';
     let url = `${this.apiUrl}/admin/asistencias/libro?mes=${this.libroMes}`;
     if (this.libroCat)  url += `&categoria=${encodeURIComponent(this.libroCat)}`;
-    if (this.libroSede) url += `&sede=${encodeURIComponent(this.libroSede)}`;
+    if (this.libroSede) {
+      // Enviar primera palabra para capturar variantes: "Viña del Mar" → "Viña" (coincide con "Viña" y "Viña del Mar")
+      const sedeKey = this.libroSede.trim().split(/\s+/)[0];
+      url += `&sede=${encodeURIComponent(sedeKey)}`;
+    }
     this.http.get<any>(url, this.authHeaders()).subscribe({
       next: (data: any) => {
         this.libroFechas = data.fechas;
