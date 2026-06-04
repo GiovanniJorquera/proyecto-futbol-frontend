@@ -235,7 +235,7 @@ export class VistaProfesorComponent implements OnInit {
     this.api.getLibroProfesor(this.libroMes).subscribe({
       next: (data) => {
         this.libroFechas = data.fechas;
-        this.libroJugadores = (data.jugadores || []).filter(j => this.applyProfesorSedeLibroFilter(j));
+        this.libroJugadores = (data.jugadores || []).filter((j: any) => this.applyProfesorSedeLibroFilter(j));
         this.cargandoLibro = false;
       },
       error: (err: any) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro.'; }
