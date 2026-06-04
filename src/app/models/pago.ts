@@ -4,7 +4,7 @@ export interface Pago {
   id: string;
   apoderado: string;
   alumno: string;
-  sede: 'Sede 1' | 'Sede 2';
+  sede: string;
   monto: number;
   fecha: string;
   voucherBase64: string;

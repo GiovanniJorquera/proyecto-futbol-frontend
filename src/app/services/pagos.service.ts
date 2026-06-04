@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 export interface CrearPagoDto {
   apoderado: string;
   alumno: string;
-  sede: 'Sede 1' | 'Sede 2';
+  sede: string;
   monto: number;
   fecha: string;
   voucherBase64: string;
@@ -20,7 +20,7 @@ interface PagoMongoResponse {
   _id: string;
   apoderado: string;
   alumno: string;
-  sede: 'Sede 1' | 'Sede 2';
+  sede: string;
   monto: number;
   fecha: string;
   voucherBase64: string;

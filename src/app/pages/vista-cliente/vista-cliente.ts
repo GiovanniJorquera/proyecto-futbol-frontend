@@ -185,7 +185,7 @@ export class VistaClienteComponent implements OnInit {
     this.pagosService.postPago({
       apoderado: this.ficha.apoderado?.nombre || 'Apoderado',
       alumno: `${this.ficha.nombre} (${this.ficha.cedula || 'sin RUT'})`,
-      sede: this.voucherForm.sede as 'Sede 1' | 'Sede 2',
+      sede: this.voucherForm.sede,
       monto: this.voucherForm.montoPagado,
       fecha: this.voucherForm.fecha,
       voucherBase64: this.voucherForm.voucherBase64,
