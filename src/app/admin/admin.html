@@ -539,7 +539,7 @@
               <th class="libro-th-num">#</th>
               <th class="libro-th-nombre">Jugador</th>
               <th class="libro-th-cat">Cat.</th>
-              <th class="libro-th-cat">Sede</th>
+              <th class="libro-th-sede">Sede</th>
               <th *ngFor="let f of libroFechas" class="libro-th-fecha">{{ formatFechaLibro(f) }}</th>
               <th class="libro-th-pct">%</th>
               <th class="libro-th-resumen">Asistencias</th>
@@ -551,7 +551,7 @@
               <td class="libro-td-num">{{ i + 1 }}</td>
               <td class="libro-td-nombre">{{ nombreLibro(j) }}</td>
               <td class="libro-td-cat"><span class="libro-cat-badge">{{ j.categoria }}</span></td>
-              <td class="libro-td-cat" style="font-size:.78rem; opacity:.75;">{{ j.sede || '—' }}</td>
+              <td class="libro-td-sede">{{ j.sede || '—' }}</td>
               <td *ngFor="let f of libroFechas" class="libro-td-estado">
                 <span
                   class="libro-celda-span"
@@ -561,8 +561,9 @@
                   [class.libro-estado-licenciado]="j.registros[f] === 'licenciado'"
                   [class.libro-estado-sin]="!j.registros[f]"
                   tabindex="0"
+                  (click)="onLibroCeldaClick($event, j, f)"
                   (keydown)="onLibroCeldaKeydown($event, j, f)"
-                  title="Clic para enfocar, luego teclea: P=Presente  A=Ausente  J=Justificado  L=Licenciado">
+                  title="Clic para cambiar (P→L→J→A). También puedes teclear la letra.">
                   {{ estadoLetra(j.registros[f]) }}
                 </span>
               </td>
@@ -600,7 +601,7 @@
         <span class="lib-ley lib-ley-j">J = Justificado (0%)</span>
         <span class="lib-ley lib-ley-a">A = Ausente (0%)</span>
         <span class="lib-ley lib-ley-critico">Rojo = menos del 70%</span>
-        <span class="lib-ley" style="opacity:.6;font-size:.78rem;">✏️ Clic en celda y teclea P / A / J / L para editar</span>
+        <span class="lib-ley" style="opacity:.6;font-size:.78rem;">✏️ Clic en celda para cambiar (cicla P→L→J→A). También puedes teclear la letra directamente.</span>
       </div>
     </p-card>
   </div>
@@ -870,7 +871,7 @@
       </div>
       <div class="filter-field medium">
         <label>Estado pago</label>
-        <p-select [options]="[{label:'Todos',value:null},{label:'Pagado',value:'pagado'},{label:'Pendiente',value:'pendiente'}]" [(ngModel)]="filtrosFichas.conCuenta" optionLabel="label" optionValue="value" placeholder="Todos" appendTo="body"></p-select>
+        <p-select [options]="[{label:'Todos',value:null},{label:'Pagado',value:'pagado'},{label:'Pendiente (deben)',value:'pendiente'}]" [(ngModel)]="filtrosFichas.pago" optionLabel="label" optionValue="value" placeholder="Todos" appendTo="body"></p-select>
       </div>
       <p-button label="Limpiar" icon="pi pi-filter-slash" severity="secondary" (onClick)="limpiarFiltrosFichas()"></p-button>
     </div>

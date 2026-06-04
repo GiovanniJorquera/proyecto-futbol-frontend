@@ -84,7 +84,7 @@ export class AdminComponent implements OnInit {
   limpiarFiltros() { this.filtros = { texto: '', estado: null, comuna: null, edadMin: null, edadMax: null }; }
 
   /* ── FILTROS ─────────────────────────────────── */
-  filtrosFichas     = { texto: '', categoria: null as string | null, conCuenta: null as boolean | null };
+  filtrosFichas     = { texto: '', categoria: null as string | null, conCuenta: null as boolean | null, pago: null as string | null };
   filtrosProfesores = { texto: '', division: null as string | null };
   filtrosDivisiones = { texto: '' };
   filtrosPartidos   = { texto: '', tipo: null as string | null };
@@ -874,12 +874,14 @@ export class AdminComponent implements OnInit {
       }
       if (this.filtrosFichas.categoria && f.categoria !== this.filtrosFichas.categoria) return false;
       if (this.filtrosFichas.conCuenta !== null && f.tieneCuenta !== this.filtrosFichas.conCuenta) return false;
+      if (this.filtrosFichas.pago === 'pagado'   && f.pagoMesActual !== 'pagado')   return false;
+      if (this.filtrosFichas.pago === 'pendiente' && (f.beca || f.pagoMesActual === 'pagado')) return false;
       return true;
     });
   }
   get totalConCuenta() { return this.fichas.filter((f: any) => f.tieneCuenta).length; }
   get totalBeca()      { return this.fichas.filter((f: any) => f.beca).length; }
-  limpiarFiltrosFichas() { this.filtrosFichas = { texto: '', categoria: null, conCuenta: null }; }
+  limpiarFiltrosFichas() { this.filtrosFichas = { texto: '', categoria: null, conCuenta: null, pago: null }; }
 
   generarLinkRegistro() {
     this.http.post<{ token: string }>(`${this.apiUrl}/admin/generar-invitacion`, {}, this.authHeaders()).subscribe({
@@ -1158,10 +1160,10 @@ export class AdminComponent implements OnInit {
 
   /* Lista unificada de divisiones disponibles (de la colección Divisiones + de profesores) */
   get divisionesDisponibles(): string[] {
-    const fromDivisiones = this.divisiones.map((d: any) => d.nombre).filter(Boolean);
-    const fromProfesores = this.profesores.flatMap((p: any) => p.divisiones || []);
+    const fromDivisiones = this.divisiones.map((d: any) => (d.nombre || '').trim()).filter(Boolean);
+    const fromProfesores = this.profesores.flatMap((p: any) => (p.divisiones || []).map((s: string) => s.trim())).filter(Boolean);
     const todas = [...new Set([...fromDivisiones, ...fromProfesores])].sort();
-    return todas as string[];
+    return todas;
   }
 
   isDivisionSeleccionada(d: string): boolean {
@@ -1177,21 +1179,26 @@ export class AdminComponent implements OnInit {
     this.profesorForm.divisionesTexto = lista.join(', ');
   }
 
-  /* Edición inline en libro de asistencia */
-  /* Edición con teclado: foco en celda y presiona P, A, J o L */
-  onLibroCeldaKeydown(event: KeyboardEvent, jugador: any, fecha: string) {
-    const key = (event.key || '').toUpperCase();
-    let nuevoEstado: string | null = null;
-    if (key === 'P') nuevoEstado = 'asistio';
-    else if (key === 'A') nuevoEstado = 'ausente';
-    else if (key === 'J') nuevoEstado = 'justificado';
-    else if (key === 'L') nuevoEstado = 'licenciado';
-    else return;
+  /* Clic → cicla P → L → J → A → P */
+  onLibroCeldaClick(event: MouseEvent, jugador: any, fecha: string) {
+    const ciclo: Record<string, string> = { '': 'asistio', 'asistio': 'licenciado', 'licenciado': 'justificado', 'justificado': 'ausente', 'ausente': 'asistio' };
+    const nuevoEstado = ciclo[jugador.registros[fecha] || ''] ?? 'asistio';
+    (event.currentTarget as HTMLElement).focus();
+    this.guardarCeldaLibro(jugador, fecha, nuevoEstado);
+  }
 
+  /* Teclado → P, A, J o L */
+  onLibroCeldaKeydown(event: KeyboardEvent, jugador: any, fecha: string) {
+    const mapa: Record<string, string> = { P: 'asistio', A: 'ausente', J: 'justificado', L: 'licenciado' };
+    const nuevoEstado = mapa[(event.key || '').toUpperCase()];
+    if (!nuevoEstado) return;
     event.preventDefault();
+    this.guardarCeldaLibro(jugador, fecha, nuevoEstado);
+  }
+
+  private guardarCeldaLibro(jugador: any, fecha: string, nuevoEstado: string) {
     const estadoAnterior = jugador.registros[fecha] || '';
     jugador.registros[fecha] = nuevoEstado;
-
     this.http.put(
       `${this.apiUrl}/admin/asistencias/editar`,
       { jugadorId: jugador._id, fecha, estado: nuevoEstado },
@@ -1199,12 +1206,13 @@ export class AdminComponent implements OnInit {
     ).subscribe({
       next: () => {
         const totalClases = this.libroFechas.length;
-        const asistio     = this.libroFechas.filter(f => jugador.registros[f] === 'asistio').length;
-        const justificado = this.libroFechas.filter(f => jugador.registros[f] === 'justificado').length;
+        const asistio    = this.libroFechas.filter(f => jugador.registros[f] === 'asistio').length;
+        const licenciado = this.libroFechas.filter(f => jugador.registros[f] === 'licenciado').length;
         jugador.asistio     = asistio;
-        jugador.justificado = justificado;
+        jugador.licenciado  = licenciado;
+        jugador.justificado = this.libroFechas.filter(f => jugador.registros[f] === 'justificado').length;
         jugador.ausente     = this.libroFechas.filter(f => jugador.registros[f] === 'ausente').length;
-        jugador.porcentaje  = totalClases > 0 ? Math.round((asistio + justificado) / totalClases * 100) : null;
+        jugador.porcentaje  = totalClases > 0 ? Math.round((asistio + licenciado) / totalClases * 100) : null;
       },
       error: () => {
         jugador.registros[fecha] = estadoAnterior;
