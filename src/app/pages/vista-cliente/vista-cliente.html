@@ -210,20 +210,34 @@
             <div class="pago-monto ok-text"><i class="pi pi-check"></i> Mes al día</div>
           </div>
 
-          <!-- Tarjeta estado: pendiente (debe $20.000) -->
+          <!-- Tarjeta estado: pendiente -->
           <div *ngIf="estadoPago === 'pendiente'" class="pago-card pago-pendiente">
             <div class="pago-card-header">
               <i class="pi pi-exclamation-circle"></i>
               <span class="pago-mes-label">Cuota mensual</span>
               <span class="pago-badge badge-warn">Pendiente</span>
             </div>
-            <div class="pago-monto">
-              Debes: <strong>$20.000</strong>
+
+            <!-- Sin voucher enviado o rechazado → mostrar botón -->
+            <ng-container *ngIf="!voucherMesActual.existe || voucherMesActual.estado === 'rechazado'">
+              <div class="pago-monto" *ngIf="voucherMesActual.estado === 'rechazado'" style="color:#ff6b6b;font-size:.88rem;">
+                <i class="pi pi-times-circle"></i> Comprobante rechazado. Por favor envía uno nuevo.
+              </div>
+              <div style="margin-top:0.85rem;">
+                <button type="button" class="btn-voucher" (click)="abrirFormVoucher()">
+                  <i class="pi pi-receipt"></i> {{ mostrarFormVoucher ? 'Cancelar' : 'Enviar comprobante de pago' }}
+                </button>
+              </div>
+            </ng-container>
+
+            <!-- Voucher enviado → en revisión -->
+            <div *ngIf="voucherMesActual.existe && voucherMesActual.estado === 'pendiente'" class="pago-monto" style="color:#fbbf24;font-size:.88rem;margin-top:.5rem;">
+              <i class="pi pi-clock"></i> Comprobante enviado — en revisión por el administrador.
             </div>
-            <div style="margin-top:0.85rem;">
-              <button type="button" class="btn-voucher" (click)="abrirFormVoucher()">
-                <i class="pi pi-receipt"></i> {{ mostrarFormVoucher ? 'Cancelar' : 'Enviar comprobante de pago' }}
-              </button>
+
+            <!-- Voucher aprobado pero PagoMensual aún no actualizado -->
+            <div *ngIf="voucherMesActual.existe && voucherMesActual.estado === 'aprobado'" class="pago-monto ok-text" style="font-size:.88rem;margin-top:.5rem;">
+              <i class="pi pi-check-circle"></i> Pago aprobado — será confirmado en breve.
             </div>
           </div>
 

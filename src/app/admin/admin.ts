@@ -1339,6 +1339,11 @@ export class AdminComponent implements OnInit {
     return 'warn';
   }
 
+  get mesActualNombre(): string {
+    const m = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    return m[new Date().getMonth()];
+  }
+
   volverInicio(): void { this.router.navigate(['/inicio']); }
 
   cerrarSesion(): void {

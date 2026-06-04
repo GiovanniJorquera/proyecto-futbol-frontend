@@ -26,6 +26,7 @@ export class VistaClienteComponent implements OnInit {
 
   pagosMensuales: any = null;
   pagosMensualesError = false;
+  voucherMesActual: { existe: boolean; estado: string | null } = { existe: false, estado: null };
   rendimiento: any = null;
 
   chartData: any = null;
@@ -56,6 +57,7 @@ export class VistaClienteComponent implements OnInit {
           mesActual: { mes: data.mesActual.mes, anio: data.mesActual['año'], estado: data.mesActual.estado, monto: data.mesActual.monto },
           historial: (data.historial || []).map((p: any) => ({ mes: p.mes, anio: p['año'], estado: p.estado }))
         };
+        this.voucherMesActual = data.voucherMesActual || { existe: false, estado: null };
       },
       error: () => { this.pagosMensualesError = true; this.pagosMensuales = { error: true }; }
     });
@@ -139,8 +141,9 @@ export class VistaClienteComponent implements OnInit {
   abrirFormVoucher(): void {
     this.mostrarFormVoucher = !this.mostrarFormVoucher;
     if (this.mostrarFormVoucher) {
-      // Auto-rellenar sede desde la ficha del jugador
       this.voucherForm.sede = this.ficha?.sede || '';
+      this.tipoMensajeVoucher = '';
+      this.mensajeVoucher = '';
     }
   }
 

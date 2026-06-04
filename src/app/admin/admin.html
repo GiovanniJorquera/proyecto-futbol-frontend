@@ -917,8 +917,8 @@
           <td>
             <span *ngIf="f.beca" style="color:rgba(233,247,234,0.45); font-size:0.8rem;">Exento (beca)</span>
             <ng-container *ngIf="!f.beca">
-              <p-tag *ngIf="f.pagoMesActual === 'pagado'" value="Pagado" severity="success"></p-tag>
-              <span *ngIf="f.pagoMesActual !== 'pagado'" style="color:#ef5350; font-weight:700;">Debe $20.000</span>
+              <p-tag *ngIf="f.pagoMesActual === 'pagado'" [value]="'Pagado · ' + mesActualNombre" severity="success"></p-tag>
+              <p-tag *ngIf="f.pagoMesActual !== 'pagado'" value="PENDIENTE" severity="warn"></p-tag>
             </ng-container>
           </td>
           <td>
