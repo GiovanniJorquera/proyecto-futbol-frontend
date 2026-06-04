@@ -207,7 +207,7 @@ export class AdminComponent implements OnInit {
     this.migracionEnCurso = true;
     this.migracionResultado = '';
     this.http.post<any>(`${this.apiUrl}/admin/migracion-fichas-csv`, {}, this.authHeaders()).subscribe({
-      next: (r) => {
+      next: (r: any) => {
         this.migracionEnCurso = false;
         this.migracionResultado = r.mensaje + (r.errores ? ` (${r.errores} errores)` : '');
         this.cargarFichas();
@@ -215,8 +215,7 @@ export class AdminComponent implements OnInit {
         this.libroJugadores = [];
         this.libroFechas    = [];
       },
-      error: (err) => {
-        this.migracionEnCurso = false;
+      error: (err: any) => {
         this.migracionResultado = 'Error: ' + (err?.error?.detalle || err?.error?.mensaje || 'desconocido');
       }
     });
@@ -294,7 +293,7 @@ export class AdminComponent implements OnInit {
   cargarSolicitudes() {
     this.cargando = true;
     this.http.get<any[]>(`${this.apiUrl}/inscripciones`, this.authHeaders()).subscribe({
-      next: (data) => { this.solicitudes = data; this.cargando = false; },
+      next: (data: any[]) => { this.solicitudes = data; this.cargando = false; },
       error: () => { this.toast('error', 'Error', 'No se pudieron cargar las solicitudes.'); this.cargando = false; }
     });
   }
@@ -322,7 +321,7 @@ export class AdminComponent implements OnInit {
   /* ── PROFESORES ───────────────────────────────── */
   cargarProfesores() {
     this.http.get<any[]>(`${this.apiUrl}/profesores`, this.authHeaders()).subscribe({
-      next: (data) => this.profesores = data,
+      next: (data: any[]) => this.profesores = data,
       error: () => {}
     });
   }
@@ -337,6 +336,7 @@ export class AdminComponent implements OnInit {
 
   guardarProfesor() {
     if (!this.profesorForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
+    if (!this.profesorForm.sede) { this.toast('warn', 'Campo requerido', 'La sede es obligatoria.'); return; }
     const divisiones = this.profesorForm.divisionesTexto.split(',').map(d => d.trim()).filter(Boolean);
 
     if (this.profesorEditando) {
@@ -346,8 +346,8 @@ export class AdminComponent implements OnInit {
         error: () => this.toast('error', 'Error', 'No se pudo actualizar el profesor.')
       });
     } else {
-      if (!this.profesorForm.apellido || !this.profesorForm.rut) {
-        this.toast('warn', 'Campos requeridos', 'Apellido y RUT son obligatorios para crear el acceso.'); return;
+      if (!this.profesorForm.apellido || !this.profesorForm.rut || !this.profesorForm.sede) {
+        this.toast('warn', 'Campos requeridos', 'Apellido, RUT y sede son obligatorios para crear el acceso.'); return;
       }
       const data = {
         nombre: this.profesorForm.nombre,
@@ -360,13 +360,13 @@ export class AdminComponent implements OnInit {
         divisiones
       };
       this.http.post<any>(`${this.apiUrl}/profesores/crear-acceso`, data, this.authHeaders()).subscribe({
-        next: (res) => {
+        next: (res: any) => {
           this.modalProfesorVisible = false;
           this.credencialesProfesor = res.credenciales;
           this.modalCredencialesProfesorVisible = true;
           this.cargarProfesores();
         },
-        error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear el profesor.')
+        error: (err: any) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear el profesor.')
       });
     }
   }
@@ -380,10 +380,15 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  get profesorSedeOpciones() {
+    const opciones = (this.siteConfig.sedes || []).map((s: string) => ({ label: s, value: s }));
+    return [{ label: 'Seleccionar sede', value: null }, ...opciones];
+  }
+
   /* ── DIVISIONES ───────────────────────────────── */
   cargarDivisiones() {
     this.http.get<any[]>(`${this.apiUrl}/divisiones`, this.authHeaders()).subscribe({
-      next: (data) => this.divisiones = data,
+      next: (data: any[]) => this.divisiones = data,
       error: () => {}
     });
   }
@@ -419,7 +424,7 @@ export class AdminComponent implements OnInit {
   /* ── PARTIDOS ─────────────────────────────────── */
   cargarPartidos() {
     this.http.get<any[]>(`${this.apiUrl}/partidos`).subscribe({
-      next: (data) => this.partidos = data,
+      next: (data: any[]) => this.partidos = data,
       error: () => {}
     });
   }
@@ -461,7 +466,7 @@ export class AdminComponent implements OnInit {
         this.toast('warn', 'Atención', 'No se pudo cargar los pagos aprobados.');
         return of([] as Pago[]);
       })
-    ).subscribe((pagos) => {
+    ).subscribe((pagos: any) => {
       this.pagosAprobados = pagos;
       this.cargandoAprobados = false;
     });
@@ -477,7 +482,7 @@ export class AdminComponent implements OnInit {
             this.toast('success', 'Vinculado', 'Pago mensual marcado como pagado.');
             if (this.fichas.length > 0) this.cargarFichas();
           },
-          error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo vincular el pago.')
+          error: (err: any) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo vincular el pago.')
         });
       }
     );
@@ -512,7 +517,7 @@ export class AdminComponent implements OnInit {
         this.toast('warn', 'Atención', 'No se pudo conectar al servidor de pagos.');
         return of([] as Pago[]);
       })
-    ).subscribe((pagos) => {
+    ).subscribe((pagos: any) => {
       this.pagosPendientes = pagos;
       this.cargandoPagos = false;
     });
@@ -524,7 +529,7 @@ export class AdminComponent implements OnInit {
       this.modalVoucherVisible = true;
     } else {
       this.http.get<any>(`${this.apiUrl}/pagos/${pago.id}`, this.authHeaders()).subscribe({
-        next: (full) => { this.pagoSeleccionado = { ...pago, voucherBase64: full.voucherBase64 }; this.modalVoucherVisible = true; },
+        next: (full: any) => { this.pagoSeleccionado = { ...pago, voucherBase64: full.voucherBase64 }; this.modalVoucherVisible = true; },
         error: () => this.toast('error', 'Error', 'No se pudo cargar el voucher.')
       });
     }
@@ -555,7 +560,7 @@ export class AdminComponent implements OnInit {
   /* ── CONFIG / NOTICIAS ────────────────────────── */
   cargarConfig(): void {
     this.http.get<any>(`${this.apiUrl}/config`).subscribe({
-      next: (c) => {
+      next: (c: any) => {
         this.siteConfig.tituloHeader = c.tituloHeader || 'Escuela de Futbol - Inicio';
         this.siteConfig.tituloBienvenida = c.tituloBienvenida || '¡Bienvenidos Crack!';
         this.siteConfig.subtituloBienvenida = c.subtituloBienvenida || 'Revisa las últimas novedades de tu club.';
@@ -637,14 +642,13 @@ export class AdminComponent implements OnInit {
   private putConfig(payload: object): void {
     this.guardandoConfig = true;
     this.http.put<any>(`${this.apiUrl}/config`, payload, this.authHeaders()).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.guardandoConfig = false;
         if (res && res.imagenesCarrusel) this.siteConfig.imagenesCarrusel = res.imagenesCarrusel;
         if (res && res.imagenesGaleria)  this.siteConfig.imagenesGaleria  = res.imagenesGaleria;
         this.toast('success', 'Guardado', 'Configuración actualizada.');
       },
-      error: (err) => {
-        this.guardandoConfig = false;
+      error: (err: any) => {
         const detalle = err?.error?.detalle || err?.message || '';
         this.toast('error', 'Error al guardar', detalle || 'No se pudo guardar la configuración.');
       },
@@ -695,7 +699,7 @@ export class AdminComponent implements OnInit {
   }
 
   cargarNoticiasAdmin(): void {
-    this.http.get<any[]>(`${this.apiUrl}/noticias`).subscribe({ next: (d) => this.noticiasAdmin = d, error: () => {} });
+    this.http.get<any[]>(`${this.apiUrl}/noticias`).subscribe({ next: (d: any) => this.noticiasAdmin = d, error: () => {} });
   }
 
   abrirModalNoticia(n?: any): void {
@@ -730,7 +734,7 @@ export class AdminComponent implements OnInit {
   cargarFichas() {
     this.cargandoFichas = true;
     this.http.get<any[]>(`${this.apiUrl}/ficha-temporada`, this.authHeaders()).subscribe({
-      next: (data) => { this.fichas = data; this.cargandoFichas = false; },
+      next: (data: any[]) => { this.fichas = data; this.cargandoFichas = false; },
       error: () => { this.toast('error', 'Error', 'No se pudieron cargar las fichas.'); this.cargandoFichas = false; }
     });
   }
@@ -790,7 +794,7 @@ export class AdminComponent implements OnInit {
     delete datos.numerosFavoritosTexto;
     this.http.put<any>(`${this.apiUrl}/ficha-temporada/${this.fichaSeleccionada._id}`, datos, this.authHeaders()).subscribe({
       next: () => { this.modalEditarFichaVisible = false; this.toast('success', 'Guardado', 'Jugador actualizado correctamente.'); this.cargarFichas(); },
-      error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo guardar.')
+      error: (err: any) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo guardar.')
     });
   }
 
@@ -820,12 +824,12 @@ export class AdminComponent implements OnInit {
       'Crear cuenta cliente', 'pi pi-user-plus', 'Sí, crear', 'p-button-success',
       () => {
         this.http.post<any>(`${this.apiUrl}/admin/crear-cliente-ficha/${fichaId}`, {}, this.authHeaders()).subscribe({
-          next: (res) => {
+          next: (res: any) => {
             this.credencialesCliente = { email: res.email, passwordTemporal: res.passwordTemporal };
             this.modalFichaVisible = false;
             this.modalCredencialesVisible = true;
           },
-          error: (err) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear la cuenta.')
+          error: (err: any) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo crear la cuenta.')
         });
       }
     );
@@ -879,7 +883,7 @@ export class AdminComponent implements OnInit {
 
   generarLinkRegistro() {
     this.http.post<{ token: string }>(`${this.apiUrl}/admin/generar-invitacion`, {}, this.authHeaders()).subscribe({
-      next: ({ token }) => {
+      next: ({ token }: any) => {
         const url = `${window.location.origin}/registrar/${token}`;
         navigator.clipboard.writeText(url).then(() => {
           this.toast('success', '¡Link copiado!', 'Válido por 48 horas. Envíalo al apoderado.');
@@ -924,7 +928,7 @@ export class AdminComponent implements OnInit {
       }
       if (this.filtrosJugadores.categoria && f.categoria !== this.filtrosJugadores.categoria) return false;
       if (this.filtrosJugadores.posicion && f.posicion !== this.filtrosJugadores.posicion) return false;
-      if (this.filtrosJugadores.sede && f.sede !== this.filtrosJugadores.sede) return false;
+      if (this.filtrosJugadores.sede && !this.sedeMatches(f.sede, this.filtrosJugadores.sede)) return false;
       return true;
     });
   }
@@ -934,8 +938,67 @@ export class AdminComponent implements OnInit {
     return [{ label: 'Todas', value: null }, ...pos.map(p => ({ label: p as string, value: p as string }))];
   }
 
+  private normalizeString(value: string | null | undefined): string {
+    if (!value) return '';
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeCategoria(value: string | null | undefined): string {
+    const normalized = this.normalizeString(value);
+    return normalized.replace(/sub\s*[-_\s]?(\d+)/, 'sub-$1');
+  }
+
+  private categoriaMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeCategoria(a);
+    const bNorm = this.normalizeCategoria(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private normalizeSede(sede: string | null | undefined): string {
+    if (!sede) return '';
+    const canonical = sede
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (canonical === 'vina' || canonical === 'vina del mar') return 'viña del mar';
+    if (canonical === 'olmue') return 'olmué';
+    return canonical;
+  }
+
+  private sedeMatches(sede: string | null | undefined, filtro: string | null | undefined): boolean {
+    if (!filtro) return true;
+    const fichaNorm = this.normalizeSede(sede);
+    const filtroNorm = this.normalizeSede(filtro);
+    if (!fichaNorm) return false;
+    if (fichaNorm === filtroNorm) return true;
+    return fichaNorm.includes(filtroNorm) || filtroNorm.includes(fichaNorm);
+  }
+
   get sedeJugadorOpciones() {
-    return [{ label: 'Todas', value: null }, ...this.siteConfig.sedes.map(s => ({ label: s, value: s }))];
+    const opcionesMap = new Map<string, { label: string; value: string }>();
+    this.siteConfig.sedes.forEach((s: string) => opcionesMap.set(this.normalizeSede(s), { label: s, value: s }));
+    this.fichas.forEach((f: any) => {
+      const raw = f?.sede;
+      if (!raw) return;
+      const key = this.normalizeSede(raw);
+      if (!opcionesMap.has(key)) {
+        opcionesMap.set(key, { label: raw, value: raw });
+      }
+    });
+    return [{ label: 'Todas', value: null }, ...Array.from(opcionesMap.values())];
   }
 
   limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null, sede: null }; }
@@ -948,7 +1011,7 @@ export class AdminComponent implements OnInit {
     this.rendZoomAnio = null;
     this.rendZoomMes = null;
     this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${ficha._id}`, this.authHeaders()).subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.rendimientoJugador = [...data].reverse();
         this.cargandoRendimiento = false;
         this.buildRendChart();
@@ -1053,9 +1116,19 @@ export class AdminComponent implements OnInit {
     if (this.libroCat)  url += `&categoria=${encodeURIComponent(this.libroCat)}`;
     if (this.libroSede) url += `&sede=${encodeURIComponent(this.libroSede)}`;
     this.http.get<any>(url, this.authHeaders()).subscribe({
-      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
-      error: (err) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro de asistencia.'; }
+      next: (data: any) => {
+        this.libroFechas = data.fechas;
+        this.libroJugadores = (Array.isArray(data.jugadores) ? data.jugadores : []).filter((j: any) => this.libroJugadorMatches(j));
+        this.cargandoLibro = false;
+      },
+      error: (err: any) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro de asistencia.'; }
     });
+  }
+
+  private libroJugadorMatches(jugador: any): boolean {
+    if (this.libroCat && !this.categoriaMatches(jugador.categoria, this.libroCat)) return false;
+    if (this.libroSede && !this.sedeMatches(jugador.sede, this.libroSede)) return false;
+    return true;
   }
 
   formatFechaLibro(iso: string): string {

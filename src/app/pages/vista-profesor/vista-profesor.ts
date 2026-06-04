@@ -25,6 +25,7 @@ interface RegistroAsistencia {
   styleUrl: './vista-profesor.css'
 })
 export class VistaProfesorComponent implements OnInit {
+  // Type annotations for strict mode compliance
   @HostBinding('class.dark') temaOscuro = false;
   menuAbierto = false;
 
@@ -90,10 +91,10 @@ export class VistaProfesorComponent implements OnInit {
 
   cargarDatos() {
     this.api.getPerfilProfesor().subscribe({
-      next: (p) => {
+      next: (p: any) => {
         this.profesor = p;
         this.api.getMisFichas().subscribe({
-          next: (f) => { this.fichas = f; this.cargando = false; },
+          next: (f: any) => { this.fichas = f; this.cargando = false; },
           error: () => { this.error = 'Error al cargar jugadores.'; this.cargando = false; }
         });
       },
@@ -154,14 +155,17 @@ export class VistaProfesorComponent implements OnInit {
     }));
 
     this.api.getAsistenciasProfesor(this.fechaSeleccionada).subscribe({
-      next: (asistencias) => {
-        asistencias.forEach(a => {
+      next: (asistencias: any[]) => {
+        asistencias.forEach((a: any) => {
           const r = this.registros.find(r => r.jugadorId.toString() === a.jugadorId.toString());
           if (r) { r.estado = a.estado; r.marcado = true; }
         });
         // Si ya hay registros guardados para esta fecha, bloquear re-guardado
         if (asistencias.length > 0) {
           this.asistenciaGuardada = true;
+          this.registros.forEach(r => {
+            if (!r.marcado) { r.marcado = true; r.estado = 'ausente'; }
+          });
         }
         this.cargandoAsistencia = false;
       },
@@ -170,7 +174,9 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   setEstado(registro: RegistroAsistencia, estado: 'asistio' | 'ausente' | 'justificado' | 'licenciado') {
+    if (this.asistenciaGuardada) return;
     registro.estado = estado;
+    registro.marcado = true;
   }
 
   getLetra(registro: RegistroAsistencia): string {
@@ -182,6 +188,10 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
+    if (this.asistenciaGuardada) {
+      event.preventDefault();
+      return;
+    }
     const key = event.key.toUpperCase();
     if      (key === 'P') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
     else if (key === 'A') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
@@ -224,7 +234,11 @@ export class VistaProfesorComponent implements OnInit {
     this.cargandoLibro = true;
     this.libroError = '';
     this.api.getLibroProfesor(this.libroMes).subscribe({
-      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
+      next: (data: any) => {
+        this.libroFechas = data.fechas;
+        this.libroJugadores = (data.jugadores || []).filter((j: any) => this.applyProfesorSedeLibroFilter(j));
+        this.cargandoLibro = false;
+      },
       error: (err: any) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro.'; }
     });
   }
@@ -283,8 +297,8 @@ export class VistaProfesorComponent implements OnInit {
       fisico: 3, tecnico: 3, psicologico: 3, estrategico: 3, notas: ''
     }));
     this.api.getRendimientoProfesorFecha(this.fechaRendimiento).subscribe({
-      next: (datos) => {
-        datos.forEach(d => {
+      next: (datos: any[]) => {
+        datos.forEach((d: any) => {
           const r = this.registrosRendimiento.find(r => r.jugadorId.toString() === d.jugadorId.toString());
           if (r) { r.fisico = d.fisico; r.tecnico = d.tecnico; r.psicologico = d.psicologico; r.estrategico = d.estrategico; r.notas = d.notas || ''; }
         });
@@ -332,7 +346,7 @@ export class VistaProfesorComponent implements OnInit {
     this.rendZoomAnio = null;
     this.rendZoomMes = null;
     this.rendimientoService.obtenerRendimientos(this.jugadorSeleccionadoRend._id).subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.rendHistorial = [...data].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         this.cargandoRendHist = false;
         this.buildRendChart();
@@ -340,7 +354,7 @@ export class VistaProfesorComponent implements OnInit {
       error: () => { this.cargandoRendHist = false; }
     });
     this.rendimientoService.obtenerResumen(this.jugadorSeleccionadoRend._id).subscribe({
-      next: (data) => { this.rendResumen = data; }
+      next: (data: any) => { this.rendResumen = data; }
     });
   }
 
@@ -429,14 +443,58 @@ export class VistaProfesorComponent implements OnInit {
     });
   }
 
+  private normalizeString(value: string | null | undefined): string {
+    if (!value) return '';
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeCategoria(value: string | null | undefined): string {
+    const normalized = this.normalizeString(value);
+    return normalized.replace(/sub\s*[-_\s]?(\d+)/, 'sub-$1');
+  }
+
+  private normalizeSede(value: string | null | undefined): string {
+    return this.normalizeString(value);
+  }
+
+  private categoriaMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeCategoria(a);
+    const bNorm = this.normalizeCategoria(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private sedeMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeSede(a);
+    const bNorm = this.normalizeSede(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private applyProfesorSedeFilter(fichas: any[]): any[] {
+    if (!this.profesor?.sede) return fichas;
+    return fichas.filter(f => this.sedeMatches(f.sede, this.profesor.sede));
+  }
+
+  private applyProfesorSedeLibroFilter(jugador: any): boolean {
+    return !this.profesor?.sede || this.sedeMatches(jugador.sede, this.profesor.sede);
+  }
+
   get fichasFiltradas(): any[] {
     if (!this.divisionFiltro) return this.fichas;
-    return this.fichas.filter(f => f.categoria === this.divisionFiltro);
+    return this.fichas.filter(f => this.categoriaMatches(f.categoria, this.divisionFiltro));
   }
 
   get libroJugadoresFiltrados(): any[] {
     if (!this.libroFiltroDivision) return this.libroJugadores;
-    return this.libroJugadores.filter(j => j.categoria === this.libroFiltroDivision);
+    return this.libroJugadores.filter(j => this.categoriaMatches(j.categoria, this.libroFiltroDivision));
   }
 
   toggleFiltroDiv(d: string) {

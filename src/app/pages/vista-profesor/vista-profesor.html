@@ -221,6 +221,7 @@
                 [id]="'asis-' + i"
                 maxlength="1"
                 readonly
+                [disabled]="asistenciaGuardada"
                 autocomplete="off"
                 spellcheck="false"
               />
@@ -230,7 +231,7 @@
           <!-- Ya guardada (cargada desde BD) -->
           <div class="alerta-ok" *ngIf="asistenciaGuardada && !guardando">
             <i class="pi pi-check-circle"></i>
-            Asistencia ya registrada para este día. Los jugadores sin marca fueron contados como Ausentes.
+            Asistencia ya registrada para este día. Los jugadores sin marca fueron contados como Ausentes. Si necesitas corregir un error, solicita al administrador que lo edite.
           </div>
 
           <!-- Error -->

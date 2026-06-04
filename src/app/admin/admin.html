@@ -1156,7 +1156,7 @@
       </div>
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <label style="font-weight:600;">Sede *</label>
-        <p-select [(ngModel)]="profesorForm.sede" [options]="[{label:'Viña del Mar', value:'VIÑA'},{label:'Olmué', value:'OLMUÉ'}]" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" style="width:100%;"></p-select>
+        <p-select [(ngModel)]="profesorForm.sede" [options]="profesorSedeOpciones" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" style="width:100%;"></p-select>
       </div>
       <div style="display:flex; flex-direction:column; gap:0.5rem; grid-column:1/-1;">
         <label style="font-weight:600;">Sub-Divisiones <small style="font-weight:400;">(haz clic para agregar/quitar)</small></label>
