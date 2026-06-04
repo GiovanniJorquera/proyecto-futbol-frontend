@@ -338,6 +338,7 @@ export class AdminComponent implements OnInit {
 
   guardarProfesor() {
     if (!this.profesorForm.nombre) { this.toast('warn', 'Campo requerido', 'El nombre es obligatorio.'); return; }
+    if (!this.profesorForm.sede) { this.toast('warn', 'Campo requerido', 'La sede es obligatoria.'); return; }
     const divisiones = this.profesorForm.divisionesTexto.split(',').map(d => d.trim()).filter(Boolean);
 
     if (this.profesorEditando) {
@@ -347,8 +348,8 @@ export class AdminComponent implements OnInit {
         error: () => this.toast('error', 'Error', 'No se pudo actualizar el profesor.')
       });
     } else {
-      if (!this.profesorForm.apellido || !this.profesorForm.rut) {
-        this.toast('warn', 'Campos requeridos', 'Apellido y RUT son obligatorios para crear el acceso.'); return;
+      if (!this.profesorForm.apellido || !this.profesorForm.rut || !this.profesorForm.sede) {
+        this.toast('warn', 'Campos requeridos', 'Apellido, RUT y sede son obligatorios para crear el acceso.'); return;
       }
       const data = {
         nombre: this.profesorForm.nombre,
@@ -379,6 +380,11 @@ export class AdminComponent implements OnInit {
         error: () => this.toast('error', 'Error', 'No se pudo eliminar.')
       });
     });
+  }
+
+  get profesorSedeOpciones() {
+    const opciones = (this.siteConfig.sedes || []).map((s: string) => ({ label: s, value: s }));
+    return [{ label: 'Seleccionar sede', value: null }, ...opciones];
   }
 
   /* ── DIVISIONES ───────────────────────────────── */
@@ -1141,9 +1147,19 @@ export class AdminComponent implements OnInit {
     if (this.libroCat)  url += `&categoria=${encodeURIComponent(this.libroCat)}`;
     if (this.libroSede) url += `&sede=${encodeURIComponent(this.libroSede)}`;
     this.http.get<any>(url, this.authHeaders()).subscribe({
-      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
+      next: (data) => {
+        this.libroFechas = data.fechas;
+        this.libroJugadores = (Array.isArray(data.jugadores) ? data.jugadores : []).filter((j: any) => this.libroJugadorMatches(j));
+        this.cargandoLibro = false;
+      },
       error: (err) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro de asistencia.'; }
     });
+  }
+
+  private libroJugadorMatches(jugador: any): boolean {
+    if (this.libroCat && !this.categoriaMatches(jugador.categoria, this.libroCat)) return false;
+    if (this.libroSede && !this.sedeMatches(jugador.sede, this.libroSede)) return false;
+    return true;
   }
 
   formatFechaLibro(iso: string): string {

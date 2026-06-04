@@ -93,7 +93,7 @@ export class VistaProfesorComponent implements OnInit {
       next: (p) => {
         this.profesor = p;
         this.api.getMisFichas().subscribe({
-          next: (f) => { this.fichas = f; this.cargando = false; },
+          next: (f) => { this.fichas = this.applyProfesorSedeFilter(f); this.cargando = false; },
           error: () => { this.error = 'Error al cargar jugadores.'; this.cargando = false; }
         });
       },
@@ -233,7 +233,11 @@ export class VistaProfesorComponent implements OnInit {
     this.cargandoLibro = true;
     this.libroError = '';
     this.api.getLibroProfesor(this.libroMes).subscribe({
-      next: (data) => { this.libroFechas = data.fechas; this.libroJugadores = data.jugadores; this.cargandoLibro = false; },
+      next: (data) => {
+        this.libroFechas = data.fechas;
+        this.libroJugadores = (data.jugadores || []).filter(j => this.applyProfesorSedeLibroFilter(j));
+        this.cargandoLibro = false;
+      },
       error: (err: any) => { this.cargandoLibro = false; this.libroError = err?.error?.mensaje || 'Error al cargar el libro.'; }
     });
   }
@@ -462,14 +466,36 @@ export class VistaProfesorComponent implements OnInit {
     return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
   }
 
+  private normalizeSede(value: string | null | undefined): string {
+    return this.normalizeString(value);
+  }
+
+  private sedeMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeSede(a);
+    const bNorm = this.normalizeSede(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private applyProfesorSedeFilter(fichas: any[]): any[] {
+    if (!this.profesor?.sede) return fichas;
+    return fichas.filter(f => this.sedeMatches(f.sede, this.profesor.sede));
+  }
+
+  private applyProfesorSedeLibroFilter(jugador: any): boolean {
+    return !this.profesor?.sede || this.sedeMatches(jugador.sede, this.profesor.sede);
+  }
+
   get fichasFiltradas(): any[] {
-    if (!this.divisionFiltro) return this.fichas;
-    return this.fichas.filter(f => this.categoriaMatches(f.categoria, this.divisionFiltro));
+    const filteredBySede = this.applyProfesorSedeFilter(this.fichas);
+    if (!this.divisionFiltro) return filteredBySede;
+    return filteredBySede.filter(f => this.categoriaMatches(f.categoria, this.divisionFiltro));
   }
 
   get libroJugadoresFiltrados(): any[] {
-    if (!this.libroFiltroDivision) return this.libroJugadores;
-    return this.libroJugadores.filter(j => this.categoriaMatches(j.categoria, this.libroFiltroDivision));
+    const jugadores = this.libroJugadores.filter(j => this.applyProfesorSedeLibroFilter(j));
+    if (!this.libroFiltroDivision) return jugadores;
+    return jugadores.filter(j => this.categoriaMatches(j.categoria, this.libroFiltroDivision));
   }
 
   toggleFiltroDiv(d: string) {
