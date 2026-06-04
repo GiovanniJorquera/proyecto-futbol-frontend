@@ -221,7 +221,7 @@
               Debes: <strong>$20.000</strong>
             </div>
             <div style="margin-top:0.85rem;">
-              <button type="button" class="btn-voucher" (click)="mostrarFormVoucher = !mostrarFormVoucher">
+              <button type="button" class="btn-voucher" (click)="abrirFormVoucher()">
                 <i class="pi pi-receipt"></i> {{ mostrarFormVoucher ? 'Cancelar' : 'Enviar comprobante de pago' }}
               </button>
             </div>
@@ -256,16 +256,16 @@
           <div class="voucher-fields">
             <div class="voucher-field">
               <label>Sede</label>
-              <select [(ngModel)]="voucherForm.sede" class="voucher-select">
-                <option value="">— Selecciona sede —</option>
-                <option *ngFor="let s of voucherSedes" [value]="s.value">{{ s.label }}</option>
-              </select>
+              <div class="voucher-sede-display">
+                <i class="pi pi-map-marker"></i>
+                {{ ficha?.sede || 'Sin sede asignada' }}
+              </div>
             </div>
             <div class="voucher-field">
               <label>Monto ($)</label>
               <input type="number" [(ngModel)]="voucherForm.montoPagado" class="voucher-input" min="1" />
             </div>
-            <div class="voucher-field">
+            <div class="voucher-field full-width">
               <label>Fecha del pago</label>
               <input type="date" [(ngModel)]="voucherForm.fecha" class="voucher-input" />
             </div>
@@ -277,6 +277,9 @@
 
           <div class="voucher-preview" *ngIf="voucherPreview">
             <img [src]="voucherPreview" alt="Vista previa del comprobante" />
+            <button type="button" class="btn-quitar-voucher" (click)="quitarVoucherImagen()">
+              <i class="pi pi-times"></i> Quitar imagen
+            </button>
           </div>
 
           <div class="alerta-error" *ngIf="tipoMensajeVoucher === 'error'">

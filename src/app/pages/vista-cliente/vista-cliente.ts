@@ -32,7 +32,6 @@ export class VistaClienteComponent implements OnInit {
   chartOptions: any = null;
 
   mostrarFormVoucher = false;
-  voucherSedes = [{ label: 'Sede 1', value: 'Sede 1' }, { label: 'Sede 2', value: 'Sede 2' }];
   voucherForm = { sede: '', montoPagado: 20000, fecha: '', voucherBase64: '' };
   voucherPreview = '';
   enviandoVoucher = false;
@@ -137,6 +136,19 @@ export class VistaClienteComponent implements OnInit {
     });
   }
 
+  abrirFormVoucher(): void {
+    this.mostrarFormVoucher = !this.mostrarFormVoucher;
+    if (this.mostrarFormVoucher) {
+      // Auto-rellenar sede desde la ficha del jugador
+      this.voucherForm.sede = this.ficha?.sede || '';
+    }
+  }
+
+  quitarVoucherImagen(): void {
+    this.voucherPreview = '';
+    this.voucherForm.voucherBase64 = '';
+  }
+
   onVoucherFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -161,7 +173,9 @@ export class VistaClienteComponent implements OnInit {
   }
 
   enviarVoucher(): void {
-    if (!this.ficha || !this.voucherForm.sede || !this.voucherForm.fecha || !this.voucherForm.voucherBase64) {
+    // Asegurar sede desde la ficha si aún no está
+    if (!this.voucherForm.sede) this.voucherForm.sede = this.ficha?.sede || '';
+    if (!this.ficha || !this.voucherForm.fecha || !this.voucherForm.voucherBase64) {
       this.tipoMensajeVoucher = 'error';
       this.mensajeVoucher = 'Por favor completa todos los campos y sube el comprobante.';
       return;
