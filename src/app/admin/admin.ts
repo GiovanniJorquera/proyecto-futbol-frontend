@@ -132,6 +132,15 @@ export class AdminComponent implements OnInit {
     { label: 'Extrovertido', value: 'Extrovertido' },
     { label: 'Mixto', value: 'Mixto' },
   ];
+
+  actitudAdversidadOpciones = [
+    { label: '— Sin especificar —', value: '' },
+    { label: 'Tristeza por un día o más', value: 'Tristeza por un día o más' },
+    { label: 'Tristeza solo durante la actividad', value: 'Tristeza solo durante la actividad' },
+    { label: 'Sin reacción', value: 'Sin reacción' },
+    { label: 'Conversa para ver en qué mejorar', value: 'Conversa para ver en qué mejorar' },
+    { label: 'Conversa durante el día o más para mejorar', value: 'Conversa durante el día o más para mejorar' },
+  ];
   cuentaOpciones = [
     { label: 'Todos', value: null },
     { label: 'Con acceso al portal', value: true },
@@ -201,6 +210,30 @@ export class AdminComponent implements OnInit {
   /* ── MIGRACIÓN CSV ───────────────────────────────── */
   migracionEnCurso  = false;
   migracionResultado = '';
+
+  /* ── NORMALIZACIÓN SEDES ─────────────────────────── */
+  normalizandoSedes  = false;
+  normalizacionResultado = '';
+
+  normalizarSedes() {
+    if (this.normalizandoSedes) return;
+    this.normalizandoSedes = true;
+    this.normalizacionResultado = '';
+    this.http.post<any>(`${this.apiUrl}/admin/normalizar-sedes`, {}, this.authHeaders()).subscribe({
+      next: (r) => {
+        this.normalizandoSedes = false;
+        this.normalizacionResultado = r.mensaje;
+        this.cargarFichas();
+        this.tabLibroLoaded = false;
+        this.libroJugadores = [];
+        this.libroFechas = [];
+      },
+      error: (err) => {
+        this.normalizandoSedes = false;
+        this.normalizacionResultado = 'Error: ' + (err?.error?.detalle || 'desconocido');
+      }
+    });
+  }
 
   ejecutarMigracionCSV() {
     if (this.migracionEnCurso) return;
@@ -1104,10 +1137,12 @@ export class AdminComponent implements OnInit {
     return this.fichas.filter((f: any) => (f.posicion || '').toLowerCase() === 'arquero');
   }
 
-  /* Categorías */
+  /* Categorías — dinámico desde las fichas + base estática (incluye femenina y cualquier otra) */
   get categoriaJugadorOpciones() {
-    const cats = ['Sub-6','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Libre'];
-    return [{ label: 'Todas', value: null }, ...cats.map(c => ({ label: c, value: c }))];
+    const base = ['Sub-6','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Libre'];
+    const fromFichas = this.fichas.map((f: any) => f.categoria).filter(Boolean) as string[];
+    const todas = [...new Set([...base, ...fromFichas])].sort();
+    return [{ label: 'Todas', value: null }, ...todas.map(c => ({ label: c, value: c }))];
   }
 
   /* Libro de asistencia */

@@ -938,6 +938,21 @@
   <ng-container *ngIf="tabJugadoresLoaded">
   <p-card>
     <div class="sec-header"><h3>Jugadores</h3></div>
+
+    <!-- Normalización de sedes -->
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;padding:.6rem 1rem;background:rgba(57,211,83,.05);border:1px solid rgba(57,211,83,.15);border-radius:8px;flex-wrap:wrap;">
+      <span style="font-size:.85rem;opacity:.7;">Normaliza los valores de sede (VIÑA → Viña del Mar, OLMUÉ → Olmué):</span>
+      <p-button
+        label="Normalizar sedes"
+        icon="pi pi-map-marker"
+        severity="secondary"
+        size="small"
+        [loading]="normalizandoSedes"
+        (onClick)="normalizarSedes()">
+      </p-button>
+      <span *ngIf="normalizacionResultado" style="font-size:.82rem;color:#39d353;">{{ normalizacionResultado }}</span>
+    </div>
+
     <div class="filter-bar">
       <div class="filter-field grow">
         <label>Buscar</label>
@@ -1463,7 +1478,7 @@
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Ante adversidad</label>
-          <input pInputText [(ngModel)]="fichaEditandoForm.actitudAdversidad" style="width:100%;" />
+          <p-select [options]="actitudAdversidadOpciones" [(ngModel)]="fichaEditandoForm.actitudAdversidad" optionLabel="label" optionValue="value" appendTo="body" style="width:100%;"></p-select>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">¿Practica otros deportes?</label>
