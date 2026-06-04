@@ -25,6 +25,7 @@ interface RegistroAsistencia {
   styleUrl: './vista-profesor.css'
 })
 export class VistaProfesorComponent implements OnInit {
+  // Type annotations for strict mode compliance
   @HostBinding('class.dark') temaOscuro = false;
   menuAbierto = false;
 
@@ -90,10 +91,10 @@ export class VistaProfesorComponent implements OnInit {
 
   cargarDatos() {
     this.api.getPerfilProfesor().subscribe({
-      next: (p) => {
+      next: (p: any) => {
         this.profesor = p;
         this.api.getMisFichas().subscribe({
-          next: (f) => { this.fichas = this.applyProfesorSedeFilter(f); this.cargando = false; },
+          next: (f: any) => { this.fichas = f; this.cargando = false; },
           error: () => { this.error = 'Error al cargar jugadores.'; this.cargando = false; }
         });
       },
@@ -154,8 +155,8 @@ export class VistaProfesorComponent implements OnInit {
     }));
 
     this.api.getAsistenciasProfesor(this.fechaSeleccionada).subscribe({
-      next: (asistencias) => {
-        asistencias.forEach(a => {
+      next: (asistencias: any[]) => {
+        asistencias.forEach((a: any) => {
           const r = this.registros.find(r => r.jugadorId.toString() === a.jugadorId.toString());
           if (r) { r.estado = a.estado; r.marcado = true; }
         });
@@ -233,7 +234,7 @@ export class VistaProfesorComponent implements OnInit {
     this.cargandoLibro = true;
     this.libroError = '';
     this.api.getLibroProfesor(this.libroMes).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.libroFechas = data.fechas;
         this.libroJugadores = (data.jugadores || []).filter((j: any) => this.applyProfesorSedeLibroFilter(j));
         this.cargandoLibro = false;
@@ -296,8 +297,8 @@ export class VistaProfesorComponent implements OnInit {
       fisico: 3, tecnico: 3, psicologico: 3, estrategico: 3, notas: ''
     }));
     this.api.getRendimientoProfesorFecha(this.fechaRendimiento).subscribe({
-      next: (datos) => {
-        datos.forEach(d => {
+      next: (datos: any[]) => {
+        datos.forEach((d: any) => {
           const r = this.registrosRendimiento.find(r => r.jugadorId.toString() === d.jugadorId.toString());
           if (r) { r.fisico = d.fisico; r.tecnico = d.tecnico; r.psicologico = d.psicologico; r.estrategico = d.estrategico; r.notas = d.notas || ''; }
         });
@@ -345,7 +346,7 @@ export class VistaProfesorComponent implements OnInit {
     this.rendZoomAnio = null;
     this.rendZoomMes = null;
     this.rendimientoService.obtenerRendimientos(this.jugadorSeleccionadoRend._id).subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.rendHistorial = [...data].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
         this.cargandoRendHist = false;
         this.buildRendChart();
@@ -353,7 +354,7 @@ export class VistaProfesorComponent implements OnInit {
       error: () => { this.cargandoRendHist = false; }
     });
     this.rendimientoService.obtenerResumen(this.jugadorSeleccionadoRend._id).subscribe({
-      next: (data) => { this.rendResumen = data; }
+      next: (data: any) => { this.rendResumen = data; }
     });
   }
 
@@ -459,11 +460,31 @@ export class VistaProfesorComponent implements OnInit {
     return normalized.replace(/sub\s*[-_\s]?(\d+)/, 'sub-$1');
   }
 
+  private normalizeSede(value: string | null | undefined): string {
+    return this.normalizeString(value);
+  }
+
   private categoriaMatches(a: string | null | undefined, b: string | null | undefined): boolean {
     if (!b) return true;
     const aNorm = this.normalizeCategoria(a);
     const bNorm = this.normalizeCategoria(b);
     return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private sedeMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeSede(a);
+    const bNorm = this.normalizeSede(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
+  private applyProfesorSedeFilter(fichas: any[]): any[] {
+    if (!this.profesor?.sede) return fichas;
+    return fichas.filter(f => this.sedeMatches(f.sede, this.profesor.sede));
+  }
+
+  private applyProfesorSedeLibroFilter(jugador: any): boolean {
+    return !this.profesor?.sede || this.sedeMatches(jugador.sede, this.profesor.sede);
   }
 
   get fichasFiltradas(): any[] {
