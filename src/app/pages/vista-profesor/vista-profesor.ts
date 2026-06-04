@@ -322,6 +322,7 @@ export class VistaProfesorComponent implements OnInit {
       tecnico:     { controlDominio: 50, precisionEjecucion: 50, fluidezMovimiento: 50, usoPerfiles: 50, posturaCorporal: 50 },
       actitudinal: { motivacion: 50, reaccionResultado: 50, apoyoCompanero: 50, deseosSuperacion: 50, resiliencia: 50 },
       estrategico: { tomaDecisiones: 50, lecturaJuego: 50, ocupacionEspacio: 50, transiciones: 50, cumplimientoPlan: 50 },
+      actitudAdversidad: '',
       comentario: ''
     };
   }
@@ -426,6 +427,7 @@ export class VistaProfesorComponent implements OnInit {
       tecnico:     { controlDominio: n(f.tecnico.controlDominio), precisionEjecucion: n(f.tecnico.precisionEjecucion), fluidezMovimiento: n(f.tecnico.fluidezMovimiento), usoPerfiles: n(f.tecnico.usoPerfiles), posturaCorporal: n(f.tecnico.posturaCorporal) },
       actitudinal: { motivacion: n(f.actitudinal.motivacion), reaccionResultado: n(f.actitudinal.reaccionResultado), apoyoCompanero: n(f.actitudinal.apoyoCompanero), deseosSuperacion: n(f.actitudinal.deseosSuperacion), resiliencia: n(f.actitudinal.resiliencia) },
       estrategico: { tomaDecisiones: n(f.estrategico.tomaDecisiones), lecturaJuego: n(f.estrategico.lecturaJuego), ocupacionEspacio: n(f.estrategico.ocupacionEspacio), transiciones: n(f.estrategico.transiciones), cumplimientoPlan: n(f.estrategico.cumplimientoPlan) },
+      actitudAdversidad: f.actitudAdversidad || '',
       comentario:  f.comentario
     };
     this.rendimientoService.crearRendimiento(data).subscribe({

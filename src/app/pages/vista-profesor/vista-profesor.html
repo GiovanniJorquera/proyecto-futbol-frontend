@@ -466,8 +466,21 @@
 
             </div>
 
-            <!-- Comentario -->
+            <!-- Ante adversidad -->
             <div class="rend-form-field rend-form-full" style="margin-top:1rem">
+              <label style="font-size:.82rem;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.05em;">Ante adversidad</label>
+              <select class="rend-select" [(ngModel)]="rendForm.actitudAdversidad">
+                <option value="">— Sin especificar —</option>
+                <option value="Tristeza por un día o más">Tristeza por un día o más</option>
+                <option value="Tristeza solo durante la actividad">Tristeza solo durante la actividad</option>
+                <option value="Sin reacción">Sin reacción</option>
+                <option value="Conversa para ver en qué mejorar">Conversa para ver en qué mejorar</option>
+                <option value="Conversa durante el día o más para mejorar">Conversa durante el día o más para mejorar</option>
+              </select>
+            </div>
+
+            <!-- Comentario -->
+            <div class="rend-form-field rend-form-full" style="margin-top:.75rem">
               <label style="font-size:.82rem;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.05em;">Comentario</label>
               <textarea class="rend-textarea" [(ngModel)]="rendForm.comentario" rows="3" placeholder="Observaciones opcionales..."></textarea>
             </div>
@@ -530,6 +543,9 @@
                   <span><strong>Est:</strong> {{ r.estrategico?.promedio || 0 }}%</span>
                   <span class="rend-hist-avg"><strong>Gral:</strong> {{ r.promedioGeneral || 0 }}%</span>
                 </div>
+                <p class="rend-hist-adversidad" *ngIf="r.actitudAdversidad" style="font-size:.78rem;opacity:.7;margin:.25rem 0 0;">
+                  <strong>Ante adversidad:</strong> {{ r.actitudAdversidad }}
+                </p>
                 <p class="rend-hist-comentario" *ngIf="r.comentario">{{ r.comentario }}</p>
               </div>
             </div>

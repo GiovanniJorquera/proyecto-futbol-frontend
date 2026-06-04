@@ -950,6 +950,22 @@ kbd {
 }
 .rend-textarea:focus { border-color: var(--accent); }
 
+.rend-select {
+  width: 100%;
+  padding: .6rem .9rem;
+  border: 1px solid var(--bdr);
+  border-radius: 10px;
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.rend-select:focus { border-color: var(--accent); }
+
 /* Historial */
 .rend-historial {
   margin-top: 2rem;
