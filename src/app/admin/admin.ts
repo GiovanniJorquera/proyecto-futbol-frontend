@@ -514,8 +514,10 @@ export class AdminComponent implements OnInit {
       () => {
         this.http.post<any>(`${this.apiUrl}/admin/vincular-pago-mensual/${pago.id}`, {}, this.authHeaders()).subscribe({
           next: () => {
-            this.toast('success', 'Vinculado', 'Pago mensual marcado como pagado.');
-            if (this.fichas.length > 0) this.cargarFichas();
+            this.toast('success', 'Vinculado', 'Pago mensual marcado como pagado. Ya se refleja en Ficha-Temporada.');
+            // Siempre recargar fichas para reflejar el nuevo pagoMesActual
+            this.cargarFichas();
+            this.tabFichasLoaded = true;
           },
           error: (err: any) => this.toast('error', 'Error', err?.error?.mensaje || 'No se pudo vincular el pago.')
         });

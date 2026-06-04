@@ -144,7 +144,24 @@ export class VistaClienteComponent implements OnInit {
       this.voucherForm.sede = this.ficha?.sede || '';
       this.tipoMensajeVoucher = '';
       this.mensajeVoucher = '';
+      // Refrescar estado de pago para mostrar el estado más reciente
+      this.recargarEstadoPago();
     }
+  }
+
+  recargarEstadoPago(): void {
+    this.api.getMisPagosMensuales().subscribe({
+      next: (data) => {
+        this.pagosMensuales = {
+          mesActual: { mes: data.mesActual.mes, anio: data.mesActual['año'], estado: data.mesActual.estado, monto: data.mesActual.monto },
+          historial: (data.historial || []).map((p: any) => ({ mes: p.mes, anio: p['año'], estado: p.estado }))
+        };
+        this.voucherMesActual = data.voucherMesActual || { existe: false, estado: null };
+        // Si ya está pagado, cerrar el formulario
+        if (data.mesActual.estado === 'pagado') this.mostrarFormVoucher = false;
+      },
+      error: () => {}
+    });
   }
 
   quitarVoucherImagen(): void {
