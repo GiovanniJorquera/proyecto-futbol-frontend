@@ -924,7 +924,7 @@ export class AdminComponent implements OnInit {
       }
       if (this.filtrosJugadores.categoria && f.categoria !== this.filtrosJugadores.categoria) return false;
       if (this.filtrosJugadores.posicion && f.posicion !== this.filtrosJugadores.posicion) return false;
-      if (this.filtrosJugadores.sede && f.sede !== this.filtrosJugadores.sede) return false;
+      if (this.filtrosJugadores.sede && !this.sedeMatches(f.sede, this.filtrosJugadores.sede)) return false;
       return true;
     });
   }
@@ -934,8 +934,43 @@ export class AdminComponent implements OnInit {
     return [{ label: 'Todas', value: null }, ...pos.map(p => ({ label: p as string, value: p as string }))];
   }
 
+  private normalizeSede(sede: string | null | undefined): string {
+    if (!sede) return '';
+    const canonical = sede
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (canonical === 'vina' || canonical === 'vina del mar') return 'viña del mar';
+    if (canonical === 'olmue') return 'olmué';
+    return canonical;
+  }
+
+  private sedeMatches(sede: string | null | undefined, filtro: string | null | undefined): boolean {
+    if (!filtro) return true;
+    const fichaNorm = this.normalizeSede(sede);
+    const filtroNorm = this.normalizeSede(filtro);
+    if (!fichaNorm) return false;
+    if (fichaNorm === filtroNorm) return true;
+    return fichaNorm.includes(filtroNorm) || filtroNorm.includes(fichaNorm);
+  }
+
   get sedeJugadorOpciones() {
-    return [{ label: 'Todas', value: null }, ...this.siteConfig.sedes.map(s => ({ label: s, value: s }))];
+    const opcionesMap = new Map<string, { label: string; value: string }>();
+    this.siteConfig.sedes.forEach((s) => opcionesMap.set(this.normalizeSede(s), { label: s, value: s }));
+    this.fichas.forEach((f: any) => {
+      const raw = f?.sede;
+      if (!raw) return;
+      const key = this.normalizeSede(raw);
+      if (!opcionesMap.has(key)) {
+        opcionesMap.set(key, { label: raw, value: raw });
+      }
+    });
+    return [{ label: 'Todas', value: null }, ...Array.from(opcionesMap.values())];
   }
 
   limpiarFiltrosJugadores() { this.filtrosJugadores = { texto: '', categoria: null, posicion: null, sede: null }; }

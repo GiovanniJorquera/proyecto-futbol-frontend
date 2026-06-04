@@ -162,6 +162,9 @@ export class VistaProfesorComponent implements OnInit {
         // Si ya hay registros guardados para esta fecha, bloquear re-guardado
         if (asistencias.length > 0) {
           this.asistenciaGuardada = true;
+          this.registros.forEach(r => {
+            if (!r.marcado) { r.marcado = true; r.estado = 'ausente'; }
+          });
         }
         this.cargandoAsistencia = false;
       },
@@ -170,7 +173,9 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   setEstado(registro: RegistroAsistencia, estado: 'asistio' | 'ausente' | 'justificado' | 'licenciado') {
+    if (this.asistenciaGuardada) return;
     registro.estado = estado;
+    registro.marcado = true;
   }
 
   getLetra(registro: RegistroAsistencia): string {
@@ -182,6 +187,10 @@ export class VistaProfesorComponent implements OnInit {
   }
 
   onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
+    if (this.asistenciaGuardada) {
+      event.preventDefault();
+      return;
+    }
     const key = event.key.toUpperCase();
     if      (key === 'P') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'asistio');     this.moverFoco(index + 1); }
     else if (key === 'A') { event.preventDefault(); registro.marcado = true; this.setEstado(registro, 'ausente');      this.moverFoco(index + 1); }
