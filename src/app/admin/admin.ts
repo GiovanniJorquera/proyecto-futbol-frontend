@@ -265,6 +265,7 @@ export class AdminComponent implements OnInit {
     this.cargarPendientes();
     this.cargarAprobados();
     this.cargarConfig();
+    this.cargarFichas();
     this.cargarNoticiasAdmin();
   }
 
@@ -868,7 +869,7 @@ export class AdminComponent implements OnInit {
         const a = (f.apoderado?.nombre || '').toLowerCase();
         if (!n.includes(t) && !c.includes(t) && !a.includes(t)) return false;
       }
-      if (this.filtrosFichas.categoria && f.categoria !== this.filtrosFichas.categoria) return false;
+      if (this.filtrosFichas.categoria && !this.categoriaMatches(f.categoria, this.filtrosFichas.categoria)) return false;
       if (this.filtrosFichas.conCuenta !== null && f.tieneCuenta !== this.filtrosFichas.conCuenta) return false;
       return true;
     });
@@ -922,7 +923,7 @@ export class AdminComponent implements OnInit {
         const s = (f.sede || '').toLowerCase();
         if (!n.includes(t) && !c.includes(t) && !s.includes(t)) return false;
       }
-      if (this.filtrosJugadores.categoria && f.categoria !== this.filtrosJugadores.categoria) return false;
+      if (this.filtrosJugadores.categoria && !this.categoriaMatches(f.categoria, this.filtrosJugadores.categoria)) return false;
       if (this.filtrosJugadores.posicion && f.posicion !== this.filtrosJugadores.posicion) return false;
       if (this.filtrosJugadores.sede && !this.sedeMatches(f.sede, this.filtrosJugadores.sede)) return false;
       return true;
@@ -932,6 +933,30 @@ export class AdminComponent implements OnInit {
   get posicionJugadorOpciones() {
     const pos = [...new Set(this.fichas.map((f: any) => f.posicion).filter(Boolean))];
     return [{ label: 'Todas', value: null }, ...pos.map(p => ({ label: p as string, value: p as string }))];
+  }
+
+  private normalizeString(value: string | null | undefined): string {
+    if (!value) return '';
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeCategoria(categoria: string | null | undefined): string {
+    const normalized = this.normalizeString(categoria);
+    return normalized.replace(/sub\s*[-_\s]?(\d+)/, 'sub-$1');
+  }
+
+  private categoriaMatches(categoria: string | null | undefined, filtro: string | null | undefined): boolean {
+    if (!filtro) return true;
+    const catNorm = this.normalizeCategoria(categoria);
+    const filtroNorm = this.normalizeCategoria(filtro);
+    return !!catNorm && (catNorm === filtroNorm || catNorm.includes(filtroNorm) || filtroNorm.includes(catNorm));
   }
 
   private normalizeSede(sede: string | null | undefined): string {
@@ -955,19 +980,26 @@ export class AdminComponent implements OnInit {
     const fichaNorm = this.normalizeSede(sede);
     const filtroNorm = this.normalizeSede(filtro);
     if (!fichaNorm) return false;
-    if (fichaNorm === filtroNorm) return true;
-    return fichaNorm.includes(filtroNorm) || filtroNorm.includes(fichaNorm);
+    return fichaNorm === filtroNorm || fichaNorm.includes(filtroNorm) || filtroNorm.includes(fichaNorm);
   }
 
   get sedeJugadorOpciones() {
     const opcionesMap = new Map<string, { label: string; value: string }>();
-    this.siteConfig.sedes.forEach((s) => opcionesMap.set(this.normalizeSede(s), { label: s, value: s }));
     this.fichas.forEach((f: any) => {
       const raw = f?.sede;
       if (!raw) return;
       const key = this.normalizeSede(raw);
       if (!opcionesMap.has(key)) {
         opcionesMap.set(key, { label: raw, value: raw });
+      }
+    });
+    (this.siteConfig.sedes || []).forEach((s) => {
+      const key = this.normalizeSede(s);
+      if (!opcionesMap.has(key)) {
+        opcionesMap.set(key, { label: s, value: s });
+      } else {
+        const existing = opcionesMap.get(key);
+        if (existing && existing.label !== s) existing.label = s;
       }
     });
     return [{ label: 'Todas', value: null }, ...Array.from(opcionesMap.values())];
@@ -1076,8 +1108,29 @@ export class AdminComponent implements OnInit {
 
   /* Categorías */
   get categoriaJugadorOpciones() {
+    const opcionesMap = new Map<string, { label: string; value: string }>();
+
+    this.fichas.forEach((f: any) => {
+      const raw = f?.categoria;
+      if (!raw) return;
+      const key = this.normalizeCategoria(raw);
+      if (!opcionesMap.has(key)) {
+        opcionesMap.set(key, { label: raw, value: raw });
+      }
+    });
+
     const cats = ['Sub-6','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Libre'];
-    return [{ label: 'Todas', value: null }, ...cats.map(c => ({ label: c, value: c }))];
+    cats.forEach((c) => {
+      const key = this.normalizeCategoria(c);
+      if (!opcionesMap.has(key)) {
+        opcionesMap.set(key, { label: c, value: c });
+      } else {
+        const existing = opcionesMap.get(key);
+        if (existing && existing.label !== c) existing.label = c;
+      }
+    });
+
+    return [{ label: 'Todas', value: null }, ...Array.from(opcionesMap.values())];
   }
 
   /* Libro de asistencia */
@@ -1151,12 +1204,19 @@ export class AdminComponent implements OnInit {
     else return;
 
     event.preventDefault();
+    const jugadorId = jugador._id || jugador.id || jugador.jugadorId;
+    if (!jugadorId) {
+      this.toast('error', 'Error', 'No se pudo identificar al jugador.');
+      return;
+    }
+
     const estadoAnterior = jugador.registros[fecha] || '';
+    if (estadoAnterior === nuevoEstado) return;
     jugador.registros[fecha] = nuevoEstado;
 
     this.http.put(
       `${this.apiUrl}/admin/asistencias/editar`,
-      { jugadorId: jugador._id, fecha, estado: nuevoEstado },
+      { jugadorId, id: jugadorId, fecha, estado: nuevoEstado },
       this.authHeaders()
     ).subscribe({
       next: () => {
@@ -1197,9 +1257,8 @@ export class AdminComponent implements OnInit {
   /* Cuenta cuántas fichas tienen una categoría que coincide con el nombre de la división */
   contarJugadoresDivision(division: any): number {
     if (!this.fichas.length) return division.estudiantes || 0;
-    const nombre = (division.nombre || '').toLowerCase().trim();
     return this.fichas.filter((f: any) =>
-      (f.categoria || '').toLowerCase().trim() === nombre
+      this.categoriaMatches(f.categoria, division.nombre)
     ).length;
   }
 

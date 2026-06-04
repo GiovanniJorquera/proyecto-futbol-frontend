@@ -438,14 +438,38 @@ export class VistaProfesorComponent implements OnInit {
     });
   }
 
+  private normalizeString(value: string | null | undefined): string {
+    if (!value) return '';
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeCategoria(value: string | null | undefined): string {
+    const normalized = this.normalizeString(value);
+    return normalized.replace(/sub\s*[-_\s]?(\d+)/, 'sub-$1');
+  }
+
+  private categoriaMatches(a: string | null | undefined, b: string | null | undefined): boolean {
+    if (!b) return true;
+    const aNorm = this.normalizeCategoria(a);
+    const bNorm = this.normalizeCategoria(b);
+    return !!aNorm && (aNorm === bNorm || aNorm.includes(bNorm) || bNorm.includes(aNorm));
+  }
+
   get fichasFiltradas(): any[] {
     if (!this.divisionFiltro) return this.fichas;
-    return this.fichas.filter(f => f.categoria === this.divisionFiltro);
+    return this.fichas.filter(f => this.categoriaMatches(f.categoria, this.divisionFiltro));
   }
 
   get libroJugadoresFiltrados(): any[] {
     if (!this.libroFiltroDivision) return this.libroJugadores;
-    return this.libroJugadores.filter(j => j.categoria === this.libroFiltroDivision);
+    return this.libroJugadores.filter(j => this.categoriaMatches(j.categoria, this.libroFiltroDivision));
   }
 
   toggleFiltroDiv(d: string) {
