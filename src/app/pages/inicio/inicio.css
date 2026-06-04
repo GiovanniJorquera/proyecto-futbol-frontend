@@ -872,7 +872,7 @@
   .floating-popup-button { right: 1rem; bottom: 1rem; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 820px) {
   .header-nav { display: none; }
   .burger-btn { display: flex; }
   .page-header h1 { font-size: 0.95rem; }

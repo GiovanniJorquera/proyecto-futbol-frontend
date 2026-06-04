@@ -1147,7 +1147,7 @@ kbd {
 }
 .dropdown-full { width: 100%; justify-content: center; }
 
-@media (max-width: 640px) {
+@media (max-width: 820px) {
   .header-nav { display: none; }
   .burger-btn { display: flex; }
   .header-dropdown:not([hidden]) { display: flex; }

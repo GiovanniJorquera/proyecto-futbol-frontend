@@ -771,7 +771,7 @@
 .dropdown-full { width: 100%; justify-content: center; }
 
 /* RESPONSIVE */
-@media (max-width: 640px) {
+@media (max-width: 820px) {
   .header-nav { display: none; }
   .burger-btn { display: flex; }
   .page-header h1 { font-size: .95rem; }

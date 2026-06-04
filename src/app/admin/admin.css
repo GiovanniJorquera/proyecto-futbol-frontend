@@ -25,6 +25,16 @@
   gap: 1rem;
 }
 
+.admin-header-titulo {
+  margin: 0;
+  color: #39d353;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex: 1;
+}
 .admin-header h1 {
   margin: 0;
   color: #39d353;
@@ -33,6 +43,50 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+.admin-header-nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Burger admin */
+.admin-burger-btn {
+  display: none;
+  background: rgba(57,211,83,.1);
+  border: 1px solid rgba(57,211,83,.3);
+  color: #39d353;
+  border-radius: 8px;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.admin-burger-btn:hover { background: rgba(57,211,83,.2); }
+
+.admin-burger-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  z-index: 100;
+  background: rgba(6,10,6,.98);
+  border-bottom: 1px solid rgba(57,211,83,.22);
+  padding: 0.75rem 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.admin-burger-dropdown:not([hidden]) { display: flex; }
+
+@media (max-width: 820px) {
+  .admin-header-nav { display: none; }
+  .admin-burger-btn { display: flex; }
+  .admin-header-titulo { font-size: 0.88rem; }
 }
 
 /* ── TABS ───────────────────────────────────────── */

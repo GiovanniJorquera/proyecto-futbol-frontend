@@ -31,6 +31,8 @@ import { AuthService } from '../services/auth.service';
 })
 export class AdminComponent implements OnInit {
 
+  menuAbierto = false;
+
   /* ── SOLICITUDES ──────────────────────────────── */
   solicitudes: any[] = [];
   cargando = true;
@@ -737,10 +739,19 @@ export class AdminComponent implements OnInit {
 
   abrirModalNoticia(n?: any): void {
     this.noticiaEditando = n || null;
+    const hoy = new Date().toISOString().split('T')[0];
     this.noticiaForm = n
-      ? { titulo: n.titulo, descripcion: n.descripcion, contenido: n.contenido || '', fecha: n.fecha, imagenUrl: n.imagenUrl, categoria: n.categoria }
-      : { titulo: '', descripcion: '', contenido: '', fecha: '', imagenUrl: '', categoria: '' };
+      ? { titulo: n.titulo, descripcion: n.descripcion, contenido: n.contenido || '', fecha: n.fecha ? n.fecha.split('T')[0] : hoy, imagenUrl: n.imagenUrl, categoria: n.categoria }
+      : { titulo: '', descripcion: '', contenido: '', fecha: hoy, imagenUrl: '', categoria: '' };
     this.modalNoticiaVisible = true;
+  }
+
+  async seleccionarImagenNoticia(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.noticiaForm.imagenUrl = await this.comprimirImagen(file, 1200, 0.88);
+    input.value = '';
   }
 
   guardarNoticia(): void {
@@ -1329,4 +1340,9 @@ export class AdminComponent implements OnInit {
   }
 
   volverInicio(): void { this.router.navigate(['/inicio']); }
+
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/inicio']);
+  }
 }

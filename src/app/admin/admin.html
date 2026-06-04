@@ -3,8 +3,24 @@
 <div class="admin-container">
 
   <header class="admin-header">
-    <h1>Panel Administrador — Escuela Familias del Fútbol</h1>
-    <button pButton type="button" label="Inicio" icon="pi pi-home" size="small" severity="secondary" (click)="volverInicio()"></button>
+    <h1 class="admin-header-titulo">Panel Administrador</h1>
+
+    <!-- Nav escritorio -->
+    <nav class="admin-header-nav">
+      <button pButton type="button" label="Inicio" icon="pi pi-home" size="small" severity="secondary" (click)="volverInicio()"></button>
+      <button pButton type="button" label="Cerrar sesión" icon="pi pi-sign-out" size="small" severity="danger" (click)="cerrarSesion()"></button>
+    </nav>
+
+    <!-- Burger (solo móvil) -->
+    <button type="button" class="admin-burger-btn" (click)="menuAbierto = !menuAbierto">
+      <i class="pi" [class.pi-bars]="!menuAbierto" [class.pi-times]="menuAbierto"></i>
+    </button>
+
+    <!-- Dropdown móvil -->
+    <div class="admin-burger-dropdown" [hidden]="!menuAbierto">
+      <button pButton type="button" label="Inicio" icon="pi pi-home" severity="secondary" style="width:100%;" (click)="volverInicio(); menuAbierto=false"></button>
+      <button pButton type="button" label="Cerrar sesión" icon="pi pi-sign-out" severity="danger" style="width:100%;" (click)="cerrarSesion(); menuAbierto=false"></button>
+    </div>
   </header>
 
   <!-- MENÚ DE NAVEGACIÓN -->
@@ -1322,13 +1338,25 @@
     </div>
 
     <div style="display:flex; flex-direction:column; gap:0.25rem;">
-      <label style="font-weight:600;">Fecha</label>
-      <input type="date" [(ngModel)]="noticiaForm.fecha" style="width:100%; padding:0.5rem; border:1px solid #ced4da; border-radius:6px;" />
+      <label style="font-weight:600;">Fecha de publicación <small style="font-weight:400;opacity:.6;">(automática)</small></label>
+      <input type="date" [(ngModel)]="noticiaForm.fecha" style="width:100%; padding:0.5rem; border:1px solid rgba(57,211,83,.22); border-radius:6px; background:rgba(57,211,83,.03); color:inherit;" />
     </div>
 
     <div style="display:flex; flex-direction:column; gap:0.25rem;">
-      <label style="font-weight:600;">URL de imagen</label>
-      <input pInputText [(ngModel)]="noticiaForm.imagenUrl" style="width:100%;" placeholder="assets/noticias/imagen.jpg" />
+      <label style="font-weight:600;">Imagen de la noticia</label>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <label style="display:inline-flex;align-items:center;gap:.5rem;cursor:pointer;background:rgba(57,211,83,.08);border:1px solid rgba(57,211,83,.25);padding:.45rem .9rem;border-radius:8px;width:fit-content;font-size:.85rem;">
+          <i class="pi pi-image"></i> Subir imagen
+          <input type="file" accept="image/*" style="display:none;" (change)="seleccionarImagenNoticia($event)" />
+        </label>
+        <div *ngIf="noticiaForm.imagenUrl" style="margin-top:.25rem;">
+          <img [src]="noticiaForm.imagenUrl" alt="Preview" style="max-width:220px;max-height:130px;border-radius:8px;object-fit:cover;border:1px solid rgba(57,211,83,.2);" />
+          <div style="margin-top:.4rem;">
+            <button pButton type="button" label="Quitar imagen" icon="pi pi-times" severity="danger" size="small" (click)="noticiaForm.imagenUrl=''"></button>
+          </div>
+        </div>
+        <span *ngIf="!noticiaForm.imagenUrl" style="font-size:.8rem;opacity:.5;">Sin imagen seleccionada</span>
+      </div>
     </div>
 
     <div style="display:flex; flex-direction:column; gap:0.25rem;">
