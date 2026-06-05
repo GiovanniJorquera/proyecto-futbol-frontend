@@ -1,11 +1,11 @@
-.page-header {
+﻿.page-header {
   position: sticky;
   top: 0;
   z-index: 10;
   padding: 0.75rem 1.25rem;
-  background: rgba(6, 10, 6, 0.92);
+  background: rgba(6, 8, 18, 0.92);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(42, 181, 76, 0.2);
+  border-bottom: 1px solid rgba(133, 175, 239, 0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,7 +14,7 @@
 
 .page-header h1 {
   margin: 0;
-  color: #39d353;
+  color: #85afef;
   font-size: 1.1rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;

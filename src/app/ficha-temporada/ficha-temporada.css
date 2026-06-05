@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   display: block;
   min-height: 100vh;
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
@@ -100,7 +100,7 @@ p-select {
   width: 100%;
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #39d353;
+  border: 1px solid #85afef;
   transition: 0.2s;
   color: #0b6623;
   background: #fafafa;
@@ -110,8 +110,8 @@ input:focus,
 .p-dropdown .p-dropdown-label:focus,
 .p-select .p-select-label:focus {
   outline: none;
-  border-color: #39d353;
-  box-shadow: 0 0 0 4px rgba(57, 211, 83, 0.12);
+  border-color: #85afef;
+  box-shadow: 0 0 0 4px rgba(133, 175, 239, 0.12);
 }
 
 :host ::ng-deep span.p-select-label {
@@ -141,7 +141,7 @@ input:focus,
   display: flex;
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #39d353;
+  border: 1px solid #85afef;
   transition: 0.2s;
   color: #0b6623;
   background: #fafafa;
@@ -150,7 +150,7 @@ input:focus,
 .boton {
   width: 100%;
   margin-top: 28px;
-  background: linear-gradient(135deg, #0b6623, #39d353);
+  background: linear-gradient(135deg, #0b6623, #85afef);
   border: none;
   height: 52px;
   border-radius: 12px;

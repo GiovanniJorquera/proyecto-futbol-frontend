@@ -1,43 +1,43 @@
-/* ================================================================
+﻿/* ================================================================
    THEME VARIABLES
    ================================================================ */
 :host {
   /* ── Light mode (default) ── */
-  --bg:           #f4fbf4;
+  --bg:           #f0f4ff;
   --surface:      #ffffff;
-  --surface-alt:  #e8f5e8;
+  --surface-alt:  #e4eeff;
   --header-bg:    #ffffff;
-  --header-bdr:   #1e7a30;
-  --header-title: #163b1a;
+  --header-bdr:   #2563eb;
+  --header-title: #0d2150;
   --nav-bg:       #ffffff;
-  --nav-bdr:      rgba(30, 122, 48, 0.15);
+  --nav-bdr:      rgba(37, 99, 235, 0.15);
   --nav-text:     rgba(20, 50, 20, 0.5);
-  --nav-hover:    #1a2e1a;
-  --nav-active:   #1e7a30;
-  --text:         #1a2e1a;
+  --nav-hover:    #0f1a3e;
+  --nav-active:   #2563eb;
+  --text:         #0f1a3e;
   --text-sub:     rgba(20, 46, 26, 0.68);
-  --accent:       #1e7a30;
-  --accent-a:     rgba(30, 122, 48, 0.1);
-  --bdr:          rgba(30, 122, 48, 0.18);
-  --shadow:       0 2px 16px rgba(0, 40, 0, 0.07);
-  --shadow-h:     0 8px 32px rgba(0, 40, 0, 0.13);
-  --heading:      #163b1a;
-  --tag-bg:       rgba(30, 122, 48, 0.1);
-  --tag-clr:      #1e7a30;
+  --accent:       #2563eb;
+  --accent-a:     rgba(37, 99, 235, 0.1);
+  --bdr:          rgba(37, 99, 235, 0.18);
+  --shadow:       0 2px 16px rgba(0, 20, 60, 0.07);
+  --shadow-h:     0 8px 32px rgba(0, 20, 60, 0.13);
+  --heading:      #0d2150;
+  --tag-bg:       rgba(37, 99, 235, 0.1);
+  --tag-clr:      #2563eb;
   --date-clr:     rgba(20, 50, 20, 0.48);
-  --strip-bg:     #1e7a30;
+  --strip-bg:     #2563eb;
   --strip-h:      #ffffff;
   --strip-p:      rgba(255, 255, 255, 0.88);
-  --dlg-head:     #1e7a30;
+  --dlg-head:     #2563eb;
   --dlg-head-txt: #ffffff;
   --dlg-body:     #ffffff;
-  --dlg-text:     #1a2e1a;
+  --dlg-text:     #0f1a3e;
   --dlg-close-h:  rgba(255, 255, 255, 0.18);
   --empty-clr:    rgba(20, 50, 20, 0.35);
   --plantel-exp:  rgba(20, 50, 20, 0.5);
   --vs-clr:       rgba(20, 50, 20, 0.35);
-  --dtag-bg:      rgba(30, 122, 48, 0.1);
-  --dtag-bdr:     rgba(30, 122, 48, 0.25);
+  --dtag-bg:      rgba(37, 99, 235, 0.1);
+  --dtag-bdr:     rgba(37, 99, 235, 0.25);
   --dtag-clr:     rgba(20, 50, 20, 0.8);
 
   display: block;
@@ -50,42 +50,42 @@
 
 /* ── Dark mode overrides ── */
 :host.dark {
-  --bg:           #060e06;
-  --surface:      rgba(14, 20, 14, 0.98);
-  --surface-alt:  rgba(6, 10, 6, 0.6);
-  --header-bg:    rgba(6, 10, 6, 0.92);
-  --header-bdr:   rgba(42, 181, 76, 0.3);
+  --bg:           #06080f;
+  --surface:      rgba(9, 14, 28, 0.98);
+  --surface-alt:  rgba(6, 8, 18, 0.6);
+  --header-bg:    rgba(6, 8, 18, 0.92);
+  --header-bdr:   rgba(133, 175, 239, 0.3);
   --header-title: #ffffff;
-  --nav-bg:       rgba(4, 8, 4, 0.96);
-  --nav-bdr:      rgba(57, 211, 83, 0.15);
-  --nav-text:     rgba(233, 247, 234, 0.5);
-  --nav-hover:    #e9f7ea;
-  --nav-active:   #39d353;
+  --nav-bg:       rgba(4, 8, 20, 0.96);
+  --nav-bdr:      rgba(133, 175, 239, 0.15);
+  --nav-text:     rgba(220, 232, 255, 0.5);
+  --nav-hover:    #dce8ff;
+  --nav-active:   #85afef;
   --text:         #f4f7f3;
-  --text-sub:     rgba(244, 247, 243, 0.7);
-  --accent:       #39d353;
-  --accent-a:     rgba(57, 211, 83, 0.12);
-  --bdr:          rgba(57, 211, 83, 0.16);
+  --text-sub:     rgba(238, 243, 255, 0.7);
+  --accent:       #85afef;
+  --accent-a:     rgba(133, 175, 239, 0.12);
+  --bdr:          rgba(133, 175, 239, 0.16);
   --shadow:       none;
   --shadow-h:     0 22px 45px rgba(0, 0, 0, 0.38);
-  --heading:      #e9f7ea;
-  --tag-bg:       rgba(57, 211, 83, 0.15);
-  --tag-clr:      #39d353;
-  --date-clr:     rgba(233, 247, 234, 0.5);
-  --strip-bg:     rgba(4, 8, 4, 0.96);
-  --strip-h:      #39d353;
-  --strip-p:      rgba(233, 247, 234, 0.7);
-  --dlg-head:     #0d130d;
-  --dlg-head-txt: #39d353;
-  --dlg-body:     #111a11;
+  --heading:      #dce8ff;
+  --tag-bg:       rgba(133, 175, 239, 0.15);
+  --tag-clr:      #85afef;
+  --date-clr:     rgba(220, 232, 255, 0.5);
+  --strip-bg:     rgba(4, 8, 20, 0.96);
+  --strip-h:      #85afef;
+  --strip-p:      rgba(220, 232, 255, 0.7);
+  --dlg-head:     #080c1e;
+  --dlg-head-txt: #85afef;
+  --dlg-body:     #0a0f22;
   --dlg-text:     #f4f7f3;
-  --dlg-close-h:  rgba(57, 211, 83, 0.12);
-  --empty-clr:    rgba(233, 247, 234, 0.38);
-  --plantel-exp:  rgba(233, 247, 234, 0.55);
-  --vs-clr:       rgba(233, 247, 234, 0.4);
-  --dtag-bg:      rgba(57, 211, 83, 0.12);
-  --dtag-bdr:     rgba(57, 211, 83, 0.25);
-  --dtag-clr:     rgba(233, 247, 234, 0.8);
+  --dlg-close-h:  rgba(133, 175, 239, 0.12);
+  --empty-clr:    rgba(220, 232, 255, 0.38);
+  --plantel-exp:  rgba(220, 232, 255, 0.55);
+  --vs-clr:       rgba(220, 232, 255, 0.4);
+  --dtag-bg:      rgba(133, 175, 239, 0.12);
+  --dtag-bdr:     rgba(133, 175, 239, 0.25);
+  --dtag-clr:     rgba(220, 232, 255, 0.8);
 }
 
 /* ================================================================
@@ -222,7 +222,7 @@
 
 :host ::ng-deep .hero-carousel .p-carousel-prev:hover,
 :host ::ng-deep .hero-carousel .p-carousel-next:hover {
-  background: rgba(30, 122, 48, 0.75) !important;
+  background: rgba(37, 99, 235, 0.75) !important;
   border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
@@ -266,7 +266,7 @@
 }
 
 .hero-kicker {
-  color: #6ee87a;
+  color: #85afef;
   font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -604,7 +604,7 @@
 }
 
 :host.dark ::ng-deep .galeria-component .p-galleria-item-nav {
-  background: rgba(6, 10, 6, 0.65) !important;
+  background: rgba(6, 8, 18, 0.65) !important;
 }
 
 :host ::ng-deep .galeria-component .p-galleria-item-nav:hover {
@@ -726,11 +726,11 @@
   height: 3.5rem;
   border: none;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1e7a30, #2ea84a);
+  background: linear-gradient(135deg, #2563eb, #2ea84a);
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: 900;
-  box-shadow: 0 8px 24px rgba(30, 122, 48, 0.35);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
@@ -738,7 +738,7 @@
 .floating-popup-button:hover {
   transform: translateY(-2px) scale(1.03);
   filter: brightness(1.08);
-  box-shadow: 0 14px 32px rgba(30, 122, 48, 0.45);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.45);
 }
 
 .floating-popup-button:active { transform: scale(0.98); }

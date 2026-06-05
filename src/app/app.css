@@ -1,4 +1,4 @@
-/* fondo general */
+﻿/* fondo general */
 body {
   margin: 0;
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
@@ -7,7 +7,7 @@ body {
 
 /* HEADER */
 .header {
-  background: linear-gradient(135deg, #0b6623, #39d353);
+  background: linear-gradient(135deg, #0b6623, #85afef);
   color: white;
   text-align: center;
   padding: 40px 20px;
@@ -94,14 +94,14 @@ input, p-select {
 /* FOCUS */
 input:focus {
   outline: none;
-  border: 2px solid #39d353;
+  border: 2px solid #85afef;
 }
 
 /* BOTÓN */
 .boton {
   width: 100%;
   margin-top: 30px;
-  background: linear-gradient(135deg, #0b6623, #39d353);
+  background: linear-gradient(135deg, #0b6623, #85afef);
   border: none;
   height: 50px;
   font-weight: bold;

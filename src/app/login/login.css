@@ -1,4 +1,4 @@
-.login-container {
+﻿.login-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -15,7 +15,7 @@
 
 .login-card h2 {
   margin: 0 0 10px;
-  color: #39d353;
+  color: #85afef;
 }
 
 .login-subtitle {
@@ -54,7 +54,7 @@ input[pInputText] {
 }
 
 .login-btn {
-  background: #39d353;
+  background: #85afef;
   border: none;
 }
 

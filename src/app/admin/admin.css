@@ -1,4 +1,4 @@
-:host {
+﻿:host {
   display: block;
   min-height: 100vh;
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
@@ -16,9 +16,9 @@
   top: 0;
   z-index: 20;
   padding: 0.75rem 1.5rem;
-  background: rgba(6, 10, 6, 0.96);
+  background: rgba(6, 8, 18, 0.96);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(42, 181, 76, 0.22);
+  border-bottom: 1px solid rgba(133, 175, 239, 0.22);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -27,7 +27,7 @@
 
 .admin-header-titulo {
   margin: 0;
-  color: #39d353;
+  color: #85afef;
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -37,7 +37,7 @@
 }
 .admin-header h1 {
   margin: 0;
-  color: #39d353;
+  color: #85afef;
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -53,9 +53,9 @@
 /* Burger admin */
 .admin-burger-btn {
   display: none;
-  background: rgba(57,211,83,.1);
-  border: 1px solid rgba(57,211,83,.3);
-  color: #39d353;
+  background: rgba(133,175,239,.1);
+  border: 1px solid rgba(133,175,239,.3);
+  color: #85afef;
   border-radius: 8px;
   width: 2.4rem;
   height: 2.4rem;
@@ -66,7 +66,7 @@
   flex-shrink: 0;
   transition: background .15s;
 }
-.admin-burger-btn:hover { background: rgba(57,211,83,.2); }
+.admin-burger-btn:hover { background: rgba(133,175,239,.2); }
 
 .admin-burger-dropdown {
   display: none;
@@ -75,8 +75,8 @@
   right: 0;
   left: 0;
   z-index: 100;
-  background: rgba(6,10,6,.98);
-  border-bottom: 1px solid rgba(57,211,83,.22);
+  background: rgba(6,8,18,.98);
+  border-bottom: 1px solid rgba(133,175,239,.22);
   padding: 0.75rem 1rem;
   flex-direction: column;
   gap: 0.5rem;
@@ -95,8 +95,8 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 2px;
-  background: rgba(6, 10, 6, 0.9);
-  border-bottom: 1px solid rgba(42, 181, 76, 0.14);
+  background: rgba(6, 8, 18, 0.9);
+  border-bottom: 1px solid rgba(133, 175, 239, 0.14);
   padding: 6px 16px;
   position: sticky;
   top: 52px;
@@ -112,22 +112,22 @@
   border-radius: 6px;
   font-weight: 600;
   font-size: 0.85rem;
-  color: rgba(233, 247, 234, 0.48);
+  color: rgba(220, 232, 255, 0.48);
   transition: all 0.16s;
   letter-spacing: 0.03em;
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
 }
 
 .tab-btn:hover {
-  color: #39d353;
-  background: rgba(57, 211, 83, 0.08);
-  border-color: rgba(57, 211, 83, 0.15);
+  color: #85afef;
+  background: rgba(133, 175, 239, 0.08);
+  border-color: rgba(133, 175, 239, 0.15);
 }
 
 .tab-btn.active {
-  color: #39d353;
-  background: rgba(57, 211, 83, 0.14);
-  border-color: rgba(57, 211, 83, 0.32);
+  color: #85afef;
+  background: rgba(133, 175, 239, 0.14);
+  border-color: rgba(133, 175, 239, 0.32);
 }
 
 /* ── CONTENIDO DE TABS ──────────────────────────── */
@@ -153,7 +153,7 @@
 
 .sec-header h3 {
   margin: 0;
-  color: rgba(233, 247, 234, 0.88);
+  color: rgba(220, 232, 255, 0.88);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -163,8 +163,8 @@
 /* ── CARDS ─────────────────────────────────────── */
 :host ::ng-deep .p-card,
 :host ::ng-deep .p-card.p-component {
-  background: rgba(12, 18, 12, 0.82) !important;
-  border: 1px solid rgba(57, 211, 83, 0.13) !important;
+  background: rgba(8, 12, 24, 0.82) !important;
+  border: 1px solid rgba(133, 175, 239, 0.13) !important;
   border-radius: 16px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.42) !important;
   color: #f4f7f3 !important;
@@ -178,8 +178,8 @@
 
 :host ::ng-deep .p-card .p-card-header {
   background: transparent !important;
-  border-bottom: 1px solid rgba(57, 211, 83, 0.1) !important;
-  color: #39d353 !important;
+  border-bottom: 1px solid rgba(133, 175, 239, 0.1) !important;
+  color: #85afef !important;
 }
 
 /* ── TABLE ─────────────────────────────────────── */
@@ -191,9 +191,9 @@
 
 :host ::ng-deep .p-datatable .p-datatable-thead > tr > th,
 :host ::ng-deep .p-datatable thead > tr > th {
-  background: rgba(35, 169, 72, 0.1) !important;
-  color: #39d353 !important;
-  border-color: rgba(57, 211, 83, 0.14) !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #85afef !important;
+  border-color: rgba(133, 175, 239, 0.14) !important;
   font-weight: 700 !important;
   font-size: 0.78rem !important;
   text-transform: uppercase !important;
@@ -203,62 +203,62 @@
 
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr,
 :host ::ng-deep .p-datatable tbody > tr {
-  background: rgba(12, 18, 12, 0.55) !important;
-  color: #e9f7ea !important;
-  border-bottom: 1px solid rgba(57, 211, 83, 0.07) !important;
+  background: rgba(8, 12, 24, 0.55) !important;
+  color: #dce8ff !important;
+  border-bottom: 1px solid rgba(133, 175, 239, 0.07) !important;
   transition: background 0.13s;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover,
 :host ::ng-deep .p-datatable tbody > tr:hover {
-  background: rgba(57, 211, 83, 0.07) !important;
+  background: rgba(133, 175, 239, 0.07) !important;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td,
 :host ::ng-deep .p-datatable tbody > tr > td {
-  border-color: rgba(57, 211, 83, 0.07) !important;
+  border-color: rgba(133, 175, 239, 0.07) !important;
   padding: 0.75rem 1rem !important;
-  color: #e9f7ea !important;
+  color: #dce8ff !important;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-emptymessage td {
   text-align: center !important;
   padding: 2.5rem 1rem !important;
-  color: rgba(233, 247, 234, 0.38) !important;
+  color: rgba(220, 232, 255, 0.38) !important;
   background: transparent !important;
 }
 
 :host ::ng-deep .p-sortable-column-icon {
-  color: rgba(57, 211, 83, 0.55) !important;
+  color: rgba(133, 175, 239, 0.55) !important;
 }
 
 /* ── PAGINATOR ─────────────────────────────────── */
 :host ::ng-deep .p-paginator {
-  background: rgba(8, 14, 8, 0.7) !important;
-  color: #e9f7ea !important;
-  border-top: 1px solid rgba(57, 211, 83, 0.1) !important;
+  background: rgba(6, 10, 22, 0.7) !important;
+  color: #dce8ff !important;
+  border-top: 1px solid rgba(133, 175, 239, 0.1) !important;
   border-radius: 0 0 16px 16px !important;
 }
 
 :host ::ng-deep .p-paginator .p-paginator-element {
-  color: rgba(233, 247, 234, 0.65) !important;
+  color: rgba(220, 232, 255, 0.65) !important;
 }
 
 :host ::ng-deep .p-paginator .p-paginator-element:hover {
-  background: rgba(57, 211, 83, 0.1) !important;
-  color: #39d353 !important;
+  background: rgba(133, 175, 239, 0.1) !important;
+  color: #85afef !important;
 }
 
 :host ::ng-deep .p-paginator .p-highlight {
-  background: rgba(57, 211, 83, 0.18) !important;
-  color: #39d353 !important;
+  background: rgba(133, 175, 239, 0.18) !important;
+  color: #85afef !important;
 }
 
 /* ── SELECTS / DROPDOWNS ───────────────────────── */
 :host ::ng-deep .p-select,
 :host ::ng-deep .p-dropdown {
   background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(57, 211, 83, 0.22) !important;
+  border-color: rgba(133, 175, 239, 0.22) !important;
   color: #f4f7f3 !important;
 }
 
@@ -266,29 +266,29 @@
 :host ::ng-deep .p-dropdown .p-dropdown-label,
 :host ::ng-deep .p-select .p-placeholder,
 :host ::ng-deep .p-dropdown .p-placeholder {
-  color: rgba(233, 247, 234, 0.7) !important;
+  color: rgba(220, 232, 255, 0.7) !important;
 }
 
 :host ::ng-deep .p-select-panel,
 :host ::ng-deep .p-dropdown-panel {
-  background: #111a11 !important;
-  border: 1px solid rgba(57, 211, 83, 0.2) !important;
+  background: #0a0f22 !important;
+  border: 1px solid rgba(133, 175, 239, 0.2) !important;
 }
 
 :host ::ng-deep .p-select-panel .p-select-option,
 :host ::ng-deep .p-dropdown-panel .p-dropdown-item {
-  color: #e9f7ea !important;
+  color: #dce8ff !important;
 }
 
 :host ::ng-deep .p-select-panel .p-select-option:hover,
 :host ::ng-deep .p-dropdown-panel .p-dropdown-item:hover {
-  background: rgba(57, 211, 83, 0.1) !important;
+  background: rgba(133, 175, 239, 0.1) !important;
 }
 
 :host ::ng-deep .p-select-panel .p-highlight,
 :host ::ng-deep .p-dropdown-panel .p-highlight {
-  background: rgba(57, 211, 83, 0.18) !important;
-  color: #39d353 !important;
+  background: rgba(133, 175, 239, 0.18) !important;
+  color: #85afef !important;
 }
 
 /* ── INPUTS ─────────────────────────────────────── */
@@ -296,13 +296,13 @@
 :host ::ng-deep .tab-content input[type='text'],
 :host ::ng-deep .tab-content input[type='number'] {
   background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(57, 211, 83, 0.22) !important;
+  border-color: rgba(133, 175, 239, 0.22) !important;
   color: #f4f7f3 !important;
 }
 
 /* ── DIALOGS ───────────────────────────────────── */
 :host ::ng-deep .p-dialog {
-  border: 1px solid rgba(57, 211, 83, 0.18) !important;
+  border: 1px solid rgba(133, 175, 239, 0.18) !important;
   border-radius: 18px !important;
   overflow: hidden !important;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65) !important;
@@ -310,52 +310,52 @@
 
 :host ::ng-deep .p-dialog .p-dialog-header {
   background: #0c140c !important;
-  color: #39d353 !important;
-  border-bottom: 1px solid rgba(57, 211, 83, 0.16) !important;
+  color: #85afef !important;
+  border-bottom: 1px solid rgba(133, 175, 239, 0.16) !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em !important;
 }
 
 :host ::ng-deep .p-dialog .p-dialog-content {
-  background: linear-gradient(180deg, #111a11, #0d130d) !important;
+  background: linear-gradient(180deg, #0a0f22, #080c1e) !important;
   color: #f4f7f3 !important;
 }
 
 :host ::ng-deep .p-dialog .p-dialog-footer {
   background: #0c140c !important;
-  border-top: 1px solid rgba(57, 211, 83, 0.1) !important;
+  border-top: 1px solid rgba(133, 175, 239, 0.1) !important;
 }
 
 :host ::ng-deep .p-dialog .p-dialog-header-close {
-  color: #39d353 !important;
+  color: #85afef !important;
 }
 
 :host ::ng-deep .p-dialog .p-dialog-header-close:hover {
-  background: rgba(57, 211, 83, 0.12) !important;
+  background: rgba(133, 175, 239, 0.12) !important;
 }
 
 :host ::ng-deep .p-dialog input,
 :host ::ng-deep .p-dialog input[pInputText],
 :host ::ng-deep .p-dialog textarea {
   background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(57, 211, 83, 0.22) !important;
+  border-color: rgba(133, 175, 239, 0.22) !important;
   color: #f4f7f3 !important;
   border-radius: 8px !important;
 }
 
 :host ::ng-deep .p-dialog input[type='date'] {
   background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(57, 211, 83, 0.22) !important;
+  border-color: rgba(133, 175, 239, 0.22) !important;
   color: #f4f7f3 !important;
   color-scheme: dark;
 }
 
 :host ::ng-deep .p-dialog label {
-  color: rgba(233, 247, 234, 0.78) !important;
+  color: rgba(220, 232, 255, 0.78) !important;
 }
 
 :host ::ng-deep .p-dialog textarea {
-  border-color: rgba(57, 211, 83, 0.22) !important;
+  border-color: rgba(133, 175, 239, 0.22) !important;
   background: rgba(255, 255, 255, 0.06) !important;
   color: #f4f7f3 !important;
 }
@@ -369,7 +369,7 @@
 
 /* ── ESTADOS ────────────────────────────────────── */
 .estado-pendiente { color: #ffb74d; font-weight: 700; }
-.estado-aprobado  { color: #39d353; font-weight: 700; }
+.estado-aprobado  { color: #85afef; font-weight: 700; }
 .estado-rechazado { color: #ef5350; font-weight: 700; }
 
 /* ── FILTER BAR ─────────────────────────────────── */
@@ -394,14 +394,14 @@
 .filter-field label {
   font-size: 0.77rem;
   font-weight: 700;
-  color: rgba(233, 247, 234, 0.55);
+  color: rgba(220, 232, 255, 0.55);
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
 
 .result-count {
   font-size: 0.83rem;
-  color: rgba(233, 247, 234, 0.42);
+  color: rgba(220, 232, 255, 0.42);
   margin-bottom: 0.5rem;
 }
 
@@ -412,10 +412,10 @@
 
 .item-main h3 {
   margin: 0 0 0.4rem;
-  color: #39d353;
+  color: #85afef;
 }
 
-.item-main p { color: rgba(233, 247, 234, 0.8); margin: 0.2rem 0; }
+.item-main p { color: rgba(220, 232, 255, 0.8); margin: 0.2rem 0; }
 
 .actions {
   display: flex;
@@ -429,14 +429,14 @@
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.75rem;
-  color: rgba(233, 247, 234, 0.55);
+  color: rgba(220, 232, 255, 0.55);
   font-size: 0.84rem;
 }
 
 .voucher-thumb img {
   max-width: 120px;
   border-radius: 8px;
-  border: 1px solid rgba(57, 211, 83, 0.22);
+  border: 1px solid rgba(133, 175, 239, 0.22);
 }
 
 .example-banner {
@@ -467,11 +467,11 @@
 
 .config-field label {
   font-weight: 600;
-  color: rgba(233, 247, 234, 0.78);
+  color: rgba(220, 232, 255, 0.78);
   font-size: 0.9rem;
 }
 
-.config-field small { color: rgba(233, 247, 234, 0.4); font-size: 0.8rem; }
+.config-field small { color: rgba(220, 232, 255, 0.4); font-size: 0.8rem; }
 
 .img-preview-row {
   display: flex;
@@ -482,7 +482,7 @@
 
 .img-status-label {
   font-size: 0.82rem;
-  color: rgba(233, 247, 234, 0.55);
+  color: rgba(220, 232, 255, 0.55);
   font-weight: 500;
 }
 
@@ -589,7 +589,7 @@
   align-items: center;
   gap: .5rem;
   font-size: .85rem;
-  color: rgba(244,247,243,.75);
+  color: rgba(238,243,255,.75);
   flex: 1;
 }
 
@@ -614,16 +614,16 @@
 
 .migracion-resultado {
   font-size: .82rem;
-  color: #39d353;
+  color: #85afef;
   font-weight: 600;
 }
 
 /* ── LIBRO DE ASISTENCIA ─────────────────────────── */
 .libro-mes-input {
   padding: .48rem .75rem;
-  border: 1px solid rgba(57,211,83,.25);
+  border: 1px solid rgba(133,175,239,.25);
   border-radius: 8px;
-  background: rgba(14,20,14,.9);
+  background: rgba(9,14,28,.9);
   color: #f4f7f3;
   font-size: .9rem;
   font-family: inherit;
@@ -631,13 +631,13 @@
   width: 100%;
   cursor: pointer;
 }
-.libro-mes-input:focus { border-color: #39d353; }
+.libro-mes-input:focus { border-color: #85afef; }
 
 .libro-scroll-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 10px;
-  border: 1px solid rgba(57,211,83,.18);
+  border: 1px solid rgba(133,175,239,.18);
   margin-bottom: 1rem;
 }
 
@@ -650,39 +650,39 @@
 }
 
 .libro-tabla thead tr {
-  background: rgba(57,211,83,.1);
+  background: rgba(133,175,239,.1);
 }
 
-.libro-th-num    { width: 2.2rem; padding: .55rem .4rem; text-align: center; color: rgba(244,247,243,.5); font-weight: 600; }
-.libro-th-nombre { padding: .55rem .75rem; text-align: left; color: rgba(244,247,243,.7); font-weight: 600; min-width: 180px; }
-.libro-th-cat    { padding: .55rem .5rem; text-align: center; color: rgba(244,247,243,.7); font-weight: 600; }
-.libro-th-sede   { padding: .55rem .75rem; text-align: left; color: rgba(244,247,243,.7); font-weight: 600; min-width: 90px; }
-.libro-th-fecha  { padding: .55rem .4rem; text-align: center; color: #39d353; font-weight: 700; font-size: .78rem; min-width: 2.6rem; }
-.libro-th-pct    { padding: .55rem .6rem; text-align: center; color: rgba(244,247,243,.7); font-weight: 700; }
-.libro-th-resumen{ padding: .55rem .75rem; text-align: center; color: rgba(244,247,243,.5); font-weight: 600; }
+.libro-th-num    { width: 2.2rem; padding: .55rem .4rem; text-align: center; color: rgba(238,243,255,.5); font-weight: 600; }
+.libro-th-nombre { padding: .55rem .75rem; text-align: left; color: rgba(238,243,255,.7); font-weight: 600; min-width: 180px; }
+.libro-th-cat    { padding: .55rem .5rem; text-align: center; color: rgba(238,243,255,.7); font-weight: 600; }
+.libro-th-sede   { padding: .55rem .75rem; text-align: left; color: rgba(238,243,255,.7); font-weight: 600; min-width: 90px; }
+.libro-th-fecha  { padding: .55rem .4rem; text-align: center; color: #85afef; font-weight: 700; font-size: .78rem; min-width: 2.6rem; }
+.libro-th-pct    { padding: .55rem .6rem; text-align: center; color: rgba(238,243,255,.7); font-weight: 700; }
+.libro-th-resumen{ padding: .55rem .75rem; text-align: center; color: rgba(238,243,255,.5); font-weight: 600; }
 
 .libro-tabla tbody tr {
-  border-bottom: 1px solid rgba(57,211,83,.08);
+  border-bottom: 1px solid rgba(133,175,239,.08);
   transition: background .15s;
 }
-.libro-tabla tbody tr:hover { background: rgba(57,211,83,.05); }
+.libro-tabla tbody tr:hover { background: rgba(133,175,239,.05); }
 
 .libro-row-critico { background: rgba(255,80,80,.06) !important; }
 .libro-row-critico:hover { background: rgba(255,80,80,.1) !important; }
 
-.libro-td-num     { padding: .5rem .4rem; text-align: center; color: rgba(244,247,243,.4); font-size: .78rem; }
+.libro-td-num     { padding: .5rem .4rem; text-align: center; color: rgba(238,243,255,.4); font-size: .78rem; }
 .libro-td-nombre  { padding: .5rem .75rem; color: #f4f7f3; font-weight: 600; }
 .libro-td-cat     { padding: .5rem .5rem; text-align: center; }
-.libro-td-sede    { padding: .5rem .75rem; font-size: .8rem; color: rgba(244,247,243,.65); white-space: nowrap; }
+.libro-td-sede    { padding: .5rem .75rem; font-size: .8rem; color: rgba(238,243,255,.65); white-space: nowrap; }
 
 .libro-cat-badge {
-  background: rgba(57,211,83,.15);
-  border: 1px solid rgba(57,211,83,.25);
+  background: rgba(133,175,239,.15);
+  border: 1px solid rgba(133,175,239,.25);
   border-radius: 999px;
   padding: .1rem .5rem;
   font-size: .72rem;
   font-weight: 700;
-  color: #39d353;
+  color: #85afef;
 }
 
 .libro-td-estado {
@@ -690,12 +690,12 @@
   text-align: center;
   font-weight: 800;
   font-size: .88rem;
-  border-left: 1px solid rgba(57,211,83,.06);
+  border-left: 1px solid rgba(133,175,239,.06);
 }
-.libro-estado-asistio    { color: #39d353; background: rgba(57,211,83,.08); }
+.libro-estado-asistio    { color: #85afef; background: rgba(133,175,239,.08); }
 .libro-estado-ausente    { color: #ff6b6b; background: rgba(255,107,107,.08); }
 .libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
-.libro-estado-sin        { color: rgba(244,247,243,.2); }
+.libro-estado-sin        { color: rgba(238,243,255,.2); }
 
 .libro-celda-span {
   display: inline-flex;
@@ -712,17 +712,17 @@
   user-select: none;
 }
 .libro-celda-span:focus {
-  border-color: rgba(57,211,83,0.6);
-  box-shadow: 0 0 0 2px rgba(57,211,83,0.2);
+  border-color: rgba(133,175,239,0.6);
+  box-shadow: 0 0 0 2px rgba(133,175,239,0.2);
 }
-.libro-celda-span.libro-estado-asistio    { color: #39d353; background: rgba(57,211,83,.08); }
+.libro-celda-span.libro-estado-asistio    { color: #85afef; background: rgba(133,175,239,.08); }
 .libro-celda-span.libro-estado-ausente    { color: #ff6b6b; background: rgba(255,107,107,.08); }
 .libro-celda-span.libro-estado-justificado{ color: #fbbf24; background: rgba(251,191,36,.08); }
 .libro-celda-span.libro-estado-licenciado { color: #38bdf8; background: rgba(56,189,248,.10); }
-.libro-celda-span.libro-estado-sin        { color: rgba(244,247,243,.2); }
+.libro-celda-span.libro-estado-sin        { color: rgba(238,243,255,.2); }
 
 .libro-l   { color: #38bdf8; font-weight: 700; font-size: .78rem; }
-.libro-sep { color: rgba(244,247,243,.25); font-size: .72rem; margin: 0 .15rem; }
+.libro-sep { color: rgba(238,243,255,.25); font-size: .72rem; margin: 0 .15rem; }
 .lib-ley-l { background: rgba(56,189,248,.12); color: #38bdf8; }
 
 .libro-td-pct {
@@ -730,9 +730,9 @@
   text-align: center;
   font-weight: 800;
   font-size: .92rem;
-  border-left: 2px solid rgba(57,211,83,.15);
+  border-left: 2px solid rgba(133,175,239,.15);
 }
-.pct-ok   { color: #39d353; }
+.pct-ok   { color: #85afef; }
 .pct-warn { color: #fbbf24; }
 .pct-err  { color: #ff6b6b; }
 
@@ -745,35 +745,35 @@
   justify-content: center;
 }
 
-.libro-p  { color: #39d353; font-weight: 700; font-size: .8rem; }
+.libro-p  { color: #85afef; font-weight: 700; font-size: .8rem; }
 .libro-j  { color: #fbbf24; font-weight: 700; font-size: .8rem; }
 .libro-a  { color: #ff6b6b; font-weight: 700; font-size: .8rem; }
 
 .libro-tfoot td {
   padding: .45rem .4rem;
-  background: rgba(57,211,83,.05);
-  border-top: 2px solid rgba(57,211,83,.2);
+  background: rgba(133,175,239,.05);
+  border-top: 2px solid rgba(133,175,239,.2);
   font-weight: 700;
   text-align: center;
   font-size: .78rem;
-  color: rgba(244,247,243,.6);
+  color: rgba(238,243,255,.6);
 }
 .libro-tf-label { text-align: left; padding-left: .75rem; }
-.libro-tf-total { color: #39d353; }
+.libro-tf-total { color: #85afef; }
 
 .libro-leyenda {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
   padding: .6rem .75rem;
-  background: rgba(57,211,83,.04);
-  border: 1px solid rgba(57,211,83,.12);
+  background: rgba(133,175,239,.04);
+  border: 1px solid rgba(133,175,239,.12);
   border-radius: 8px;
   font-size: .78rem;
 }
 
 .lib-ley         { font-weight: 600; }
-.lib-ley-p       { color: #39d353; }
+.lib-ley-p       { color: #85afef; }
 .lib-ley-j       { color: #fbbf24; }
 .lib-ley-a       { color: #ff6b6b; }
-.lib-ley-critico { color: rgba(244,247,243,.5); }
+.lib-ley-critico { color: rgba(238,243,255,.5); }
