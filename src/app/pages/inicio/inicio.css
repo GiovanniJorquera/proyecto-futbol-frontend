@@ -1,4 +1,46 @@
 ﻿/* ================================================================
+   SKELETON LOADER
+   ================================================================ */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.sk {
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(133,175,239,.07) 0%,
+    rgba(133,175,239,.22) 50%,
+    rgba(133,175,239,.07) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  display: block;
+}
+
+/* Header */
+.sk-header       { width: 200px; height: 1.1rem; border-radius: 4px; }
+.header-title-text { font-size: 1.05rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+/* Hero overlay */
+.sk-hero-title   { width: 320px; max-width: 90%; height: 2.6rem; margin-bottom: .6rem; border-radius: 8px; }
+.sk-hero-sub     { width: 240px; max-width: 80%; height: 1.1rem; border-radius: 4px; }
+
+/* Welcome strip */
+.sk-strip-title  { width: 280px; max-width: 90%; height: 2rem; border-radius: 8px; margin-bottom: .5rem; }
+.sk-strip-sub    { width: 200px; max-width: 80%; height: 1rem; border-radius: 4px; }
+
+/* Noticias skeleton */
+.sk-card         { pointer-events: none; }
+.sk-card-img     { width: 100%; height: 180px; border-radius: 12px 12px 0 0; }
+.sk-meta-row     { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; }
+.sk-tag          { width: 70px; height: .85rem; border-radius: 999px; }
+.sk-date         { width: 80px; height: .75rem; border-radius: 4px; }
+.sk-card-title   { width: 90%; height: 1.1rem; border-radius: 4px; margin-bottom: .5rem; }
+.sk-card-desc    { width: 100%; height: .85rem; border-radius: 4px; margin-bottom: .3rem; }
+
+/* ================================================================
    THEME VARIABLES
    ================================================================ */
 :host {

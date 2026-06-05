@@ -1,6 +1,7 @@
 <!-- ========= HEADER ========= -->
 <header class="page-header">
-  <h1>{{ siteConfig.tituloHeader }}</h1>
+  <span *ngIf="configCargada" class="header-title-text">{{ siteConfig.tituloHeader }}</span>
+  <span *ngIf="!configCargada" class="sk sk-header"></span>
 
   <!-- Nav escritorio -->
   <nav class="header-nav">
@@ -51,9 +52,15 @@
     <div class="hero-fallback">
       <img [src]="imgDestacada" alt="Imagen destacada del club" />
       <div class="hero-overlay">
-        <span class="hero-kicker">Santiago Wanderers</span>
-        <h1 class="hero-title">{{ siteConfig.tituloBienvenida }}</h1>
-        <p class="hero-sub">{{ siteConfig.subtituloBienvenida }}</p>
+        <span class="hero-kicker">Escuela Familias del Fútbol</span>
+        <ng-container *ngIf="configCargada; else heroSkeleton">
+          <h1 class="hero-title">{{ siteConfig.tituloBienvenida }}</h1>
+          <p class="hero-sub">{{ siteConfig.subtituloBienvenida }}</p>
+        </ng-container>
+        <ng-template #heroSkeleton>
+          <div class="sk sk-hero-title"></div>
+          <div class="sk sk-hero-sub"></div>
+        </ng-template>
       </div>
     </div>
   </ng-template>
@@ -61,8 +68,14 @@
 
 <!-- Welcome strip (only shown when carousel is active) -->
 <div class="welcome-strip" *ngIf="siteConfig.imagenesCarrusel.length > 0">
-  <h1>{{ siteConfig.tituloBienvenida }}</h1>
-  <p>{{ siteConfig.subtituloBienvenida }}</p>
+  <ng-container *ngIf="configCargada; else stripSkeleton">
+    <h1>{{ siteConfig.tituloBienvenida }}</h1>
+    <p>{{ siteConfig.subtituloBienvenida }}</p>
+  </ng-container>
+  <ng-template #stripSkeleton>
+    <div class="sk sk-strip-title"></div>
+    <div class="sk sk-strip-sub"></div>
+  </ng-template>
 </div>
 
 <!-- ========= SECTIONS NAV ========= -->
@@ -98,7 +111,23 @@
   <div class="section-inner">
     <h2 class="section-heading">Últimas Noticias</h2>
 
-    <div class="news-grid" *ngIf="noticias.length > 0; else noNoticias">
+    <!-- Skeleton noticias mientras carga -->
+    <div class="news-grid sk-news-grid" *ngIf="!noticiasCargadas">
+      <article class="news-card sk-card" *ngFor="let i of [1,2,3]">
+        <div class="sk sk-card-img"></div>
+        <div class="news-card-body">
+          <div class="sk-meta-row">
+            <div class="sk sk-tag"></div>
+            <div class="sk sk-date"></div>
+          </div>
+          <div class="sk sk-card-title"></div>
+          <div class="sk sk-card-desc"></div>
+          <div class="sk sk-card-desc" style="width:60%"></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="news-grid" *ngIf="noticiasCargadas && noticias.length > 0">
       <article class="news-card" *ngFor="let noticia of noticias">
         <div class="news-card-img-wrap">
           <img
@@ -120,9 +149,9 @@
       </article>
     </div>
 
-    <ng-template #noNoticias>
-      <p class="section-empty">No hay noticias disponibles por el momento.</p>
-    </ng-template>
+    <p class="section-empty" *ngIf="noticiasCargadas && noticias.length === 0">
+      No hay noticias disponibles por el momento.
+    </p>
   </div>
 </section>
 

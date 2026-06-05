@@ -26,10 +26,13 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
 
   private observer?: IntersectionObserver;
 
+  configCargada = false;
+  noticiasCargadas = false;
+
   siteConfig = {
-    tituloHeader: 'Escuela de Futbol - Inicio',
-    tituloBienvenida: '¡Bienvenidos Crack!',
-    subtituloBienvenida: 'Revisa las últimas novedades de tu club.',
+    tituloHeader: '',
+    tituloBienvenida: '',
+    subtituloBienvenida: '',
     imagenDestacada: '',
     imagenesCarrusel: [] as string[],
     imagenesGaleria: [] as GaleriaImg[],
@@ -73,6 +76,7 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
           if (config.tituloPopup) this.siteConfig.tituloPopup = config.tituloPopup;
           if (config.cuerpoPopup) this.siteConfig.cuerpoPopup = config.cuerpoPopup;
           if (this.siteConfig.mostrarPopup) this.mostrarPostulaciones = true;
+          this.configCargada = true;
           this.cdr.detectChanges();
         });
       },
@@ -83,10 +87,11 @@ export class Inicio implements OnInit, AfterViewInit, OnDestroy {
       next: (data) => {
         this.zone.run(() => {
           if (data && data.length > 0) this.noticias = data;
+          this.noticiasCargadas = true;
           this.cdr.detectChanges();
         });
       },
-      error: () => {},
+      error: () => { this.noticiasCargadas = true; },
     });
 
     this.http.get<Partido[]>(`${this.apiUrl}/partidos`).subscribe({
