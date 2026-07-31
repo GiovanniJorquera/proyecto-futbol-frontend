@@ -146,4 +146,17 @@
   .reg-actions { padding: 4px 0 12px; }
   .reg-actions p-button,
   .reg-actions .p-button { width: 100%; }
+
+  .estado-card {
+    padding: 32px 20px;
+    max-width: 100%;
+  }
+
+  .estado-wrap {
+    padding: 16px;
+  }
+
+  .reg-logo {
+    height: 48px;
+  }
 }
