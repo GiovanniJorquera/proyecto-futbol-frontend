@@ -835,6 +835,8 @@ kbd {
   border: 1px solid transparent;
 }
 .rend-jugador-item:hover { background: var(--accent-a); }
+.rend-jugador-item > div:last-child { min-width: 0; }
+.rend-jugador-item .jc-nombre { overflow-wrap: break-word; }
 .rend-jugador-item.rend-jugador-activo {
   background: var(--accent-a);
   border-color: var(--accent);
