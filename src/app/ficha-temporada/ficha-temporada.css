@@ -2,7 +2,7 @@
   display: block;
   min-height: 100vh;
   font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #0b6623, #14532d);
+  background: linear-gradient(135deg, #85afef, #2563eb);
   color: #1f2937;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .estado-card.estado-error { border-top: 5px solid #b91c1c; }
-.estado-card.estado-ok    { border-top: 5px solid #0b6623; }
+.estado-card.estado-ok    { border-top: 5px solid #2563eb; }
 
 .estado-icon {
   font-size: 3.2rem;
@@ -35,7 +35,7 @@
 }
 
 .estado-error .estado-icon { color: #b91c1c; }
-.estado-ok    .estado-icon { color: #0b6623; }
+.estado-ok    .estado-icon { color: #2563eb; }
 .estado-card h2 { margin: 0 0 10px; font-size: 1.45rem; color: #1a1a2e; }
 .estado-card p  { color: #555; line-height: 1.55; margin: 0; }
 
@@ -56,7 +56,7 @@
 }
 
 .subtitulo {
-  color: #0b6623;
+  color: #2563eb;
   font-size: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -67,12 +67,12 @@
   padding: 24px;
   margin-top: 24px;
   background: #f9fafb;
-  color: #0b6623;
+  color: #0f1a3e;
 }
 
 .seccion h3 {
   margin-bottom: 16px;
-  color: #0b6623;
+  color: #2563eb;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -91,7 +91,7 @@
 
 label {
   font-weight: 700;
-  color: #1f4316;
+  color: #0f1a3e;
   font-size: 0.95rem;
 }
 
@@ -102,7 +102,7 @@ p-select {
   border-radius: 6px;
   border: 1px solid #85afef;
   transition: 0.2s;
-  color: #0b6623;
+  color: #0f1a3e;
   background: #fafafa;
 }
 
@@ -123,7 +123,7 @@ input:focus,
   padding: var(--p-select-padding-y) var(--p-select-padding-x);
   text-overflow: ellipsis;
   cursor: pointer;
-  color: #0b6623 !important;
+  color: #0f1a3e !important;
   background: transparent !important;
   border: 0 none;
   outline: 0 none;
@@ -150,7 +150,7 @@ input:focus,
 .boton {
   width: 100%;
   margin-top: 28px;
-  background: linear-gradient(135deg, #0b6623, #85afef);
+  background: linear-gradient(135deg, #85afef, #2563eb);
   border: none;
   height: 52px;
   border-radius: 12px;
@@ -168,9 +168,9 @@ input:focus,
   margin-top: 10px;
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(56, 142, 60, 0.08);
-  border: 1px solid rgba(56, 142, 60, 0.18);
-  color: #14532d;
+  background: rgba(133, 175, 239, 0.08);
+  border: 1px solid rgba(133, 175, 239, 0.18);
+  color: #2563eb;
   font-size: 0.9rem;
   line-height: 1.5;
 }
