@@ -189,8 +189,11 @@ export class ApiService {
     return this.http.put(`${this.apiUrl}/admin/pago-mensual/${fichaId}`, { estado }, this.authHeaders);
   }
 
-  getMisPagosMensuales(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/cliente/mis-pagos-mensuales`, this.authHeaders);
+  getMisPagosMensuales(fichaId?: string): Observable<any> {
+    const url = fichaId
+      ? `${this.apiUrl}/cliente/mis-pagos-mensuales?fichaId=${fichaId}`
+      : `${this.apiUrl}/cliente/mis-pagos-mensuales`;
+    return this.http.get<any>(url, this.authHeaders);
   }
 
   getMiRendimiento(fichaId?: string): Observable<any> {

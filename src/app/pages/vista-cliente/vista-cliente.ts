@@ -51,7 +51,10 @@ export class VistaClienteComponent implements OnInit {
     const tema = localStorage.getItem('tema');
     this.temaOscuro = tema === 'dark';
     this.cargarFicha();
-    this.api.getMisPagosMensuales().subscribe({
+  }
+
+  cargarPagosMensuales(fichaId: string) {
+    this.api.getMisPagosMensuales(fichaId).subscribe({
       next: (data) => {
         this.pagosMensuales = {
           mesActual: { mes: data.mesActual.mes, anio: data.mesActual['año'], estado: data.mesActual.estado, monto: data.mesActual.monto },
@@ -110,12 +113,13 @@ export class VistaClienteComponent implements OnInit {
         } else {
           this.ficha = data[0];
           this.cargarRendimientoFicha(this.ficha._id);
+          this.cargarPagosMensuales(this.ficha._id);
         }
         this.cargando = false;
       },
       error: () => {
         this.api.getMiFicha().subscribe({
-          next: (data) => { this.ficha = data; this.fichas = [data]; this.cargarRendimientoFicha(data._id); this.cargando = false; },
+          next: (data) => { this.ficha = data; this.fichas = [data]; this.cargarRendimientoFicha(data._id); this.cargarPagosMensuales(data._id); this.cargando = false; },
           error: () => { this.error = 'No se encontró información asociada a tu cuenta.'; this.cargando = false; }
         });
       }
@@ -127,6 +131,7 @@ export class VistaClienteComponent implements OnInit {
     this.rendimiento = null;
     this.chartData = null;
     this.cargarRendimientoFicha(ficha._id);
+    this.cargarPagosMensuales(ficha._id);
   }
 
   cargarRendimientoFicha(fichaId: string) {
