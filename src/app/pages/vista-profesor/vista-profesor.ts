@@ -187,6 +187,21 @@ export class VistaProfesorComponent implements OnInit {
     return 'P';
   }
 
+  /* Tap/clic → cicla P → L → J → A → P (para móvil, donde no aparece teclado en un input readonly) */
+  onLetraClick(registro: RegistroAsistencia, index: number) {
+    if (this.asistenciaGuardada) return;
+    const ciclo: Record<string, RegistroAsistencia['estado']> = {
+      '': 'asistio',
+      asistio: 'licenciado',
+      licenciado: 'justificado',
+      justificado: 'ausente',
+      ausente: 'asistio',
+    };
+    const actual = registro.marcado ? registro.estado : '';
+    this.setEstado(registro, ciclo[actual] ?? 'asistio');
+    this.moverFoco(index + 1);
+  }
+
   onLetraKeydown(event: KeyboardEvent, registro: RegistroAsistencia, index: number) {
     if (this.asistenciaGuardada) {
       event.preventDefault();

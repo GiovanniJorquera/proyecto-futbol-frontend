@@ -90,6 +90,8 @@ export class FichaTemporadaComponent implements OnInit {
       establecimiento: [''],
       curso:           [''],
       clubAmateur:     [''],
+      equipoPreferido: [''],
+      jugadorReferente:[''],
       actitudSocial:   [''],
       direccion:       ['', Validators.required],
       ciudad:          ['', Validators.required],

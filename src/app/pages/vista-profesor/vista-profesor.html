@@ -199,7 +199,7 @@
             <span class="ley-item ley-l"><kbd>L</kbd> Licenciado (100%)</span>
             <span class="ley-item ley-j"><kbd>J</kbd> Justificado (0%)</span>
             <span class="ley-item ley-a"><kbd>A</kbd> Ausente (0%)</span>
-            <span class="ley-hint"><i class="pi pi-info-circle"></i> Escribe la letra y avanza automáticamente</span>
+            <span class="ley-hint"><i class="pi pi-info-circle"></i> Escribe la letra, o toca la casilla para ciclar entre los estados</span>
           </div>
 
           <div class="asistencia-lista">
@@ -218,6 +218,7 @@
                 [class.letra-l]="r.marcado && r.estado === 'licenciado'"
                 [value]="getLetra(r)"
                 (keydown)="onLetraKeydown($event, r, i)"
+                (click)="onLetraClick(r, i)"
                 [id]="'asis-' + i"
                 maxlength="1"
                 readonly

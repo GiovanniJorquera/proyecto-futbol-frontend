@@ -1397,7 +1397,7 @@
       <p><strong>Categoría:</strong> {{ fichaSeleccionada.categoria }}</p>
       <p><strong>RUT:</strong> {{ fichaSeleccionada.cedula }}</p>
       <p><strong>Edad:</strong> {{ calcularEdad(fichaSeleccionada.fechaNacimiento) }} años</p>
-      <p><strong>Posición:</strong> {{ fichaSeleccionada.posicion || '—' }}</p>
+      <p><strong>Posición en la cancha:</strong> {{ fichaSeleccionada.posicion || '—' }}</p>
       <p><strong>Pie hábil:</strong> {{ fichaSeleccionada.pieHabil || '—' }}</p>
       <p><strong>Talla:</strong> {{ fichaSeleccionada.talla || '—' }}</p>
       <p><strong>Nombre camiseta:</strong> {{ fichaSeleccionada.nombreCamiseta || '—' }}</p>
@@ -1406,6 +1406,8 @@
       <p><strong>Establecimiento:</strong> {{ fichaSeleccionada.establecimiento || '—' }}</p>
       <p><strong>Curso:</strong> {{ fichaSeleccionada.curso || '—' }}</p>
       <p><strong>Club amateur:</strong> {{ fichaSeleccionada.clubAmateur || '—' }}</p>
+      <p><strong>Equipo preferido:</strong> {{ fichaSeleccionada.equipoPreferido || '—' }}</p>
+      <p><strong>Jugador referente:</strong> {{ fichaSeleccionada.jugadorReferente || '—' }}</p>
       <p><strong>Actitud social:</strong> {{ fichaSeleccionada.actitudSocial || '—' }}</p>
       <p style="grid-column:1/-1;"><strong>Dirección:</strong> {{ fichaSeleccionada.direccion }}, {{ fichaSeleccionada.ciudad }}</p>
       <p style="grid-column:1/-1;" *ngIf="fichaSeleccionada.otrosDeportes"><strong>Otros deportes:</strong> {{ fichaSeleccionada.otrosDeportes }}</p>
@@ -1481,7 +1483,7 @@
           <p-select [options]="sedeJugadorOpciones" [(ngModel)]="fichaEditandoForm.sede" optionLabel="label" optionValue="value" placeholder="Seleccionar sede" appendTo="body" style="width:100%;"></p-select>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
-          <label style="font-weight:600;">Posición</label>
+          <label style="font-weight:600;">Posición en la cancha</label>
           <p-select [options]="posicionOpciones" [(ngModel)]="fichaEditandoForm.posicion" optionLabel="label" optionValue="value" appendTo="body" style="width:100%;"></p-select>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
@@ -1533,6 +1535,14 @@
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-weight:600;">Club amateur</label>
           <input pInputText [(ngModel)]="fichaEditandoForm.clubAmateur" style="width:100%;" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Equipo preferido</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.equipoPreferido" style="width:100%;" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-weight:600;">Jugador referente</label>
+          <input pInputText [(ngModel)]="fichaEditandoForm.jugadorReferente" style="width:100%;" />
         </div>
       </div>
     </div>
@@ -1684,14 +1694,77 @@
 
         <!-- Historial tabla -->
         <div style="max-height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:0.4rem;">
-          <div *ngFor="let r of rendimientoJugadorFiltrado" style="display:grid; grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr; gap:0.5rem; align-items:center; padding:0.4rem 0.75rem; background:rgba(255,255,255,0.03); border-radius:6px; font-size:0.82rem;">
-            <span style="opacity:0.55; min-width:60px;">{{ r.fecha | date:'dd/MM/yy' }}</span>
-            <span style="color:#3b82f6;">F: <strong>{{ r.fisico?.promedio || 0 }}%</strong></span>
-            <span style="color:#f59e0b;">T: <strong>{{ r.tecnico?.promedio || 0 }}%</strong></span>
-            <span style="color:#8b5cf6;">A: <strong>{{ r.actitudinal?.promedio || 0 }}%</strong></span>
-            <span style="color:#10b981;">E: <strong>{{ r.estrategico?.promedio || 0 }}%</strong></span>
-            <span style="color:#39d353;" *ngIf="r.promedioGeneral">G: <strong>{{ r.promedioGeneral }}%</strong></span>
-          </div>
+          <ng-container *ngFor="let r of rendimientoJugadorFiltrado">
+            <div style="display:grid; grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr auto; gap:0.5rem; align-items:center; padding:0.4rem 0.75rem; background:rgba(255,255,255,0.03); border-radius:6px; font-size:0.82rem;">
+              <span style="opacity:0.55; min-width:60px;">{{ r.fecha | date:'dd/MM/yy' }}</span>
+              <span style="color:#3b82f6;">F: <strong>{{ r.fisico?.promedio || 0 }}%</strong></span>
+              <span style="color:#f59e0b;">T: <strong>{{ r.tecnico?.promedio || 0 }}%</strong></span>
+              <span style="color:#8b5cf6;">A: <strong>{{ r.actitudinal?.promedio || 0 }}%</strong></span>
+              <span style="color:#10b981;">E: <strong>{{ r.estrategico?.promedio || 0 }}%</strong></span>
+              <span style="color:#39d353;" *ngIf="r.promedioGeneral">G: <strong>{{ r.promedioGeneral }}%</strong></span>
+              <button (click)="editarRendimiento(r)" title="Editar" style="background:none; border:none; color:rgba(233,247,234,.6); cursor:pointer; padding:0.2rem;">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+
+            <!-- Formulario de edición inline -->
+            <div *ngIf="rendEditandoId === r._id && rendEditForm" style="display:flex; flex-direction:column; gap:0.6rem; padding:0.85rem; background:rgba(57,211,83,0.05); border:1px solid rgba(57,211,83,0.15); border-radius:8px;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem 1.5rem;">
+                <div>
+                  <strong style="color:#3b82f6; font-size:0.8rem;">Físico — {{ promedioCat(rendEditForm.fisico) }}%</strong>
+                  <div style="display:flex; flex-direction:column; gap:0.15rem; margin-top:0.3rem;">
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Velocidad <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.fisico.velocidad" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.fisico.velocidad }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Agilidad <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.fisico.agilidad" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.fisico.agilidad }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Resistencia <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.fisico.resistencia" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.fisico.resistencia }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Fuerza <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.fisico.fuerza" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.fisico.fuerza }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Coordinación <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.fisico.coordinacion" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.fisico.coordinacion }}%</span></label>
+                  </div>
+                </div>
+                <div>
+                  <strong style="color:#f59e0b; font-size:0.8rem;">Técnico — {{ promedioCat(rendEditForm.tecnico) }}%</strong>
+                  <div style="display:flex; flex-direction:column; gap:0.15rem; margin-top:0.3rem;">
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Control y dominio <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.tecnico.controlDominio" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.tecnico.controlDominio }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Precisión <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.tecnico.precisionEjecucion" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.tecnico.precisionEjecucion }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Fluidez <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.tecnico.fluidezMovimiento" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.tecnico.fluidezMovimiento }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Uso de perfiles <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.tecnico.usoPerfiles" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.tecnico.usoPerfiles }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Postura corporal <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.tecnico.posturaCorporal" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.tecnico.posturaCorporal }}%</span></label>
+                  </div>
+                </div>
+                <div>
+                  <strong style="color:#8b5cf6; font-size:0.8rem;">Actitudinal — {{ promedioCat(rendEditForm.actitudinal) }}%</strong>
+                  <div style="display:flex; flex-direction:column; gap:0.15rem; margin-top:0.3rem;">
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Motivación <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.actitudinal.motivacion" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.actitudinal.motivacion }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Reacción al resultado <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.actitudinal.reaccionResultado" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.actitudinal.reaccionResultado }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Apoyo al compañero <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.actitudinal.apoyoCompanero" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.actitudinal.apoyoCompanero }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Deseos de superación <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.actitudinal.deseosSuperacion" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.actitudinal.deseosSuperacion }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Resiliencia <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.actitudinal.resiliencia" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.actitudinal.resiliencia }}%</span></label>
+                  </div>
+                </div>
+                <div>
+                  <strong style="color:#10b981; font-size:0.8rem;">Estratégico — {{ promedioCat(rendEditForm.estrategico) }}%</strong>
+                  <div style="display:flex; flex-direction:column; gap:0.15rem; margin-top:0.3rem;">
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Toma de decisiones <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.estrategico.tomaDecisiones" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.estrategico.tomaDecisiones }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Lectura de juego <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.estrategico.lecturaJuego" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.estrategico.lecturaJuego }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Ocupación del espacio <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.estrategico.ocupacionEspacio" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.estrategico.ocupacionEspacio }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Transiciones <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.estrategico.transiciones" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.estrategico.transiciones }}%</span></label>
+                    <label style="font-size:0.75rem; display:flex; justify-content:space-between;">Cumplimiento del plan <input type="range" min="0" max="100" step="10" [(ngModel)]="rendEditForm.estrategico.cumplimientoPlan" [ngModelOptions]="{standalone:true}"/> <span>{{ rendEditForm.estrategico.cumplimientoPlan }}%</span></label>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label style="font-size:0.75rem; font-weight:600;">Ante adversidad</label>
+                <input pInputText [(ngModel)]="rendEditForm.actitudAdversidad" [ngModelOptions]="{standalone:true}" style="width:100%;" />
+              </div>
+              <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <label style="font-size:0.75rem; font-weight:600;">Comentario</label>
+                <textarea pTextarea [(ngModel)]="rendEditForm.comentario" [ngModelOptions]="{standalone:true}" rows="2" style="width:100%;"></textarea>
+              </div>
+              <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+                <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="cancelarEdicionRendimiento()" [disabled]="guardandoRendEdit"></p-button>
+                <p-button label="Guardar cambios" (onClick)="guardarEdicionRendimiento()" [loading]="guardandoRendEdit"></p-button>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </ng-container>
     </ng-container>

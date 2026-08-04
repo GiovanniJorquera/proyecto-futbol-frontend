@@ -110,6 +110,9 @@ export class AdminComponent implements OnInit {
   modalRendimientoVisible = false;
   rendimientoJugador: any[] = [];
   cargandoRendimiento = false;
+  rendEditandoId: string | null = null;
+  rendEditForm: any = null;
+  guardandoRendEdit = false;
   rendChartData: any = null;
   rendChartOptions: any = null;
   rendZoomAnio: number | null = null;
@@ -801,6 +804,8 @@ export class AdminComponent implements OnInit {
       establecimiento: ficha.establecimiento || '',
       curso: ficha.curso || '',
       clubAmateur: ficha.clubAmateur || '',
+      equipoPreferido: ficha.equipoPreferido || '',
+      jugadorReferente: ficha.jugadorReferente || '',
       talla: ficha.talla || '',
       nombreCamiseta: ficha.nombreCamiseta || '',
       posicion: ficha.posicion || '',
@@ -1058,6 +1063,8 @@ export class AdminComponent implements OnInit {
     this.rendChartData = null;
     this.rendZoomAnio = null;
     this.rendZoomMes = null;
+    this.rendEditandoId = null;
+    this.rendEditForm = null;
     this.http.get<any[]>(`${this.apiUrl}/admin/rendimiento/${ficha._id}`, this.authHeaders()).subscribe({
       next: (data: any[]) => {
         this.rendimientoJugador = [...data].reverse();
@@ -1095,6 +1102,47 @@ export class AdminComponent implements OnInit {
         x: { ticks: { color: 'rgba(233,247,234,.55)' }, grid: { color: 'rgba(57,211,83,.08)' } }
       }
     };
+  }
+
+  promedioCat(cat: any): number {
+    const vals = Object.entries(cat || {}).filter(([k]) => k !== 'promedio').map(([, v]) => Number(v)).filter(v => !isNaN(v));
+    return vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+  }
+
+  editarRendimiento(r: any) {
+    this.rendEditandoId = r._id;
+    this.rendEditForm = {
+      fisico: { ...r.fisico },
+      tecnico: { ...r.tecnico },
+      actitudinal: { ...r.actitudinal },
+      estrategico: { ...r.estrategico },
+      comentario: r.comentario || '',
+      actitudAdversidad: r.actitudAdversidad || '',
+    };
+  }
+
+  cancelarEdicionRendimiento() {
+    this.rendEditandoId = null;
+    this.rendEditForm = null;
+  }
+
+  guardarEdicionRendimiento() {
+    if (!this.rendEditandoId || !this.rendEditForm) return;
+    this.guardandoRendEdit = true;
+    this.http.put(`${this.apiUrl}/admin/rendimiento/${this.rendEditandoId}`, this.rendEditForm, this.authHeaders()).subscribe({
+      next: (actualizado: any) => {
+        const idx = this.rendimientoJugador.findIndex(r => r._id === this.rendEditandoId);
+        if (idx >= 0) this.rendimientoJugador[idx] = actualizado;
+        this.guardandoRendEdit = false;
+        this.cancelarEdicionRendimiento();
+        this.buildRendChart();
+        this.toast('success', 'Guardado', 'Rendimiento actualizado.');
+      },
+      error: () => {
+        this.guardandoRendEdit = false;
+        this.toast('error', 'Error', 'No se pudo actualizar el rendimiento.');
+      }
+    });
   }
 
   get rendimientoJugadorFiltrado(): any[] {
@@ -1212,8 +1260,10 @@ export class AdminComponent implements OnInit {
 
   /* Lista unificada de divisiones disponibles (de la colección Divisiones + de profesores) */
   get divisionesDisponibles(): string[] {
-    const fromDivisiones = this.divisiones.map((d: any) => (d.nombre || '').trim()).filter(Boolean);
-    const fromProfesores = this.profesores.flatMap((p: any) => (p.divisiones || []).map((s: string) => s.trim())).filter(Boolean);
+    // Normaliza "Sub10" → "Sub-10", "Sub12" → "Sub-12", etc.
+    const norm = (s: string) => s.trim().replace(/^Sub(\d+)$/i, 'Sub-$1').replace(/^sub-/i, 'Sub-');
+    const fromDivisiones = this.divisiones.map((d: any) => norm(d.nombre || '')).filter(Boolean);
+    const fromProfesores = this.profesores.flatMap((p: any) => (p.divisiones || []).map((s: string) => norm(s))).filter(Boolean);
     const todas = [...new Set([...fromDivisiones, ...fromProfesores])].sort();
     return todas;
   }
