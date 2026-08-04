@@ -132,13 +132,15 @@
           </div>
 
           <div class="campo">
-            <label>Equipo preferido</label>
-            <input pInputText formControlName="equipoPreferido" />
+            <label>Equipo preferido <span class="req">*</span> <small>(si no tiene, escribe "ninguno")</small></label>
+            <input pInputText formControlName="equipoPreferido"
+              [ngClass]="{'input-error': campoInvalido('equipoPreferido')}" />
           </div>
 
           <div class="campo">
-            <label>Jugador referente</label>
-            <input pInputText formControlName="jugadorReferente" />
+            <label>Jugador referente <span class="req">*</span> <small>(si no tiene, escribe "ninguno")</small></label>
+            <input pInputText formControlName="jugadorReferente"
+              [ngClass]="{'input-error': campoInvalido('jugadorReferente')}" />
           </div>
 
           <div class="campo">
